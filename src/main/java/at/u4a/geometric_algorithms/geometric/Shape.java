@@ -1,8 +1,19 @@
 package at.u4a.geometric_algorithms.geometric;
 
-public interface Shape {
+public abstract class Shape implements GeometricInterface {
 
-    boolean contains(double x, double y);
+    final public Point origin;
 
-    void translate(double x, double y);
+    public Shape(Point origin) {
+        this.origin = origin;
+    }
+
+    public Shape() {
+        origin = new Point(0, 0);
+    }
+
+    public void translate(Point newOrigin) {
+        origin.set(newOrigin);
+    }
+
 }
