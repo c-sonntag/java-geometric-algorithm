@@ -3,18 +3,23 @@ package at.u4a.geometric_algorithms.gui.element;
 import java.util.ArrayList;
 import java.util.List;
 
+import at.u4a.geometric_algorithms.graphic_adaptor.InterfaceShapePainter;
+import at.u4a.geometric_algorithms.gui.layer.AbstractLayer;
+import at.u4a.geometric_algorithms.gui.layer.LayerMannager;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 
 public class Drawer extends Canvas {
 
-    private final List<Shape> shapes; // * seul le pointer est fianl, la liste
-                                      // peut encore changer !*/
+    private final LayerMannager layers; 
+
     private final DrawerContext context;
 
-    public Drawer(double width, double height) {
-        super(width, height);
-        shapes = new ArrayList<Shape>();
+    //public Drawer(double width, double height) {
+    public Drawer() {
+        //super(width, height);
+        super();
+        layers = new LayerMannager();
         context = new DrawerContext(this);
         //
         setFocusTraversable(true);
@@ -33,15 +38,15 @@ public class Drawer extends Canvas {
         
     }
 
-    public void add(Shape shape) {
+    /*public void add(Shape shape) {
         shapes.add(shape);
-    }
+    }*/
 
     public void repaint() {
         GraphicsContext gc = getGraphicsContext2D();
         gc.clearRect(0, 0, getWidth(), getHeight());
-        for (Shape shape : shapes)
-            shape.paint(gc);
+        for (AbstractLayer layer : layers)
+            layer.getShapePainter().paint(gc);
         this.context.paint(gc);
     }
 

@@ -1,6 +1,6 @@
 package at.u4a.geometric_algorithms.geometric;
 
-public class Point implements GeometricInterface {
+public class Point implements InterfaceGeometric {
 
     public double x, y;
 

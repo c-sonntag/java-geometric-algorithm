@@ -1,6 +1,6 @@
 package at.u4a.geometric_algorithms.geometric;
 
-public interface GeometricInterface {
+public interface InterfaceGeometric {
     
     boolean contains(Point p);
     

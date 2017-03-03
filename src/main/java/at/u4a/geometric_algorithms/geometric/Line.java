@@ -1,6 +1,6 @@
 package at.u4a.geometric_algorithms.geometric;
 
-public class Line implements GeometricInterface {
+public class Line implements InterfaceGeometric {
 
     private final static double EPSILON = 0.1;
 

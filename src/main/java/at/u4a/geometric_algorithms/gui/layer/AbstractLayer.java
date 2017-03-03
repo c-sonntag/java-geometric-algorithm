@@ -1,7 +1,9 @@
-package at.u4a.geometric_algorithms.gui.object;
+package at.u4a.geometric_algorithms.gui.layer;
 
 import java.awt.Color;
 import java.util.Vector;
+
+import at.u4a.geometric_algorithms.graphic_adaptor.InterfaceShapePainter;
 
 public abstract class AbstractLayer {
 
@@ -21,12 +23,18 @@ public abstract class AbstractLayer {
     protected Vector<ColorSet> colors;
     
     /* ABSTRACT PUBLIC FUNCTION */
+    
+    abstract public InterfaceShapePainter getShapePainter();
+    
+    abstract public LayerCategory getCategory();
 
     abstract public String getLayerType();
 
-    abstract public String getLayerIconName();
+    abstract public String getLayerTypeIconName();
     
     abstract public Boolean isContener();
+    
+    abstract public Boolean isDeletable();
     
     abstract public Vector<AbstractLayer> getSubLayer();
 

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-public class CloudOfSegments extends Shape {
+public class CloudOfSegments extends AbstractShape {
 
     final public ArrayList<Segment> cloud = new ArrayList<Segment>();
 

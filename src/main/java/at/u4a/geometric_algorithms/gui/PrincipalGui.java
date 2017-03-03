@@ -6,14 +6,20 @@ import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JMenu;
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JToolBar;
 import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.ComponentOrientation;
 import java.awt.Dimension;
 
 import javax.swing.JButton;
 import javax.swing.SwingConstants;
 
+import at.u4a.geometric_algorithms.gui.element.Drawer;
+import at.u4a.geometric_algorithms.gui.element.LabelCategory;
+import at.u4a.geometric_algorithms.gui.element.LayerTree;
 import at.u4a.geometric_algorithms.gui.element.StatusBar;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
@@ -27,6 +33,12 @@ import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTextField;
+import javax.swing.JPopupMenu;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 /**
  * Gui principale de l'application Geométrie Algorithmique
@@ -40,8 +52,10 @@ import javax.swing.JSplitPane;
 
 public class PrincipalGui {
 
-    private final JFrame frame;
-    private final JFXPanel fxCanvas;
+    // Initialize Final Variable
+    private final JFrame frame = new JFrame();;
+    private final JFXPanel fxCanvas = new JFXPanel();;
+    private final LayerTree treeLayer = new LayerTree();;
 
     /**
      * Launch the application.
@@ -64,15 +78,11 @@ public class PrincipalGui {
      */
     public PrincipalGui() {
 
-        // Initialize Final
-        frame = new JFrame();
-        fxCanvas = new JFXPanel();
-
         // First initialization
         initializeCanvas();
+        initializeFrame();
 
         // Second
-        initializeFrame();
         initializeMenuBar();
         initializeToolBarTop();
         initializeToolBarLeft();
@@ -87,7 +97,6 @@ public class PrincipalGui {
     private void initializeFrame() {
         frame.setBounds(100, 100, 600, 600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
     }
 
     /**
@@ -256,15 +265,12 @@ public class PrincipalGui {
         frame.getContentPane().add(splitPane, BorderLayout.CENTER);
 
         splitPane.setOneTouchExpandable(true);
-
         splitPane.setResizeWeight(1.0);
+        splitPane.getLeftComponent().setMinimumSize(new Dimension(300, 0));
+        // splitPane.getLeftComponent().setMaximumSize(new Dimension(300,0));
+        splitPane.getRightComponent().setMinimumSize(new Dimension(200, 0));
+        splitPane.getRightComponent().setPreferredSize(new Dimension(200, 0));
 
-        splitPane.getLeftComponent().setMinimumSize(new Dimension(300,0));
-        //splitPane.getLeftComponent().setMaximumSize(new Dimension(300,0));
-
-        splitPane.getRightComponent().setMinimumSize(new Dimension(200,0));
-        splitPane.getRightComponent().setPreferredSize(new Dimension(200,0));
-        
     }
 
     /**
@@ -275,9 +281,38 @@ public class PrincipalGui {
         JPanel panelLayer = new JPanel();
         panelLayer.setLayout(new BorderLayout(0, 0));
 
+        /* TOOLBAR */
+
         JToolBar toolBarLayer = new JToolBar();
+        toolBarLayer.setRollover(true);
         toolBarLayer.setFloatable(false);
         panelLayer.add(toolBarLayer, BorderLayout.SOUTH);
+
+        /* TOOLBAR - MENUBAR */
+
+        JPanel panelMenuBar = new JPanel();
+        panelMenuBar.setLayout(new BoxLayout(panelMenuBar, BoxLayout.X_AXIS));
+        toolBarLayer.add(panelMenuBar);
+
+        JMenuBar menuBar = new JMenuBar();
+        menuBar.setAlignmentY(Component.CENTER_ALIGNMENT);
+        menuBar.setBorderPainted(false);
+        panelMenuBar.add(menuBar);
+
+        // menuBar.setOpaque(false);
+        // mnNewMenu.setVerticalAlignment(SwingConstants.BOTTOM);
+
+        JMenu mnNewMenu = new JMenu("F");
+
+        mnNewMenu.setFont(LabelCategory.font);
+        menuBar.add(mnNewMenu);
+
+        JMenuItem mntmNewMenuItem = new JMenuItem("Triangul");
+        mnNewMenu.add(mntmNewMenuItem);
+
+        setMenuToBottomLeftAlignement(mnNewMenu);
+
+        /* TOOLBAR - BUTTON */
 
         JButton btnLayerDelete = new JButton("");
         btnLayerDelete.setEnabled(false);
@@ -285,13 +320,20 @@ public class PrincipalGui {
         btnLayerDelete.setIcon(new ImageIcon("icons/action/cancel.png"));
         toolBarLayer.add(btnLayerDelete);
 
-        JScrollPane scrollPane = new JScrollPane();
-        panelLayer.add(scrollPane, BorderLayout.CENTER);
+        /* TREE */
 
-        JTree tree = new JTree();
-        scrollPane.setViewportView(tree);
+        JScrollPane scrollPaneTreeLayer = new JScrollPane();
+        panelLayer.add(scrollPaneTreeLayer, BorderLayout.CENTER);
+        scrollPaneTreeLayer.setViewportView(treeLayer);
 
         return panelLayer;
+    }
+
+    /**
+     * This function need to have a content in Menu for change alignement
+     */
+    private void setMenuToBottomLeftAlignement(JMenu m) {
+        m.setMenuLocation((int) -(m.getPopupMenu().getPreferredSize().getWidth() - m.getPreferredSize().getWidth()), (int) -m.getPopupMenu().getPreferredSize().getHeight());
     }
 
     /**
@@ -312,20 +354,21 @@ public class PrincipalGui {
     private void initializeFX(JFXPanel fxPanel) {
         Scene scene = createScene();
         fxPanel.setScene(scene);
-
     }
 
     private static Scene createScene() {
         Group root = new Group();
         Scene scene = new Scene(root, Color.ALICEBLUE);
+        
         Text text = new Text();
-
         text.setX(40);
         text.setY(100);
         text.setFont(new Font(25));
         text.setText("Welcome JavaFX!");
-
+        
         root.getChildren().add(text);
+        
+        Drawer canvas = new Drawer();
 
         return (scene);
     }

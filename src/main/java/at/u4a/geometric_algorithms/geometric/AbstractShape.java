@@ -1,14 +1,14 @@
 package at.u4a.geometric_algorithms.geometric;
 
-public abstract class Shape implements GeometricInterface {
+public abstract class AbstractShape implements InterfaceGeometric {
 
     final public Point origin;
 
-    public Shape(Point origin) {
+    public AbstractShape(Point origin) {
         this.origin = origin;
     }
 
-    public Shape() {
+    public AbstractShape() {
         origin = new Point(0, 0);
     }
 
