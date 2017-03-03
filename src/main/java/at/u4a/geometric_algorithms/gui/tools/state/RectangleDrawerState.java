@@ -2,11 +2,11 @@ package at.u4a.geometric_algorithms.gui.tools.state;
 
 
 import at.u4a.geometric_algorithms.gui.element.DrawerContext;
-import at.u4a.geometric_algorithms.gui.element.DrawerState;
+import at.u4a.geometric_algorithms.gui.tools.ToolState;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-public class RectangleDrawerState implements DrawerState {
+public class RectangleDrawerState implements ToolState {
 
     private double x, y;
 

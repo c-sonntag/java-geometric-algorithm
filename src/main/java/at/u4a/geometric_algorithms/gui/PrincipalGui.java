@@ -18,9 +18,13 @@ import javax.swing.JButton;
 import javax.swing.SwingConstants;
 
 import at.u4a.geometric_algorithms.gui.element.Drawer;
+import at.u4a.geometric_algorithms.gui.element.DrawerContext;
 import at.u4a.geometric_algorithms.gui.element.LabelCategory;
 import at.u4a.geometric_algorithms.gui.element.LayerTree;
 import at.u4a.geometric_algorithms.gui.element.StatusBar;
+import at.u4a.geometric_algorithms.gui.tools.Tool;
+import at.u4a.geometric_algorithms.gui.tools.ToolCategory;
+import at.u4a.geometric_algorithms.gui.tools.state.NullToolState;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Group;
@@ -56,6 +60,8 @@ public class PrincipalGui {
     private final JFrame frame = new JFrame();;
     private final JFXPanel fxCanvas = new JFXPanel();;
     private final LayerTree treeLayer = new LayerTree();;
+    private final Drawer drawer = new Drawer();
+    private final DrawerContext context = new DrawerContext(drawer);
 
     /**
      * Launch the application.
@@ -86,6 +92,7 @@ public class PrincipalGui {
         initializeMenuBar();
         initializeToolBarTop();
         initializeToolBarLeft();
+        initializeStatusBar();
 
         // Third
         initializeContent();
@@ -97,6 +104,16 @@ public class PrincipalGui {
     private void initializeFrame() {
         frame.setBounds(100, 100, 600, 600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
+        
+    }
+    
+    /**
+     * Initialize Status bar
+     */
+    private void initializeStatusBar() {
+        StatusBar statusBar = new StatusBar();
+        frame.getContentPane().add(statusBar, BorderLayout.SOUTH);
     }
 
     /**
@@ -144,9 +161,44 @@ public class PrincipalGui {
         toolBarLeft.setFloatable(false);
         frame.getContentPane().add(toolBarLeft, BorderLayout.WEST);
 
+        /* TOOL BUTTON GENERATION */
+
+        ToolCategory lastCategory = null;
+
+        for (Tool tool : Tool.values()) {
+            if (lastCategory != null)
+                if (! lastCategory.equals(tool.category))
+                    toolBarLeft.addSeparator();
+            //
+
+            JButton btnTool = new JButton();
+            btnTool.setToolTipText(tool.tip);
+            btnTool.setIcon(new ImageIcon(Tool.iconRessource + tool.icon));
+            
+            if(tool.supplier == null)
+                btnTool.setEnabled(false);
+                
+            toolBarLeft.add(btnTool);
+            
+            context.addTool(tool, btnTool);
+          
+            //
+            lastCategory = tool.category;
+        }
+
+
+    }
+    
+    private void uselessInitializeToolBarLeft() {
+        
+        JToolBar toolBarLeft = new JToolBar();
+        toolBarLeft.setOrientation(SwingConstants.VERTICAL);
+        toolBarLeft.setFloatable(false);
+        frame.getContentPane().add(toolBarLeft, BorderLayout.WEST);
+        
         JButton btnSelected = new JButton();
         btnSelected.setToolTipText("Outil Selection");
-        btnSelected.setIcon(new ImageIcon("icons/tools/cursor.png"));
+        btnSelected.setIcon(new ImageIcon("icons/tools/cursor_selection.png"));
         toolBarLeft.add(btnSelected);
 
         JButton btnDirectSelection = new JButton();
@@ -158,7 +210,7 @@ public class PrincipalGui {
 
         JButton btnToolsPointsCloud = new JButton();
         btnToolsPointsCloud.setToolTipText("Outil Nuage de Points");
-        btnToolsPointsCloud.setIcon(new ImageIcon("icons/tools/point.png"));
+        btnToolsPointsCloud.setIcon(new ImageIcon("icons/tools/cloud_of_point.png"));
         toolBarLeft.add(btnToolsPointsCloud);
 
         JButton btnToolsSegmentsCloud = new JButton();
@@ -217,9 +269,6 @@ public class PrincipalGui {
         btnToolsCurve.setIcon(new ImageIcon("icons/tools/vector.png"));
         btnToolsCurve.setEnabled(false);
         toolBarLeft.add(btnToolsCurve);
-
-        StatusBar statusBar = new StatusBar();
-        frame.getContentPane().add(statusBar, BorderLayout.SOUTH);
 
     }
 
@@ -359,15 +408,15 @@ public class PrincipalGui {
     private static Scene createScene() {
         Group root = new Group();
         Scene scene = new Scene(root, Color.ALICEBLUE);
-        
+
         Text text = new Text();
         text.setX(40);
         text.setY(100);
         text.setFont(new Font(25));
         text.setText("Welcome JavaFX!");
-        
+
         root.getChildren().add(text);
-        
+
         Drawer canvas = new Drawer();
 
         return (scene);

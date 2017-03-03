@@ -1,10 +1,10 @@
 package at.u4a.geometric_algorithms.gui.tools.state;
 
 import at.u4a.geometric_algorithms.gui.element.DrawerContext;
-import at.u4a.geometric_algorithms.gui.element.DrawerState;
+import at.u4a.geometric_algorithms.gui.tools.ToolState;
 import javafx.scene.canvas.GraphicsContext;
 
-public class NullDrawerState implements DrawerState {
+public class NullToolState implements ToolState {
 
     @Override
     public void mousePressed(DrawerContext context, double x, double y) {

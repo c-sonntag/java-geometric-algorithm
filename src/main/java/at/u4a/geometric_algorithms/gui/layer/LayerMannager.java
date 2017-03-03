@@ -3,7 +3,7 @@ package at.u4a.geometric_algorithms.gui.layer;
 import java.util.Iterator;
 import java.util.function.Supplier;
 
-import at.u4a.geometric_algorithms.gui.tools.DrawerState;
+import at.u4a.geometric_algorithms.gui.tools.ToolState;
 import at.u4a.geometric_algorithms.gui.tools.Tool;
 import javafx.scene.input.KeyCode;
 
