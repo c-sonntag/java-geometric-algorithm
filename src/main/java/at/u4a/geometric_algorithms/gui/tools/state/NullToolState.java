@@ -4,30 +4,26 @@ import at.u4a.geometric_algorithms.gui.element.DrawerContext;
 import at.u4a.geometric_algorithms.gui.tools.ToolState;
 import javafx.scene.canvas.GraphicsContext;
 
-public class NullToolState implements ToolState {
+public class NullToolState extends ToolState {
 
     @Override
     public void mousePressed(DrawerContext context, double x, double y) {
         // TODO Auto-generated method stub
-        
     }
 
     @Override
     public void mouseReleased(DrawerContext context, double x, double y) {
         // TODO Auto-generated method stub
-        
     }
 
     @Override
     public void mouseMoved(DrawerContext context, double x, double y) {
         // TODO Auto-generated method stub
-        
     }
 
     @Override
     public void paint(GraphicsContext context) {
         // TODO Auto-generated method stub
-        
     }
     
 

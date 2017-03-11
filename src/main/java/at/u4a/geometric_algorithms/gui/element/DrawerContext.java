@@ -1,51 +1,85 @@
 package at.u4a.geometric_algorithms.gui.element;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.swing.JButton;
-
 import at.u4a.geometric_algorithms.gui.tools.Tool;
 import at.u4a.geometric_algorithms.gui.tools.ToolState;
-import at.u4a.geometric_algorithms.gui.tools.state.CircleDrawerState;
-import at.u4a.geometric_algorithms.gui.tools.state.NullToolState;
-import at.u4a.geometric_algorithms.gui.tools.state.RectangleDrawerState;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 
 public class DrawerContext {
 
-    private class ToolControl {
-        public final JButton btn;
+    private Map<Tool, ToolButton> toolsItems = new HashMap<Tool, ToolButton>();
 
-        ToolControl(JButton btn) {
-            this.btn = btn;
-        }
-    }
-
-    private Map<Tool, ToolControl> toolControl = new HashMap<Tool, ToolControl>();
-
+    private Tool currentTool;
     private ToolState currentState;
-    
+
     private Drawer drawer;
 
     public DrawerContext(Drawer drawer) {
         this.drawer = drawer;
-        setState(new NullToolState());
+        setTool(Tool.Selection);
     }
 
-    public void setState(ToolState dc) {
-        for(Entry<Tool, ToolControl> toolControlEntry : toolControl.entrySet()) {
-            
+    /**
+     * @todo gerer l'outil pour terminer son travail (valid, cancel)
+     * @param tool
+     */
+    public void setTool(Tool tool) {
+
+        for (Entry<Tool, ToolButton> toolControlEntry : toolsItems.entrySet()) {
+            toolControlEntry.getValue().setActive(tool.equals(toolControlEntry.getKey()));
         }
-        this.currentState = dc;
+        
+        if (tool == currentTool)
+            return;
+
+        //
+        /*
+         * for (Entry<Tool, ToolControl> toolControlEntry :
+         * toolsControl.entrySet()) {
+         * toolControlEntry.getValue().setActive(tool.equals(toolControlEntry.
+         * getKey()));
+         * 
+         * if (tool.equals(toolControlEntry.getKey())) {
+         * toolControlEntry.getValue().data.btn.setSelected(true); } else {
+         * toolControlEntry.getValue().data.btn.setSelected(false); } }
+         */
+
+        this.currentTool = tool;
+        // this.currentState = dc;
+
+        //
+        drawer.repaint();
+    }
+    
+    public void refresh() {
+        setTool(currentTool);
     }
 
     public void paint(GraphicsContext context) {
         currentState.paint(context);
     }
+
+    /* */
+
+    public void mouseEntered(MouseEvent event) {
+        currentState.mouseEntered(drawer);
+    }
+
+    public void mouseExited(MouseEvent event) {
+        currentState.mouseExited(drawer);
+    }
+
+    /* */
 
     public void mousePressed(MouseEvent event) {
         currentState.mousePressed(this, event.getX(), event.getY());
@@ -59,30 +93,41 @@ public class DrawerContext {
         currentState.mouseMoved(this, event.getX(), event.getY());
     }
 
+    /* */
+
     public void keyPressed(KeyEvent event) {
-        ToolState choose = Tool.get(event.getCode());
-        if (choose != null)
-            setState(choose);
-        /*
-         * switch (event.getCode()) { case R: setState(new
-         * RectangleDrawerState0()); break;
-         * 
-         * case C: setState(new CircleDrawerState0()); break;
-         * 
-         * case ESCAPE: setState(new NullDrawerState()); break;
-         * 
-         * }
-         */
-        drawer.repaint();
+        EnumSet<KeyCode> eventKeys = EnumSet.of(event.getCode());
+
+        //
+        if (event.isAltDown())
+            eventKeys.add(KeyCode.ALT);
+        if (event.isControlDown())
+            eventKeys.add(KeyCode.CONTROL);
+        if (event.isShiftDown())
+            eventKeys.add(KeyCode.SHIFT);
+
+        //
+        Tool toolChoose = Tool.getByKeyCode(eventKeys);
+        if (toolChoose != null)
+            setTool(toolChoose);
     }
 
     public Drawer drawer() {
         return drawer;
     }
 
-    public void addToolControl(Tool tool, JButton btnTool) {
-        toolControl.put(tool, new ToolControl(btnTool));
-
+    public void addToolButton(ToolButton btnTool) {
+        
+        toolsItems.put(btnTool.getTool(), btnTool);
+        
+        btnTool.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                setTool(btnTool.getTool());
+            }
+        });
+        
+        // TODO Auto-generated method stub
+        
     }
 
 }

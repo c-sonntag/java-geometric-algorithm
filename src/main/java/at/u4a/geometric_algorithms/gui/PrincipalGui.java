@@ -11,7 +11,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JToolBar;
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.ComponentOrientation;
 import java.awt.Dimension;
 
 import javax.swing.JButton;
@@ -22,9 +21,9 @@ import at.u4a.geometric_algorithms.gui.element.DrawerContext;
 import at.u4a.geometric_algorithms.gui.element.LabelCategory;
 import at.u4a.geometric_algorithms.gui.element.LayerTree;
 import at.u4a.geometric_algorithms.gui.element.StatusBar;
+import at.u4a.geometric_algorithms.gui.element.ToolButton;
 import at.u4a.geometric_algorithms.gui.tools.Tool;
 import at.u4a.geometric_algorithms.gui.tools.ToolCategory;
-import at.u4a.geometric_algorithms.gui.tools.state.NullToolState;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Group;
@@ -34,13 +33,8 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
 import javax.swing.JPanel;
-import javax.swing.JTree;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.JTextField;
-import javax.swing.JPopupMenu;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
@@ -61,7 +55,7 @@ public class PrincipalGui {
     private final JFXPanel fxCanvas = new JFXPanel();;
     private final LayerTree treeLayer = new LayerTree();;
     private final Drawer drawer = new Drawer();
-    private final DrawerContext context = new DrawerContext(drawer);
+    //private final DrawerContext context = new DrawerContext(drawer);
 
     /**
      * Launch the application.
@@ -104,10 +98,9 @@ public class PrincipalGui {
     private void initializeFrame() {
         frame.setBounds(100, 100, 600, 600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        
-        
+
     }
-    
+
     /**
      * Initialize Status bar
      */
@@ -165,37 +158,36 @@ public class PrincipalGui {
 
         ToolCategory lastCategory = null;
 
+        // EnumSet<Tool> toolValues = new EnumSet.allOf(Tool.class);
+
         for (Tool tool : Tool.values()) {
+
+            if (tool.category.equals(ToolCategory.Invisible))
+                continue;
+
+            //
             if (lastCategory != null)
-                if (! lastCategory.equals(tool.category))
+                if (!lastCategory.equals(tool.category))
                     toolBarLeft.addSeparator();
             //
 
-            JButton btnTool = new JButton();
-            btnTool.setToolTipText(tool.tip);
-            btnTool.setIcon(new ImageIcon(Tool.iconRessource + tool.icon));
-            
-            if(tool.supplier == null)
-                btnTool.setEnabled(false);
-                
+            ToolButton btnTool = new ToolButton(tool);
             toolBarLeft.add(btnTool);
-            
-            context.addTool(tool, btnTool);
-          
+            drawer.addToolButton(btnTool);
+
             //
             lastCategory = tool.category;
         }
 
-
     }
-    
+
     private void uselessInitializeToolBarLeft() {
-        
+
         JToolBar toolBarLeft = new JToolBar();
         toolBarLeft.setOrientation(SwingConstants.VERTICAL);
         toolBarLeft.setFloatable(false);
         frame.getContentPane().add(toolBarLeft, BorderLayout.WEST);
-        
+
         JButton btnSelected = new JButton();
         btnSelected.setToolTipText("Outil Selection");
         btnSelected.setIcon(new ImageIcon("icons/tools/cursor_selection.png"));
