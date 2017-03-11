@@ -3,7 +3,7 @@ package at.u4a.geometric_algorithms.graphic_visitor;
 import at.u4a.geometric_algorithms.geometric.*;
 
 
-public interface InterfaceShapePainterVisitor extends InterfaceGraphicVisitor {
+public interface InterfaceShapePainterVisitor {
     
     public void visit(Polygon poly);
     
