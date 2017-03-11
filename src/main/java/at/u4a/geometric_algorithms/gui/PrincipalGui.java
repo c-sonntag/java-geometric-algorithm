@@ -52,20 +52,33 @@ import java.awt.event.ActionEvent;
 public class PrincipalGui extends JFrame {
 
     private static final long serialVersionUID = 7047807079976701109L;
-    
+
     // Initialize Final Variable
     private final LayerTree treeLayer = new LayerTree();;
-    private final DrawerScene ds = new DrawerScene();
+    private final DrawerScene ds;
 
     /**
      * Launch the application.
      */
     public static void main(String[] args) {
-        EventQueue.invokeLater(new Runnable() {
+
+        DrawerScene ds = null;
+
+        Platform.runLater(new Runnable() {
             public void run() {
+                ds = new DrawerScene();
+
+            }
+        });
+
+        EventQueue.invokeLater(new Runnable() {
+
+            public void run() {
+
                 try {
-                    PrincipalGui window = new PrincipalGui();
+                    PrincipalGui window = new PrincipalGui(ds);
                     window.setVisible(true);
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -76,10 +89,11 @@ public class PrincipalGui extends JFrame {
     /**
      * Create the application.
      */
-    public PrincipalGui() {
+    public PrincipalGui(DrawerScene ds) {
 
         // First initialization
         super();
+        this.ds = ds;
         initializeFrame();
 
         // Second
@@ -93,7 +107,7 @@ public class PrincipalGui extends JFrame {
 
         // Last
         revalidate();
-        repaint();  
+        repaint();
     }
 
     /**
@@ -305,6 +319,5 @@ public class PrincipalGui extends JFrame {
     private void setMenuToBottomLeftAlignement(JMenu m) {
         m.setMenuLocation((int) -(m.getPopupMenu().getPreferredSize().getWidth() - m.getPreferredSize().getWidth()), (int) -m.getPopupMenu().getPreferredSize().getHeight());
     }
-
 
 }

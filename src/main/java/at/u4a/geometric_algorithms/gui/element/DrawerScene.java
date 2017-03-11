@@ -12,6 +12,7 @@ import javax.swing.JComponent;
 import at.u4a.geometric_algorithms.gui.layer.LayerMannager;
 import at.u4a.geometric_algorithms.gui.tools.Tool;
 import at.u4a.geometric_algorithms.gui.tools.ToolState;
+import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -40,7 +41,7 @@ public class DrawerScene {
     private Tool currentTool;
     private ToolState currentState;
 
-    public DrawerScene() {
+    public DrawerScene() {      
         scene = new Scene(root, Color.WHITE);
         //
         fxPanel.setScene(scene);
