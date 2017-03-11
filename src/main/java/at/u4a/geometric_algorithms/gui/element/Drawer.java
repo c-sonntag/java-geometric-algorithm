@@ -5,7 +5,7 @@ import javax.swing.JOptionPane;
 import at.u4a.geometric_algorithms.geometric.AbstractShape;
 import at.u4a.geometric_algorithms.geometric.Point;
 import at.u4a.geometric_algorithms.geometric.Rectangle;
-import at.u4a.geometric_algorithms.graphic_visitor.ShapePainter;
+import at.u4a.geometric_algorithms.graphic_visitor.GraphicPainter;
 import at.u4a.geometric_algorithms.gui.layer.AbstractLayer;
 import at.u4a.geometric_algorithms.gui.layer.Geometric;
 import javafx.scene.canvas.Canvas;
@@ -24,7 +24,7 @@ public class Drawer extends Canvas {
     private final DrawerScene ds;
     private final DrawerContext context;
 
-    private final ShapePainter sp = new ShapePainter();
+    private final GraphicPainter gp = new GraphicPainter();
 
     // public Drawer(double width, double height) {
     public Drawer(DrawerScene ds) {
@@ -87,11 +87,11 @@ public class Drawer extends Canvas {
         gc.clearRect(0, 0, width, height);
 
         /** @TODO dessiner avec l'adaptor */
-        sp.setGraphicsContext(gc);
+        gp.setGraphicsContext(gc);
 
         //
         for (AbstractLayer layer : ds.getLayerMannager()) {
-            layer.accept(sp);
+            layer.accept(gp);
 
             /*
              * layer. AbstractShape shape = layer.getShape();
@@ -100,7 +100,7 @@ public class Drawer extends Canvas {
              */
         }
 
-        this.context.paint(gc);
+        this.context.paint(gp);
     }
 
     public AbstractLayer shapeContainning(double x, double y) {

@@ -9,7 +9,7 @@ import at.u4a.geometric_algorithms.geometric.Segment;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-public class GeometricPainter implements InterfaceGraphicVisitor {
+public class GraphicPainter implements InterfaceGraphicVisitor {
 
     /** La couleur d'un point a l'ecran. */
     private final static Color pointColor = Color.GRAY;
@@ -51,6 +51,11 @@ public class GeometricPainter implements InterfaceGraphicVisitor {
         this.gc = gc;
     }
     
+    @Override
+    public GraphicsContext getGraphicsContext() {
+        return  this.gc;
+    }
+    
 
     /* GEOMETRIC */
 
@@ -90,6 +95,8 @@ public class GeometricPainter implements InterfaceGraphicVisitor {
         //
         gc.strokeRect(poly.origin.x, poly.origin.y, poly.size.x, poly.size.y);
     }
+
+
 
 
 }

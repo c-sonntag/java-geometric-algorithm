@@ -30,7 +30,7 @@ public enum Tool {
     LotOfSegment("Outil Ensemble de Segments", KeyCode.S, ToolCategory.ShapeSetter, "lot_of_segment.png"), //
     TraceOfPoint("Outil Tracé de Point", KeyCode.T, ToolCategory.ShapeSetter, "trace_of_point.png"), //
 
-    ShapeRectangle("Outil Rectangle", EnumSet.of(KeyCode.SHIFT, KeyCode.R), ToolCategory.Shape, "shape_square.png"), //
+    ShapeRectangle("Outil Rectangle", EnumSet.of(KeyCode.SHIFT, KeyCode.R), ToolCategory.Shape, "shape_square.png", RectangleDrawerState::new), //
     ShapeElipse("Outil Elipse", EnumSet.of(KeyCode.SHIFT, KeyCode.E), ToolCategory.Shape, "shape_circle.png"), //
 
     ShapeConvexePoligon("Outil Polygone Convexe", EnumSet.of(KeyCode.SHIFT, KeyCode.C), ToolCategory.Shape, "shape_convexe_poligon.png"), //

@@ -11,4 +11,6 @@ public interface InterfaceGraphicVisitor extends InterfaceShapePainterVisitor, I
     public void setColor(Color color) ;
     public void setGraphicsContext(GraphicsContext gc);
     
+    public GraphicsContext getGraphicsContext();
+    
 }

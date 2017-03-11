@@ -1,6 +1,7 @@
 package at.u4a.geometric_algorithms.gui.tools.state;
 
 
+import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGraphicVisitor;
 import at.u4a.geometric_algorithms.gui.element.DrawerContext;
 import at.u4a.geometric_algorithms.gui.tools.ToolState;
 import javafx.scene.canvas.GraphicsContext;
@@ -36,6 +37,7 @@ public class CircleDrawerState implements ToolState {
     }
 
     @Override
+    // public void paint(InterfaceGraphicVisitor painter) {
     public void paint(GraphicsContext context) {
         context.setStroke(Color.BLACK);
         context.strokeLine(x - 5, y, x + 5, y);

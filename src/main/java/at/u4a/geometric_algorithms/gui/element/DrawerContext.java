@@ -2,6 +2,7 @@ package at.u4a.geometric_algorithms.gui.element;
 
 import java.util.EnumSet;
 
+import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGraphicVisitor;
 import at.u4a.geometric_algorithms.gui.tools.Tool;
 import at.u4a.geometric_algorithms.gui.tools.ToolState;
 import javafx.scene.canvas.GraphicsContext;
@@ -38,8 +39,8 @@ public class DrawerContext {
 
     /* */
 
-    public void paint(GraphicsContext context) {
-        ds.getCurrentState().paint(context);;
+    public void paint(InterfaceGraphicVisitor visitor) {
+        ds.getCurrentState().paint(visitor);
     }
     
     public void repaint() {
@@ -59,7 +60,7 @@ public class DrawerContext {
     /* */
 
     public void mousePressed(MouseEvent event) {
-        ds.getCurrentState().mousePressed(this, event.getX(), event.getY());
+        ds.getCurrentState().mousePressed(this, event);
     }
 
     public void mouseReleased(MouseEvent event) {
