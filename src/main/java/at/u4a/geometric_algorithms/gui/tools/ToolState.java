@@ -1,5 +1,6 @@
 package at.u4a.geometric_algorithms.gui.tools;
 
+import at.u4a.geometric_algorithms.graphic_visitor.InterfaceShapePainterVisitor;
 import at.u4a.geometric_algorithms.gui.element.Drawer;
 import at.u4a.geometric_algorithms.gui.element.DrawerContext;
 import javafx.scene.Cursor;

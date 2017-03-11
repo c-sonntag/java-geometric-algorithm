@@ -3,7 +3,7 @@ package at.u4a.geometric_algorithms.graphic_visitor;
 import at.u4a.geometric_algorithms.geometric.*;
 
 
-public interface InterfaceGeometricPainterVisitor {
+public interface InterfaceGeometricPainterVisitor extends InterfaceGraphicVisitor {
 
     public void visit(Point p);
 
