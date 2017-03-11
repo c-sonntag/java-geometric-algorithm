@@ -27,4 +27,6 @@ public class Point implements InterfaceGeometric {
         double xDistance = p.x - x, yDistance = p.y - y;
         return Math.sqrt(xDistance * xDistance + yDistance * yDistance);
     }
+    
+    
 }

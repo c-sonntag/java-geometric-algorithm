@@ -55,28 +55,16 @@ public class PrincipalGui extends JFrame {
 
     // Initialize Final Variable
     private final LayerTree treeLayer = new LayerTree();;
-    private final DrawerScene ds;
+    private final DrawerScene ds = new DrawerScene();
 
     /**
      * Launch the application.
      */
     public static void main(String[] args) {
-
-        DrawerScene ds = null;
-
-        Platform.runLater(new Runnable() {
-            public void run() {
-                ds = new DrawerScene();
-
-            }
-        });
-
         EventQueue.invokeLater(new Runnable() {
-
             public void run() {
-
                 try {
-                    PrincipalGui window = new PrincipalGui(ds);
+                    PrincipalGui window = new PrincipalGui();
                     window.setVisible(true);
 
                 } catch (Exception e) {
@@ -89,11 +77,10 @@ public class PrincipalGui extends JFrame {
     /**
      * Create the application.
      */
-    public PrincipalGui(DrawerScene ds) {
+    public PrincipalGui() {
 
         // First initialization
         super();
-        this.ds = ds;
         initializeFrame();
 
         // Second

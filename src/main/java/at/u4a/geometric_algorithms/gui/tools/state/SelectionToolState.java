@@ -8,7 +8,7 @@ import javafx.scene.paint.Color;
 
 public class SelectionToolState extends ToolState {
 
-    //private double x, y;
+    private double x, y;
 
     @Override
     public void mousePressed(DrawerContext context, double x, double y) {
@@ -23,18 +23,19 @@ public class SelectionToolState extends ToolState {
 
     @Override
     public void mouseMoved(DrawerContext context, double x, double y) {
-        /*this.x = x;
+        this.x = x;
         this.y = y;
-        context.drawer().repaint();*/
-        //
-
+        context.repaint();
     }
 
     @Override
     public void paint(GraphicsContext context) {
-        /*context.setStroke(Color.BLACK);
+        context.setStroke(Color.BLACK);
         context.strokeLine(x - 5, y, x + 5, y);
-        context.strokeLine(x, y - 5, x, y + 5);*/
+        context.strokeLine(x, y - 5, x, y + 5);
+        
+        context.strokeRect(x, y, 200, 200);
+        //context.strokeLine(x, y - 5, x, y + 5);
     }
 
 }

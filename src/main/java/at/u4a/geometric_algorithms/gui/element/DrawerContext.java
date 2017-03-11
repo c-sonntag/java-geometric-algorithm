@@ -1,13 +1,7 @@
 package at.u4a.geometric_algorithms.gui.element;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
 
-import javax.swing.JButton;
 import at.u4a.geometric_algorithms.gui.tools.Tool;
 import at.u4a.geometric_algorithms.gui.tools.ToolState;
 import javafx.scene.canvas.GraphicsContext;
@@ -43,9 +37,13 @@ public class DrawerContext {
     }
 
     /* */
-    
+
     public void paint(GraphicsContext context) {
-        ds.getCurrentState().paint(context);
+        ds.getCurrentState().paint(context);;
+    }
+    
+    public void repaint() {
+        drawer.repaint();
     }
 
     /* */

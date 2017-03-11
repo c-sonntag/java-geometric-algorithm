@@ -3,7 +3,7 @@ package at.u4a.geometric_algorithms.gui.layer;
 import java.awt.Color;
 import java.util.Vector;
 
-import at.u4a.geometric_algorithms.graphic_adaptor.InterfaceShapePainter;
+import at.u4a.geometric_algorithms.graphic_visitor.InterfaceShapePainter;
 
 public abstract class AbstractLayer {
 

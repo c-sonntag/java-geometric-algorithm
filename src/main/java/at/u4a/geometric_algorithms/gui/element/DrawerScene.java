@@ -2,13 +2,9 @@ package at.u4a.geometric_algorithms.gui.element;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import javax.swing.JComponent;
-
 import at.u4a.geometric_algorithms.gui.layer.LayerMannager;
 import at.u4a.geometric_algorithms.gui.tools.Tool;
 import at.u4a.geometric_algorithms.gui.tools.ToolState;
@@ -16,37 +12,48 @@ import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
 public class DrawerScene {
 
-    // Initialize Final Variable
-    private final Group root = new Group();
-    private final Scene scene;
-    private final Drawer drawer = new Drawer(this);
-    private final JFXPanel fxPanel = new JFXPanel();
+    private class FX {
+        final Group root = new Group();
+        final Scene scene;
+        final Drawer drawer;
 
-    private final Map<Tool, ToolButton> toolsItems = new HashMap<Tool, ToolButton>();
+        FX() {
+            drawer = new Drawer(DrawerScene.this);
+            scene = new Scene(root, Color.BLUEVIOLET);
+            //
+            fxPanel.setScene(scene);
+            root.getChildren().add(drawer);
+            //
+            fxPanel.setScene(scene);
+        }
+    }
+
+    // FX to Swing
+    private final JFXPanel fxPanel = new JFXPanel();
+    private FX fx = null;
 
     // LayerManager
     private final LayerMannager layers = new LayerMannager();
+
+    // Tools
+    private final Map<Tool, ToolButton> toolsItems = new HashMap<Tool, ToolButton>();
 
     // DrawerContext
     private Tool currentTool;
     private ToolState currentState;
 
-    public DrawerScene() {      
-        scene = new Scene(root, Color.WHITE);
-        //
-        fxPanel.setScene(scene);
-        root.getChildren().add(drawer);
-        //
+    public DrawerScene() {
+        Platform.runLater(new Runnable() {
+            public void run() {
+                fx = new DrawerScene.FX();
+            }
+        });
         setTool(Tool.Selection);
     }
 
@@ -63,17 +70,13 @@ public class DrawerScene {
                 setTool(btnTool.getTool());
             }
         });
-
-        // TODO Auto-generated method stub
-
     }
 
     /**
      * Initialize Canvas
      */
     private void initializeCanvas() {
-
-        fxPanel.setScene(scene);
+        // fxPanel.setScene(scene);
     }
 
     private static Scene createScene() {
@@ -94,7 +97,8 @@ public class DrawerScene {
     }
 
     /**
-     * @todo gerer l'outil pour terminer son travail (valid, cancel)
+     * TODO gerer l'outil pour terminer son travail (valid, cancel)
+     * 
      * @param tool
      */
     public void setTool(Tool tool) {
@@ -122,18 +126,23 @@ public class DrawerScene {
         this.currentState = tool.supplier.get();
 
         //
-        drawer.repaint();
+        repaint();
     }
 
     public void refresh() {
         setTool(currentTool);
     }
 
+    public void repaint() {
+        if (fx != null)
+            fx.drawer.repaint();
+    }
+
     /* */
 
-    public Drawer drawer() {
-        return drawer;
-    }
+    // public Drawer drawer() {
+    // return drawer;
+    // }
 
     public LayerMannager getLayers() {
         return layers;
