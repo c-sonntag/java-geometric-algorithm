@@ -18,6 +18,7 @@ import javax.swing.SwingConstants;
 
 import at.u4a.geometric_algorithms.gui.element.Drawer;
 import at.u4a.geometric_algorithms.gui.element.DrawerContext;
+import at.u4a.geometric_algorithms.gui.element.DrawerScene;
 import at.u4a.geometric_algorithms.gui.element.LabelCategory;
 import at.u4a.geometric_algorithms.gui.element.LayerTree;
 import at.u4a.geometric_algorithms.gui.element.StatusBar;
@@ -48,14 +49,13 @@ import java.awt.event.ActionEvent;
  *
  */
 
-public class PrincipalGui {
+public class PrincipalGui extends JFrame {
 
+    private static final long serialVersionUID = 7047807079976701109L;
+    
     // Initialize Final Variable
-    private final JFrame frame = new JFrame();;
-    private final JFXPanel fxCanvas = new JFXPanel();;
     private final LayerTree treeLayer = new LayerTree();;
-    private final Drawer drawer = new Drawer();
-    //private final DrawerContext context = new DrawerContext(drawer);
+    private final DrawerScene ds = new DrawerScene();
 
     /**
      * Launch the application.
@@ -65,7 +65,7 @@ public class PrincipalGui {
             public void run() {
                 try {
                     PrincipalGui window = new PrincipalGui();
-                    window.frame.setVisible(true);
+                    window.setVisible(true);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -79,7 +79,7 @@ public class PrincipalGui {
     public PrincipalGui() {
 
         // First initialization
-        initializeCanvas();
+        super();
         initializeFrame();
 
         // Second
@@ -90,15 +90,27 @@ public class PrincipalGui {
 
         // Third
         initializeContent();
+
+        // Last
+        revalidate();
+        repaint();  
+    }
+
+    /**
+     * GUI repaint action
+     */
+    public void repaint() {
+        super.repaint();
+        ds.refresh();
     }
 
     /**
      * Initialize the frame.
      */
     private void initializeFrame() {
-        frame.setBounds(100, 100, 600, 600);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
+        setBounds(100, 100, 800, 600);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setMinimumSize(new Dimension(800, 600));
     }
 
     /**
@@ -106,7 +118,7 @@ public class PrincipalGui {
      */
     private void initializeStatusBar() {
         StatusBar statusBar = new StatusBar();
-        frame.getContentPane().add(statusBar, BorderLayout.SOUTH);
+        getContentPane().add(statusBar, BorderLayout.SOUTH);
     }
 
     /**
@@ -114,7 +126,7 @@ public class PrincipalGui {
      */
     private void initializeMenuBar() {
         JMenuBar menuBar = new JMenuBar();
-        frame.setJMenuBar(menuBar);
+        setJMenuBar(menuBar);
 
         JMenu mnFile = new JMenu("File");
         menuBar.add(mnFile);
@@ -152,7 +164,7 @@ public class PrincipalGui {
         JToolBar toolBarLeft = new JToolBar();
         toolBarLeft.setOrientation(SwingConstants.VERTICAL);
         toolBarLeft.setFloatable(false);
-        frame.getContentPane().add(toolBarLeft, BorderLayout.WEST);
+        getContentPane().add(toolBarLeft, BorderLayout.WEST);
 
         /* TOOL BUTTON GENERATION */
 
@@ -173,94 +185,11 @@ public class PrincipalGui {
 
             ToolButton btnTool = new ToolButton(tool);
             toolBarLeft.add(btnTool);
-            drawer.addToolButton(btnTool);
+            ds.addToolButton(btnTool);
 
             //
             lastCategory = tool.category;
         }
-
-    }
-
-    private void uselessInitializeToolBarLeft() {
-
-        JToolBar toolBarLeft = new JToolBar();
-        toolBarLeft.setOrientation(SwingConstants.VERTICAL);
-        toolBarLeft.setFloatable(false);
-        frame.getContentPane().add(toolBarLeft, BorderLayout.WEST);
-
-        JButton btnSelected = new JButton();
-        btnSelected.setToolTipText("Outil Selection");
-        btnSelected.setIcon(new ImageIcon("icons/tools/cursor_selection.png"));
-        toolBarLeft.add(btnSelected);
-
-        JButton btnDirectSelection = new JButton();
-        btnDirectSelection.setToolTipText("Outil Selection directe");
-        btnDirectSelection.setIcon(new ImageIcon("icons/tools/cursor_vector.png"));
-        toolBarLeft.add(btnDirectSelection);
-
-        toolBarLeft.addSeparator();
-
-        JButton btnToolsPointsCloud = new JButton();
-        btnToolsPointsCloud.setToolTipText("Outil Nuage de Points");
-        btnToolsPointsCloud.setIcon(new ImageIcon("icons/tools/cloud_of_point.png"));
-        toolBarLeft.add(btnToolsPointsCloud);
-
-        JButton btnToolsSegmentsCloud = new JButton();
-        btnToolsSegmentsCloud.setToolTipText("Outil Ensemble de Segments");
-        btnToolsSegmentsCloud.setIcon(new ImageIcon("icons/tools/segments.png"));
-        btnToolsSegmentsCloud.setEnabled(false);
-        toolBarLeft.add(btnToolsSegmentsCloud);
-
-        JButton btnToolsPointLine = new JButton();
-        btnToolsPointLine.setToolTipText("Outil Tracé de Point");
-        btnToolsPointLine.setIcon(new ImageIcon("icons/tools/chart_line.png"));
-        btnToolsPointLine.setEnabled(false);
-        toolBarLeft.add(btnToolsPointLine);
-
-        toolBarLeft.addSeparator();
-
-        JButton btnToolsRectangle = new JButton();
-        btnToolsRectangle.setToolTipText("Outil Rectangle");
-        btnToolsRectangle.setIcon(new ImageIcon("icons/tools/shape_square.png"));
-        btnToolsRectangle.setEnabled(false);
-        toolBarLeft.add(btnToolsRectangle);
-
-        JButton btnToolsElipse = new JButton();
-        btnToolsElipse.setToolTipText("Outil Elipse");
-        btnToolsElipse.setIcon(new ImageIcon("icons/tools/shape_circle.png"));
-        btnToolsElipse.setEnabled(false);
-        toolBarLeft.add(btnToolsElipse);
-
-        JButton btnToolsConvexePolygon = new JButton();
-        btnToolsConvexePolygon.setToolTipText("Outil Polygone Convexe");
-        btnToolsConvexePolygon.setIcon(new ImageIcon("icons/tools/shape_convexe_poligon.png"));
-        toolBarLeft.add(btnToolsConvexePolygon);
-
-        JButton btnToolsSimplePolygon = new JButton();
-        btnToolsSimplePolygon.setToolTipText("Outil Polygone Simple");
-        btnToolsSimplePolygon.setIcon(new ImageIcon("icons/tools/shape_simple_poligon.png"));
-        btnToolsSimplePolygon.setEnabled(false);
-        toolBarLeft.add(btnToolsSimplePolygon);
-
-        JButton btnToolsArbitraryPolygon = new JButton();
-        btnToolsArbitraryPolygon.setToolTipText("Outil Polygone Arbitraire");
-        btnToolsArbitraryPolygon.setIcon(new ImageIcon("icons/tools/shape_arbitrary_polygon.png"));
-        btnToolsArbitraryPolygon.setEnabled(false);
-        toolBarLeft.add(btnToolsArbitraryPolygon);
-
-        toolBarLeft.addSeparator();
-
-        JButton btnToolsText = new JButton();
-        btnToolsText.setToolTipText("Outil Texte");
-        btnToolsText.setIcon(new ImageIcon("icons/tools/font.png"));
-        btnToolsText.setEnabled(false);
-        toolBarLeft.add(btnToolsText);
-
-        JButton btnToolsCurve = new JButton();
-        btnToolsCurve.setToolTipText("Outil Courbe");
-        btnToolsCurve.setIcon(new ImageIcon("icons/tools/vector.png"));
-        btnToolsCurve.setEnabled(false);
-        toolBarLeft.add(btnToolsCurve);
 
     }
 
@@ -270,7 +199,7 @@ public class PrincipalGui {
     private void initializeToolBarTop() {
         JToolBar toolBarTop = new JToolBar();
         toolBarTop.setFloatable(false);
-        frame.getContentPane().add(toolBarTop, BorderLayout.NORTH);
+        getContentPane().add(toolBarTop, BorderLayout.NORTH);
 
         JButton btnNew = new JButton("New");
         btnNew.setIcon(new ImageIcon("icons/action/page_add.png"));
@@ -302,8 +231,8 @@ public class PrincipalGui {
     private void initializeContent() {
         JPanel panelLayer = initializeContentLayer();
 
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, fxCanvas, panelLayer);
-        frame.getContentPane().add(splitPane, BorderLayout.CENTER);
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, ds.getPanel(), panelLayer);
+        getContentPane().add(splitPane, BorderLayout.CENTER);
 
         splitPane.setOneTouchExpandable(true);
         splitPane.setResizeWeight(1.0);
@@ -377,41 +306,5 @@ public class PrincipalGui {
         m.setMenuLocation((int) -(m.getPopupMenu().getPreferredSize().getWidth() - m.getPreferredSize().getWidth()), (int) -m.getPopupMenu().getPreferredSize().getHeight());
     }
 
-    /**
-     * Initialize Canvas
-     */
-    private void initializeCanvas() {
-
-        Platform.runLater(new Runnable() {
-            public void run() {
-                initializeFX(fxCanvas);
-            }
-        });
-    }
-
-    /**
-     * Initialize FX (This method is invoked on the JavaFX thread)
-     */
-    private void initializeFX(JFXPanel fxPanel) {
-        Scene scene = createScene();
-        fxPanel.setScene(scene);
-    }
-
-    private static Scene createScene() {
-        Group root = new Group();
-        Scene scene = new Scene(root, Color.ALICEBLUE);
-
-        Text text = new Text();
-        text.setX(40);
-        text.setY(100);
-        text.setFont(new Font(25));
-        text.setText("Welcome JavaFX!");
-
-        root.getChildren().add(text);
-
-        Drawer canvas = new Drawer();
-
-        return (scene);
-    }
 
 }

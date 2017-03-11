@@ -17,83 +17,13 @@ import javafx.scene.input.MouseEvent;
 
 public class DrawerContext {
 
-    private Map<Tool, ToolButton> toolsItems = new HashMap<Tool, ToolButton>();
+    private final Drawer drawer;
+    private final DrawerScene ds;
 
-    private Tool currentTool;
-    private ToolState currentState;
-
-    private Drawer drawer;
-
-    public DrawerContext(Drawer drawer) {
+    DrawerContext(Drawer drawer) {
         this.drawer = drawer;
-        setTool(Tool.Selection);
+        this.ds = drawer.getDS();
     }
-
-    /**
-     * @todo gerer l'outil pour terminer son travail (valid, cancel)
-     * @param tool
-     */
-    public void setTool(Tool tool) {
-
-        for (Entry<Tool, ToolButton> toolControlEntry : toolsItems.entrySet()) {
-            toolControlEntry.getValue().setActive(tool.equals(toolControlEntry.getKey()));
-        }
-        
-        if (tool == currentTool)
-            return;
-
-        //
-        /*
-         * for (Entry<Tool, ToolControl> toolControlEntry :
-         * toolsControl.entrySet()) {
-         * toolControlEntry.getValue().setActive(tool.equals(toolControlEntry.
-         * getKey()));
-         * 
-         * if (tool.equals(toolControlEntry.getKey())) {
-         * toolControlEntry.getValue().data.btn.setSelected(true); } else {
-         * toolControlEntry.getValue().data.btn.setSelected(false); } }
-         */
-
-        this.currentTool = tool;
-        // this.currentState = dc;
-
-        //
-        drawer.repaint();
-    }
-    
-    public void refresh() {
-        setTool(currentTool);
-    }
-
-    public void paint(GraphicsContext context) {
-        currentState.paint(context);
-    }
-
-    /* */
-
-    public void mouseEntered(MouseEvent event) {
-        currentState.mouseEntered(drawer);
-    }
-
-    public void mouseExited(MouseEvent event) {
-        currentState.mouseExited(drawer);
-    }
-
-    /* */
-
-    public void mousePressed(MouseEvent event) {
-        currentState.mousePressed(this, event.getX(), event.getY());
-    }
-
-    public void mouseReleased(MouseEvent event) {
-        currentState.mouseReleased(this, event.getX(), event.getY());
-    }
-
-    public void mouseMoved(MouseEvent event) {
-        currentState.mouseMoved(this, event.getX(), event.getY());
-    }
-
-    /* */
 
     public void keyPressed(KeyEvent event) {
         EnumSet<KeyCode> eventKeys = EnumSet.of(event.getCode());
@@ -109,25 +39,37 @@ public class DrawerContext {
         //
         Tool toolChoose = Tool.getByKeyCode(eventKeys);
         if (toolChoose != null)
-            setTool(toolChoose);
+            ds.setTool(toolChoose);
     }
 
-    public Drawer drawer() {
-        return drawer;
+    /* */
+    
+    public void paint(GraphicsContext context) {
+        ds.getCurrentState().paint(context);
     }
 
-    public void addToolButton(ToolButton btnTool) {
-        
-        toolsItems.put(btnTool.getTool(), btnTool);
-        
-        btnTool.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                setTool(btnTool.getTool());
-            }
-        });
-        
-        // TODO Auto-generated method stub
-        
+    /* */
+
+    public void mouseEntered(MouseEvent event) {
+        ds.getCurrentState().mouseEntered(drawer);
+    }
+
+    public void mouseExited(MouseEvent event) {
+        ds.getCurrentState().mouseExited(drawer);
+    }
+
+    /* */
+
+    public void mousePressed(MouseEvent event) {
+        ds.getCurrentState().mousePressed(this, event.getX(), event.getY());
+    }
+
+    public void mouseReleased(MouseEvent event) {
+        ds.getCurrentState().mouseReleased(this, event.getX(), event.getY());
+    }
+
+    public void mouseMoved(MouseEvent event) {
+        ds.getCurrentState().mouseMoved(this, event.getX(), event.getY());
     }
 
 }

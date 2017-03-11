@@ -23,7 +23,7 @@ public enum Tool {
     // NullToolState::new), //
     Escape(null, KeyCode.ESCAPE, ToolCategory.Invisible, null, NullToolState::new), //
 
-    Selection("Outil Selection", KeyCode.V, ToolCategory.Transform, "selection.png"), //
+    Selection("Outil Selection", KeyCode.V, ToolCategory.Transform, "selection.png", SelectionToolState::new), //
     DirectSelection("Outil Selection directe", KeyCode.A, ToolCategory.Transform, "selection_direct.png"), //
 
     CloudOfPoint("Outil Nuage de Point", KeyCode.P, ToolCategory.ShapeSetter, "cloud_of_point.png"), //
@@ -38,7 +38,11 @@ public enum Tool {
     ShapeArbitraryPoligon("Outil Polygone Arbitraire", EnumSet.of(KeyCode.SHIFT, KeyCode.S), ToolCategory.Shape, "shape_arbitrary_polygon.png"), //
 
     Text("Outil Texte", EnumSet.of(KeyCode.CONTROL, KeyCode.SHIFT, KeyCode.T), ToolCategory.Extended, "text.png"), //
-    Curve("Outil Courbe", EnumSet.of(KeyCode.CONTROL, KeyCode.SHIFT, KeyCode.C), ToolCategory.Extended, "curve.png"); //
+    Curve("Outil Courbe", EnumSet.of(KeyCode.CONTROL, KeyCode.SHIFT, KeyCode.C), ToolCategory.Extended, "curve.png"), //
+    
+    CameraMove("Outil Courbe", EnumSet.of(KeyCode.SPACE), ToolCategory.Camera, "move.png"), //
+    CameraZoomIn("Outil Courbe", EnumSet.of(KeyCode.CONTROL, KeyCode.PLUS), ToolCategory.Camera, "zoom_in.png"), //
+    CameraZoomOut("Outil Courbe", EnumSet.of(KeyCode.CONTROL, KeyCode.MINUS), ToolCategory.Camera, "zoom_out.png"); //
 
     /* PRIVATE STATIC */
 

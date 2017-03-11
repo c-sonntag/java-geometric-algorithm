@@ -7,6 +7,8 @@ import javafx.scene.canvas.GraphicsContext;
 
 public abstract class ToolState {
     
+    public enum State { Waiting, Started, Finish };
+    
     abstract public void mousePressed(DrawerContext context, double x, double y);
     abstract public void mouseReleased(DrawerContext context, double x, double y);
     abstract public void mouseMoved(DrawerContext context, double x, double y);
