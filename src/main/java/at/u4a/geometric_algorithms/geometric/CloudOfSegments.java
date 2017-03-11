@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGeometricPainterVisitor;
+import at.u4a.geometric_algorithms.graphic_visitor.InterfaceShapePainterVisitor;
+
 public class CloudOfSegments extends AbstractShape {
 
     final public ArrayList<Segment> cloud = new ArrayList<Segment>();
@@ -48,6 +51,11 @@ public class CloudOfSegments extends AbstractShape {
         }
 
         return minDistance;
+    }
+
+    @Override
+    public void accept(InterfaceShapePainterVisitor visitor) {
+        visitor.visit(this);
     }
 
 }

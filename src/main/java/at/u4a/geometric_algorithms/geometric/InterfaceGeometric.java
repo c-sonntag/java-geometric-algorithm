@@ -1,6 +1,6 @@
 package at.u4a.geometric_algorithms.geometric;
 
-import at.u4a.geometric_algorithms.graphic_visitor.GeometricPainterVisitor;
+import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGeometricPainterVisitor;
 
 public interface InterfaceGeometric {
     
@@ -8,6 +8,6 @@ public interface InterfaceGeometric {
     
     double distance(Point p);
     
-    void accept(GeometricPainterVisitor visitor, boolean selected);
+    void accept(InterfaceGeometricPainterVisitor visitor);
 
 }

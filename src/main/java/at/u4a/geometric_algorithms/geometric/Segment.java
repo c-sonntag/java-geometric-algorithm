@@ -1,5 +1,7 @@
 package at.u4a.geometric_algorithms.geometric;
 
+import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGeometricPainterVisitor;
+
 public class Segment extends Line {
 
     public Segment(Point a, Point b) {
@@ -19,4 +21,10 @@ public class Segment extends Line {
         /* In Range */ super.contains(p) :
         /* Out Range */ false;
     }
+    
+    @Override
+    public void accept(InterfaceGeometricPainterVisitor visitor) {
+        visitor.visit(this);
+    }
+    
 }

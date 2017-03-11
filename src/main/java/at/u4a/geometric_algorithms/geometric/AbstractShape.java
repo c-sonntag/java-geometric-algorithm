@@ -1,7 +1,7 @@
 package at.u4a.geometric_algorithms.geometric;
 
-import at.u4a.geometric_algorithms.graphic_visitor.GeometricPainterVisitor;
-import at.u4a.geometric_algorithms.graphic_visitor.ShapePainterVisitor;
+import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGeometricPainterVisitor;
+import at.u4a.geometric_algorithms.graphic_visitor.InterfaceShapePainterVisitor;
 
 public abstract class AbstractShape implements InterfaceGeometric {
 
@@ -19,6 +19,13 @@ public abstract class AbstractShape implements InterfaceGeometric {
         origin.set(newOrigin);
     }
     
-    public abstract void accept(ShapePainterVisitor visitor, boolean selected);
+    @Override
+    public void accept(InterfaceGeometricPainterVisitor visitor) {
+        // Nothing here !
+    }
+    
+    public abstract void accept(InterfaceShapePainterVisitor visitor);
+    
+    
 
 }

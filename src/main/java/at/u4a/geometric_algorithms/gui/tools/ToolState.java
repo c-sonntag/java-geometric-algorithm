@@ -12,7 +12,7 @@ public abstract class ToolState {
     abstract public void mousePressed(DrawerContext context, double x, double y);
     abstract public void mouseReleased(DrawerContext context, double x, double y);
     abstract public void mouseMoved(DrawerContext context, double x, double y);
-    abstract public void paint(GraphicsContext context);
+    abstract public void paint(InterfaceShapePainterVisitor context);
     
     public void mouseEntered(Drawer drawer) {
         drawer.setCursor(Cursor.CROSSHAIR);

@@ -3,7 +3,8 @@ package at.u4a.geometric_algorithms.gui.layer;
 import java.awt.Color;
 import java.util.Vector;
 
-import at.u4a.geometric_algorithms.graphic_visitor.InterfaceShapePainter;
+import at.u4a.geometric_algorithms.geometric.AbstractShape;
+import at.u4a.geometric_algorithms.graphic_visitor.InterfaceShapePainterVisitor;
 
 public abstract class AbstractLayer {
 
@@ -18,27 +19,39 @@ public abstract class AbstractLayer {
 
     private String layerName;
 
+    private AbstractLayer parent;
+
     /* PROTECTED */
 
     protected Vector<ColorSet> colors;
-    
+
     /* ABSTRACT PUBLIC FUNCTION */
-    
-    abstract public InterfaceShapePainter getShapePainter();
-    
+
+    abstract public AbstractShape getShape();
+
     abstract public LayerCategory getCategory();
 
     abstract public String getLayerType();
 
     abstract public String getLayerTypeIconName();
-    
+
     abstract public Boolean isContener();
-    
+
     abstract public Boolean isDeletable();
-    
+
     abstract public Vector<AbstractLayer> getSubLayer();
 
+    abstract public void accept(InterfaceShapePainterVisitor visitor);
+
     /* PUBLIC FUCNTION */
+
+    public AbstractLayer() {
+        this(null);
+    }
+
+    public AbstractLayer(AbstractLayer parent) {
+        this.parent = parent;
+    }
 
     public String getLayerName() {
         return layerName;
@@ -50,6 +63,10 @@ public abstract class AbstractLayer {
 
     public Vector<ColorSet> getColor() {
         return colors;
+    }
+
+    public AbstractLayer getParent() {
+        return parent;
     }
 
 }

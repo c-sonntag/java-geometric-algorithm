@@ -1,5 +1,7 @@
 package at.u4a.geometric_algorithms.geometric;
 
+import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGeometricPainterVisitor;
+
 public class Point implements InterfaceGeometric {
 
     public double x, y;
@@ -19,6 +21,11 @@ public class Point implements InterfaceGeometric {
         this.y = other.y;
     }
 
+    public void set(double x, double y) {
+        this.x = x;
+        this.y = y;
+    }
+
     public boolean contains(Point p) {
         return (x == p.x) && (y == p.y);
     }
@@ -27,6 +34,10 @@ public class Point implements InterfaceGeometric {
         double xDistance = p.x - x, yDistance = p.y - y;
         return Math.sqrt(xDistance * xDistance + yDistance * yDistance);
     }
-    
-    
+
+    @Override
+    public void accept(InterfaceGeometricPainterVisitor visitor) {
+        visitor.visit(this);
+    }
+
 }

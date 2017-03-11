@@ -32,14 +32,14 @@ public enum Tool {
 
     ShapeRectangle("Outil Rectangle", EnumSet.of(KeyCode.SHIFT, KeyCode.R), ToolCategory.Shape, "shape_square.png"), //
     ShapeElipse("Outil Elipse", EnumSet.of(KeyCode.SHIFT, KeyCode.E), ToolCategory.Shape, "shape_circle.png"), //
-    
+
     ShapeConvexePoligon("Outil Polygone Convexe", EnumSet.of(KeyCode.SHIFT, KeyCode.C), ToolCategory.Shape, "shape_convexe_poligon.png"), //
     ShapeSimplePoligon("Outil Polygone Simple", EnumSet.of(KeyCode.SHIFT, KeyCode.S), ToolCategory.Shape, "shape_simple_poligon.png", SimplePolygonToolState::new), //
-    ShapeArbitraryPoligon("Outil Polygone Arbitraire", EnumSet.of(KeyCode.SHIFT, KeyCode.S), ToolCategory.Shape, "shape_arbitrary_polygon.png"), //
+    ShapeArbitraryPoligon("Outil Polygone Arbitraire", EnumSet.of(KeyCode.SHIFT, KeyCode.A), ToolCategory.Shape, "shape_arbitrary_polygon.png"), //
 
     Text("Outil Texte", EnumSet.of(KeyCode.CONTROL, KeyCode.SHIFT, KeyCode.T), ToolCategory.Extended, "text.png"), //
     Curve("Outil Courbe", EnumSet.of(KeyCode.CONTROL, KeyCode.SHIFT, KeyCode.C), ToolCategory.Extended, "curve.png"), //
-    
+
     CameraMove("Outil Courbe", EnumSet.of(KeyCode.SPACE), ToolCategory.Camera, "move.png"), //
     CameraZoomIn("Outil Courbe", EnumSet.of(KeyCode.CONTROL, KeyCode.PLUS), ToolCategory.Camera, "zoom_in.png"), //
     CameraZoomOut("Outil Courbe", EnumSet.of(KeyCode.CONTROL, KeyCode.MINUS), ToolCategory.Camera, "zoom_out.png"); //
@@ -57,7 +57,7 @@ public enum Tool {
         if (mutableKeyCodeMap == null) {
             mutableKeyCodeMap = new HashMap<EnumSet<KeyCode>, Tool>();
             for (Tool tool : values())
-                if (tool.codes != null)
+                if ((tool.codes != null) && (tool.supplier != null))
                     mutableKeyCodeMap.put(tool.codes, tool);
         }
 

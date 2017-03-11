@@ -1,5 +1,7 @@
 package at.u4a.geometric_algorithms.geometric;
 
+import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGeometricPainterVisitor;
+
 public class Line implements InterfaceGeometric {
 
     private final static double EPSILON = 0.1;
@@ -28,5 +30,11 @@ public class Line implements InterfaceGeometric {
     /** Formule de distance récuperé dans le Partiel 2016/2017 de PCOO */
     public double distance(Point p) {
         return ((b.x - a.x) * (a.y - p.y) - (a.x - p.x) * (b.y - a.y)) / Math.hypot(b.x - a.x, b.y - a.y);
+    }
+    
+    
+    @Override
+    public void accept(InterfaceGeometricPainterVisitor visitor) {
+        visitor.visit(this);
     }
 }

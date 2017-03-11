@@ -9,6 +9,8 @@ import at.u4a.geometric_algorithms.gui.layer.LayerMannager;
 import at.u4a.geometric_algorithms.gui.tools.Tool;
 import at.u4a.geometric_algorithms.gui.tools.ToolState;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -25,10 +27,28 @@ public class DrawerScene {
 
         FX() {
             drawer = new Drawer(DrawerScene.this);
-            scene = new Scene(root, Color.BLUEVIOLET);
+            drawer.setVisible(true);
+            //
+            scene = new Scene(root);
             //
             fxPanel.setScene(scene);
+            //
+            drawer.getGraphicsContext2D().setFill(Color.AQUA);
             root.getChildren().add(drawer);
+            //
+            // https://blog.idrsolutions.com/2012/11/adding-a-window-resize-listener-to-javafx-scene/
+            scene.widthProperty().addListener(new ChangeListener<Number>() {
+                @Override
+                public void changed(ObservableValue<? extends Number> observableValue, Number oldSceneWidth, Number newSceneWidth) {
+                    drawer.setWidth(newSceneWidth.doubleValue());
+                }
+            });
+            scene.heightProperty().addListener(new ChangeListener<Number>() {
+                @Override
+                public void changed(ObservableValue<? extends Number> observableValue, Number oldSceneHeight, Number newSceneHeight) {
+                    drawer.setHeight(newSceneHeight.doubleValue());
+                }
+            });
             //
             fxPanel.setScene(scene);
         }
@@ -144,7 +164,7 @@ public class DrawerScene {
     // return drawer;
     // }
 
-    public LayerMannager getLayers() {
+    public LayerMannager getLayerMannager() {
         return layers;
     }
 
