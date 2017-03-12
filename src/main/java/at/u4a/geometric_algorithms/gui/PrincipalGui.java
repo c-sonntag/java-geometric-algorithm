@@ -17,6 +17,7 @@ import javax.swing.JButton;
 import javax.swing.SwingConstants;
 
 import at.u4a.geometric_algorithms.gui.element.DrawerScene;
+import at.u4a.geometric_algorithms.gui.element.InterfaceDrawerAction;
 import at.u4a.geometric_algorithms.gui.element.LabelCategory;
 import at.u4a.geometric_algorithms.gui.element.LayerTree;
 import at.u4a.geometric_algorithms.gui.element.StatusBar;
@@ -26,6 +27,18 @@ import at.u4a.geometric_algorithms.gui.tools.ToolCategory;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import java.awt.event.ActionListener;
+import java.util.concurrent.Callable;
+import java.awt.event.ActionEvent;
+import java.awt.GridLayout;
+import java.awt.CardLayout;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import net.miginfocom.swing.MigLayout;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
+import java.awt.FlowLayout;
 
 /**
  * Gui principale de l'application Geométrie Algorithmique
@@ -42,8 +55,9 @@ public class PrincipalGui extends JFrame {
     private static final long serialVersionUID = 7047807079976701109L;
 
     // Initialize Final Variable
-    private final LayerTree treeLayer = new LayerTree();;
-    private final DrawerScene ds = new DrawerScene(this);
+    private final LayerTree treeLayer = new LayerTree();
+    private final DrawerAction dad = new DrawerAction();
+    private final DrawerScene ds = new DrawerScene(dad);
 
     /**
      * Launch the application.
@@ -189,10 +203,14 @@ public class PrincipalGui extends JFrame {
         JToolBar toolBarTop = new JToolBar();
         toolBarTop.setFloatable(false);
         getContentPane().add(toolBarTop, BorderLayout.NORTH);
-
-        JButton btnNew = new JButton("New");
-        btnNew.setIcon(new ImageIcon("icons/action/page_add.png"));
-        toolBarTop.add(btnNew);
+        
+        JToolBar appToolbar = new JToolBar();
+        appToolbar.setFloatable(false);
+        toolBarTop.add(appToolbar);
+        
+                JButton btnNew = new JButton("New");
+                appToolbar.add(btnNew);
+                btnNew.setIcon(new ImageIcon("icons/action/page_add.png"));
 
         toolBarTop.addSeparator();
 
@@ -201,17 +219,11 @@ public class PrincipalGui extends JFrame {
          * ImageIcon("icons/page_add.png")); toolBarTop.add(btnNew);
          */
 
-        toolBarTop.addSeparator();
+        //toolBarTop.addSeparator();
 
-        JButton btnValid = new JButton("Valid");
-        btnValid.setIcon(new ImageIcon("icons/action/tick.png"));
-        btnValid.setEnabled(false);
-        toolBarTop.add(btnValid);
-
-        JButton btnCancel = new JButton("Cancel");
-        btnCancel.setIcon(new ImageIcon("icons/action/cancel.png"));
-        btnCancel.setEnabled(false);
-        toolBarTop.add(btnCancel);
+        JToolBar drawerActionToolBar = dad.getToolBar();
+        drawerActionToolBar.setFloatable(false);
+        toolBarTop.add(drawerActionToolBar);
     }
 
     /**
@@ -293,6 +305,60 @@ public class PrincipalGui extends JFrame {
      */
     private void setMenuToBottomLeftAlignement(JMenu m) {
         m.setMenuLocation((int) -(m.getPopupMenu().getPreferredSize().getWidth() - m.getPreferredSize().getWidth()), (int) -m.getPopupMenu().getPreferredSize().getHeight());
+    }
+
+    /* InterfaceDrawerAction */
+
+    private class DrawerAction implements InterfaceDrawerAction {
+
+        private final JButton btnValid;
+        private final JButton btnCancel;
+        private final JToolBar toolbar;
+
+        public DrawerAction() {
+
+            toolbar = new JToolBar();
+
+            btnValid = new JButton("Valid");
+            btnValid.setIcon(new ImageIcon("icons/action/tick.png"));
+
+            btnCancel = new JButton("Cancel");
+            btnCancel.setIcon(new ImageIcon("icons/action/cancel.png"));
+
+            toolbar.add(btnValid);
+            toolbar.add(btnCancel);
+
+        }
+
+        @Override
+        public void addDrawerActionListenerOfValid(Runnable func) {
+            btnValid.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent arg0) {
+                    func.run();
+                }
+            });
+        }
+
+        @Override
+        public void addDrawerActionListenerOfCancel(Runnable func) {
+            btnCancel.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent arg0) {
+                    func.run();
+                }
+            });
+
+        }
+
+        @Override
+        public void activeDrawerAction(boolean b) {
+            toolbar.setVisible(b);
+        }
+
+        @Override
+        public JToolBar getToolBar() {
+            return toolbar;
+        }
+
     }
 
 }

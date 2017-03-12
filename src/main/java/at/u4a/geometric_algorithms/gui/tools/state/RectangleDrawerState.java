@@ -7,17 +7,17 @@ import at.u4a.geometric_algorithms.gui.element.DrawerContext;
 import at.u4a.geometric_algorithms.gui.tools.ToolState;
 import at.u4a.geometric_algorithms.gui.tools.ToolState.State;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 
 public class RectangleDrawerState extends ToolState {
 
-    private ToolState.State currentState = State.Waiting;
     private final Rectangle rectangle = new Rectangle();
 
     @Override
     public void mousePressed(DrawerContext context, MouseEvent event) {
-        if (!event.isPrimaryButtonDown())
+        if (!isLeftClick(event))
             return;
         //
         if (currentState == State.Waiting) {
@@ -28,11 +28,12 @@ public class RectangleDrawerState extends ToolState {
 
     @Override
     public void mouseReleased(DrawerContext context, MouseEvent event) {
-        if (!event.isPrimaryButtonDown())
+        if (!isLeftClick(event))
             return;
         //
         currentState = State.Finish;
         setSize(event.getX(), event.getY());
+
     }
 
     @Override
@@ -43,7 +44,7 @@ public class RectangleDrawerState extends ToolState {
         setSize(event.getX(), event.getY());
         context.repaint();
     }
-    
+
     private void setSize(double x, double y) {
         rectangle.size.set(x - rectangle.origin.x, y - rectangle.origin.y);
     }

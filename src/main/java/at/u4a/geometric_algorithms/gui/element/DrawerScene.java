@@ -58,7 +58,7 @@ public class DrawerScene {
     }
 
     // FX to Swing
-    private final JFrame parent;
+    private final InterfaceDrawerAction da;
     private final JFXPanel fxPanel = new JFXPanel();
     private FX fx = null;
 
@@ -72,8 +72,8 @@ public class DrawerScene {
     private Tool currentTool;
     private ToolState currentState;
 
-    public DrawerScene(JFrame parent) {
-        this.parent = parent;
+    public DrawerScene(InterfaceDrawerAction da) {
+        this.da = da;
         //
         Platform.runLater(new Runnable() {
             public void run() {
@@ -86,6 +86,10 @@ public class DrawerScene {
     public JFXPanel getPanel() {
         return fxPanel;
     }
+    
+    public InterfaceDrawerAction getDrawerAction() {
+        return da;
+    }
 
     public void addToolButton(ToolButton btnTool) {
 
@@ -96,30 +100,6 @@ public class DrawerScene {
                 setTool(btnTool.getTool());
             }
         });
-    }
-
-    /**
-     * Initialize Canvas
-     */
-    private void initializeCanvas() {
-        // fxPanel.setScene(scene);
-    }
-
-    private static Scene createScene() {
-        Group root = new Group();
-        Scene scene = new Scene(root, Color.ALICEBLUE);
-
-        Text text = new Text();
-        text.setX(40);
-        text.setY(100);
-        text.setFont(new Font(25));
-        text.setText("Welcome JavaFX!");
-
-        root.getChildren().add(text);
-
-        // Drawer canvas = new Drawer();
-
-        return (scene);
     }
 
     /**
@@ -150,6 +130,8 @@ public class DrawerScene {
 
         this.currentTool = tool;
         this.currentState = tool.supplier.get();
+        this.da.activeDrawerAction(currentState.needValidOperation());
+        
 
         //
         repaint();

@@ -1,5 +1,9 @@
 package at.u4a.geometric_algorithms.gui.element;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.EventHandler;
+
 import javax.swing.JOptionPane;
 
 import at.u4a.geometric_algorithms.geometric.AbstractShape;
@@ -14,8 +18,10 @@ import javafx.scene.canvas.GraphicsContext;
 /**
  * 
  * @author Christophe Sonntag
- * @see ResizableCanvas (
- *      http://dlsc.com/2014/04/10/javafx-tip-1-resizable-canvas/ )
+ * @see Editeur de forme
+ *      http://pageperso.lif.univ-mrs.fr/~bertrand.estellon/javaL3/td7.pdf
+ * @see ResizableCanvas
+ *      http://dlsc.com/2014/04/10/javafx-tip-1-resizable-canvas/
  *
  */
 
@@ -29,7 +35,7 @@ public class Drawer extends Canvas {
     // public Drawer(double width, double height) {
     public Drawer(DrawerScene ds) {
         // super(width, height);
-        //super(400, 400);
+        // super(400, 400);
         this.ds = ds;
         this.context = new DrawerContext(this);
         //
@@ -50,6 +56,10 @@ public class Drawer extends Canvas {
         // Redraw canvas when size changes.
         widthProperty().addListener(evt -> repaint());
         heightProperty().addListener(evt -> repaint());
+        
+        // Add DrawerAction
+        ds.getDrawerAction().addDrawerActionListenerOfValid(context::valid);
+        ds.getDrawerAction().addDrawerActionListenerOfCancel(context::cancel);
 
         ds.getLayerMannager().addLayer(new Geometric<Rectangle>(new Rectangle(new Point(10, 10), new Point(100, 100))));
 
@@ -59,9 +69,9 @@ public class Drawer extends Canvas {
 
     @Override
     public boolean isResizable() {
-      return true;
+        return true;
     }
-    
+
     @Override
     public double prefWidth(double height) {
         return getWidth();

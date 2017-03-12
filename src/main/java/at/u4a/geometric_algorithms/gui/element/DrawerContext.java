@@ -48,6 +48,20 @@ public class DrawerContext {
     }
 
     /* */
+    
+    public void valid() {
+        ds.getCurrentState().valid(drawer);
+    }
+
+    public void cancel() {
+        ds.getCurrentState().cancel(drawer);
+    }
+
+    public Boolean needValidOperation() {
+        return  ds.getCurrentState().needValidOperation();
+    }
+        
+    /* */
 
     public void mouseEntered(MouseEvent event) {
         ds.getCurrentState().mouseEntered(drawer);

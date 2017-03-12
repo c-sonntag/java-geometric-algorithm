@@ -19,6 +19,16 @@ public abstract class AbstractShape implements InterfaceGeometric {
         origin.set(newOrigin);
     }
     
+    public void convertToOrigin(Point p) {
+        p.x = p.x - origin.x;
+        p.y = p.y - origin.y;
+    }
+    
+    public void convertToStandard(Point p) {
+        p.x = p.x + origin.x;
+        p.y = p.y + origin.y;
+    }
+    
     @Override
     public void accept(InterfaceGeometricPainterVisitor visitor) {
         // Nothing here !
