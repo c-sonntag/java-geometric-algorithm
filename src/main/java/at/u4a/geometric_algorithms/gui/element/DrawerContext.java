@@ -64,11 +64,11 @@ public class DrawerContext {
     }
 
     public void mouseReleased(MouseEvent event) {
-        ds.getCurrentState().mouseReleased(this, event.getX(), event.getY());
+        ds.getCurrentState().mouseReleased(this, event);
     }
 
     public void mouseMoved(MouseEvent event) {
-        ds.getCurrentState().mouseMoved(this, event.getX(), event.getY());
+        ds.getCurrentState().mouseMoved(this, event);
     }
 
 }

@@ -16,8 +16,6 @@ import java.awt.Dimension;
 import javax.swing.JButton;
 import javax.swing.SwingConstants;
 
-import at.u4a.geometric_algorithms.gui.element.Drawer;
-import at.u4a.geometric_algorithms.gui.element.DrawerContext;
 import at.u4a.geometric_algorithms.gui.element.DrawerScene;
 import at.u4a.geometric_algorithms.gui.element.LabelCategory;
 import at.u4a.geometric_algorithms.gui.element.LayerTree;
@@ -25,19 +23,9 @@ import at.u4a.geometric_algorithms.gui.element.StatusBar;
 import at.u4a.geometric_algorithms.gui.element.ToolButton;
 import at.u4a.geometric_algorithms.gui.tools.Tool;
 import at.u4a.geometric_algorithms.gui.tools.ToolCategory;
-import javafx.application.Platform;
-import javafx.embed.swing.JFXPanel;
-import javafx.scene.Group;
-import javafx.scene.Scene;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
-
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 
 /**
  * Gui principale de l'application Geométrie Algorithmique
@@ -55,7 +43,7 @@ public class PrincipalGui extends JFrame {
 
     // Initialize Final Variable
     private final LayerTree treeLayer = new LayerTree();;
-    private final DrawerScene ds = new DrawerScene();
+    private final DrawerScene ds = new DrawerScene(this);
 
     /**
      * Launch the application.

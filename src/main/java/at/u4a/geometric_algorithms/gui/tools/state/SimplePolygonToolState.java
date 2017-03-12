@@ -8,6 +8,7 @@ import at.u4a.geometric_algorithms.gui.element.DrawerContext;
 import at.u4a.geometric_algorithms.gui.tools.ToolState;
 import javafx.scene.Cursor;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.MouseEvent;
 
 public class SimplePolygonToolState extends ToolState {
 
@@ -19,26 +20,29 @@ public class SimplePolygonToolState extends ToolState {
     // private double x, y;
 
     public void mouseEntered(Drawer drawer) {
-        drawer.setCursor(null);
+        drawer.setCursor(Cursor.DISAPPEAR);
     }
-    
+
     @Override
-    public void mousePressed(DrawerContext context, double x, double y) {
+    public void mousePressed(DrawerContext context, MouseEvent event) {
 
     }
 
     @Override
-    public void mouseReleased(DrawerContext context, double x, double y) {
+    public void mouseReleased(DrawerContext context, MouseEvent event) {
+        if (!event.isPrimaryButtonDown())
+            return;
+        //
         if (currentState == State.Waiting) {
             currentState = State.Started;
-            poly.origin.set(x, y);
+            poly.origin.set(event.getX(), event.getY());
         }
-        poly.addPoint(x, y);
+        poly.addPoint(event.getX(), event.getY());
     }
 
     @Override
-    public void mouseMoved(DrawerContext context, double x, double y) {
-        currentPointToPlace.set(x, y);
+    public void mouseMoved(DrawerContext context, MouseEvent event) {
+        currentPointToPlace.set(event.getX(), event.getY());
         context.repaint();
     }
 

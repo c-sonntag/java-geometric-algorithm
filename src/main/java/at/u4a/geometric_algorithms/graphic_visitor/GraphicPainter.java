@@ -61,7 +61,6 @@ public class GraphicPainter implements InterfaceGraphicVisitor {
 
     public void visit(Point p) {
         gc.setStroke(isSelected ? selectedColor : pointColor);
-        //
         gc.fillOval((int) (p.x - POINT_SIZE), (int) (p.y - POINT_SIZE), 2 * POINT_SIZE + 1, 2 * POINT_SIZE + 1);
         gc.fillOval((int) (p.x - 2 * POINT_SIZE), (int) (p.y - 2 * POINT_SIZE), 2 * 2 * POINT_SIZE, 2 * 2 * POINT_SIZE);
     }
@@ -69,13 +68,11 @@ public class GraphicPainter implements InterfaceGraphicVisitor {
     /** TODO doit dessiner une ligne et non un segment ! */
     public void visit(Line l) {
         gc.setStroke(isSelected ? selectedColor : segmentColor);
-        //
         gc.strokeLine((int) l.a.x, (int) l.a.y, (int) l.b.x, (int) l.b.y);
     }
 
     public void visit(Segment s) {
         gc.setStroke(isSelected ? selectedColor : segmentColor);
-        //
         gc.strokeLine((int) s.a.x, (int) s.a.y, (int) s.b.x, (int) s.b.y);
     }
     
@@ -92,7 +89,6 @@ public class GraphicPainter implements InterfaceGraphicVisitor {
 
     public void visit(Rectangle poly) {
         gc.setStroke(Color.RED);
-        //
         gc.strokeRect(poly.origin.x, poly.origin.y, poly.size.x, poly.size.y);
     }
 

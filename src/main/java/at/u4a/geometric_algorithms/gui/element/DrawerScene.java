@@ -5,6 +5,9 @@ import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import javax.swing.JFrame;
+
 import at.u4a.geometric_algorithms.gui.layer.LayerMannager;
 import at.u4a.geometric_algorithms.gui.tools.Tool;
 import at.u4a.geometric_algorithms.gui.tools.ToolState;
@@ -55,6 +58,7 @@ public class DrawerScene {
     }
 
     // FX to Swing
+    private final JFrame parent;
     private final JFXPanel fxPanel = new JFXPanel();
     private FX fx = null;
 
@@ -68,7 +72,9 @@ public class DrawerScene {
     private Tool currentTool;
     private ToolState currentState;
 
-    public DrawerScene() {
+    public DrawerScene(JFrame parent) {
+        this.parent = parent;
+        //
         Platform.runLater(new Runnable() {
             public void run() {
                 fx = new DrawerScene.FX();

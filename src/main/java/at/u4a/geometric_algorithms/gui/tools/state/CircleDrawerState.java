@@ -5,6 +5,7 @@ import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGraphicVisitor;
 import at.u4a.geometric_algorithms.gui.element.DrawerContext;
 import at.u4a.geometric_algorithms.gui.tools.ToolState;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 
 public class CircleDrawerState implements ToolState {
@@ -12,26 +13,26 @@ public class CircleDrawerState implements ToolState {
     private double x, y;
 
     @Override
-    public void mouseEntered(DrawerContext context, double x, double y) {
+    public void mouseEntered(DrawerContext context, MouseEvent event) {
         //context.setState(new CircleDrawerState1(x, y));
     }
     
     @Override
-    public void mousePressed(DrawerContext context, double x, double y) {
+    public void mousePressed(DrawerContext context, MouseEvent event) {
         //context.setState(new CircleDrawerState1(x, y));
     }
 
     @Override
-    public void mouseReleased(DrawerContext context, double x, double y) {
+    public void mouseReleased(DrawerContext context, MouseEvent event) {
         // TODO Auto-generated method stub
 
     }
 
     @Override
-    public void mouseMoved(DrawerContext context, double x, double y) {
-        this.x = x;
-        this.y = y;
-        context.drawer().repaint();
+    public void mouseMoved(DrawerContext context, MouseEvent event) {
+        this.x = event.getX();
+        this.y = event.getY();
+        context.repaint();
         //
 
     }
