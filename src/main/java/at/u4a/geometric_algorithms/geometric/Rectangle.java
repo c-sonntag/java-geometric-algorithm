@@ -6,24 +6,29 @@ import at.u4a.geometric_algorithms.graphic_visitor.InterfaceShapePainterVisitor;
 
 public class Rectangle extends AbstractShape {
 
-    public final Point oppositeSide;
+    public final Point size;
 
     public Rectangle() {
         super();
-        this.oppositeSide = new Point();
+        this.size = new Point();
     }
 
-    public Rectangle(Point origin, Point oppositeSide) {
+    public Rectangle(Point origin, Point size) {
         super(origin);
-        this.oppositeSide = oppositeSide;
+        this.size = size;
     }
 
     public boolean contains(Point p) {
+        final Point oppositeSide = getOppositeSide();
         return
         /* MinHorizontal */ (Math.min(origin.x, oppositeSide.x) >= p.x) &&
-        /* minVertical */ (Math.min(origin.y, oppositeSide.y) >= p.y) &&
+        /* MinVertical */ (Math.min(origin.y, oppositeSide.y) >= p.y) &&
         /* TopHorizontal */ (Math.max(origin.x, oppositeSide.x) < p.y) &&
         /* TopVertical */ (Math.max(origin.y, oppositeSide.y) < p.y);
+    }
+
+    public final Point getOppositeSide() {
+        return new Point(origin.x + size.x, origin.y + size.y);
     }
 
     public double distance(Point p) {

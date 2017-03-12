@@ -20,7 +20,7 @@ public class SimplePolygonToolState extends ToolState {
     // private double x, y;
 
     public void mouseEntered(Drawer drawer) {
-        drawer.setCursor(Cursor.DISAPPEAR);
+        drawer.setCursor(Cursor.NONE);
     }
 
     @Override
