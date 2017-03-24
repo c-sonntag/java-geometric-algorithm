@@ -92,6 +92,7 @@ public enum Tool {
 
     /* PRIVATE */
 
+
     private Tool(String tip, KeyCode code, ToolCategory category, String icon) {
         this(tip, EnumSet.of(code), category, icon);
     }

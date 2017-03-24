@@ -25,9 +25,6 @@ public class GraphicPainter implements InterfaceGraphicVisitor {
     /** La couleur d'un point selectionne a l'ecran. */
     private final static Color selectedColor = Color.RED;
 
-    /** La taille d'un point a l'ecran. */
-    private final static double POINT_SIZE = 1.5;
-
     /* ACESS */
 
     protected boolean isSelected = false;
@@ -63,8 +60,8 @@ public class GraphicPainter implements InterfaceGraphicVisitor {
     public void visit(Point p) {
         gc.setFill(isSelected ? selectedColor : pointColor);
         gc.setStroke(Color.BLACK);
-        gc.fillOval((int) (p.x - 2 * POINT_SIZE), (int) (p.y - 2 * POINT_SIZE), 2 * 2 * POINT_SIZE, 2 * 2 * POINT_SIZE);
-        gc.strokeOval((int) (p.x - 2 * POINT_SIZE), (int) (p.y - 2 * POINT_SIZE), 2 * 2 * POINT_SIZE, 2 * 2 * POINT_SIZE);
+        gc.fillOval((int) (p.x - 2 * Point.POINT_RAYON), (int) (p.y - 2 * Point.POINT_RAYON), 2 * 2 * Point.POINT_RAYON, 2 * 2 * Point.POINT_RAYON);
+        gc.strokeOval((int) (p.x - 2 * Point.POINT_RAYON), (int) (p.y - 2 * Point.POINT_RAYON), 2 * 2 * Point.POINT_RAYON, 2 * 2 * Point.POINT_RAYON);
     }
 
     /** TODO doit dessiner une ligne et non un segment ! */
@@ -84,14 +81,14 @@ public class GraphicPainter implements InterfaceGraphicVisitor {
         final Segment sToOrigin = new Segment();
         for (Segment s : poly) {
             sToOrigin.set(s);
-            poly.convertToStandard( sToOrigin.a );
-            poly.convertToStandard( sToOrigin.b );
+            poly.convertToStandard(sToOrigin.a);
+            poly.convertToStandard(sToOrigin.b);
             visit(sToOrigin);
         }
         final Point pToOrigin = new Point();
         for (Point p : poly.perimeter) {
             pToOrigin.set(p);
-            poly.convertToStandard( pToOrigin );
+            poly.convertToStandard(pToOrigin);
             visit(pToOrigin);
         }
     }
@@ -110,7 +107,6 @@ public class GraphicPainter implements InterfaceGraphicVisitor {
             lastPoint = p;
         }
     }
-
 
     public void visit(CloudOfSegments clouds) {
 

@@ -11,11 +11,12 @@ public class Polygon extends AbstractShape implements Iterable<Segment> {
     private class SegmentIterator implements Iterator<Segment> {
 
         private final Iterator<Point> perimeter_it = perimeter.iterator();
-        private Point point = null, lastPoint = null;
-        // private final Segment genSegment = new Segment();
+        private Point startPoint = null, point = null, lastPoint = null;
+        // private final Segment genSegment = new Segment(); @TODO voir si possible avec un seul segment généré
 
         private SegmentIterator() {
             doNext();
+            startPoint = point;
             doNext();
         }
 
@@ -23,7 +24,10 @@ public class Polygon extends AbstractShape implements Iterable<Segment> {
             lastPoint = point;
             if (perimeter_it.hasNext())
                 point = perimeter_it.next();
-            else
+            else if (startPoint != null) {
+                point = startPoint;
+                startPoint = null;
+            } else
                 point = null;
         }
 
@@ -36,8 +40,6 @@ public class Polygon extends AbstractShape implements Iterable<Segment> {
         public Segment next() {
             Segment s = new Segment(lastPoint, point);
             doNext();
-            // genSegment.a.set(lastPoint);
-            // genSegment.b.set(point);
             return s;
         }
     }

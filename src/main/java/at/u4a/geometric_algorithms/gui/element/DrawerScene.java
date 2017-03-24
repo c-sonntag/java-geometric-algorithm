@@ -15,6 +15,7 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.embed.swing.JFXPanel;
+import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
@@ -52,6 +53,10 @@ public class DrawerScene {
                     drawer.setHeight(newSceneHeight.doubleValue());
                 }
             });
+            
+            scene.getRoot().setCursor(Cursor.WAIT);
+            root.setCursor(Cursor.WAIT);
+            
             //
             fxPanel.setScene(scene);
         }

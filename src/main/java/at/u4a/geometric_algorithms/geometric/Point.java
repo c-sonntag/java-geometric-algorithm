@@ -4,6 +4,8 @@ import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGeometricPainterVisi
 
 public class Point implements InterfaceGeometric {
 
+    public final static double POINT_RAYON = 1.5; 
+    
     public double x, y;
 
     public Point(Point p) {
@@ -32,6 +34,7 @@ public class Point implements InterfaceGeometric {
     }
 
     public boolean contains(Point p) {
+        
         return (x == p.x) && (y == p.y);
     }
 

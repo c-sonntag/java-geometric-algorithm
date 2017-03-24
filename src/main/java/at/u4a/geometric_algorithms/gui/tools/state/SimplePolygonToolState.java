@@ -1,12 +1,19 @@
 package at.u4a.geometric_algorithms.gui.tools.state;
 
+import java.io.File;
+
+import javax.swing.ImageIcon;
+
 import at.u4a.geometric_algorithms.geometric.Point;
 import at.u4a.geometric_algorithms.geometric.Polygon;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGraphicVisitor;
 import at.u4a.geometric_algorithms.gui.element.Drawer;
 import at.u4a.geometric_algorithms.gui.element.DrawerContext;
+import at.u4a.geometric_algorithms.gui.tools.Tool;
 import at.u4a.geometric_algorithms.gui.tools.ToolState;
 import javafx.scene.Cursor;
+import javafx.scene.ImageCursor;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 
 public class SimplePolygonToolState extends ToolState {
@@ -36,7 +43,31 @@ public class SimplePolygonToolState extends ToolState {
     /* */
 
     public void mouseEntered(Drawer drawer) {
-        drawer.setCursor(Cursor.NONE);
+        drawer.setCursor(Cursor.
+        
+        // drawer.setCursor(Cursor.NONE);
+        // drawer.setCursor(Cursor.E_RESIZE);
+        // setIcon(new ImageIcon(Tool.iconRessource + tool.icon));
+        // Image image = new Image("mycursor.png");
+        // ImageIcon(Tool.iconRessource + tool.icon);
+        // java.net.URL imgURL = getClass().getResource(path);
+        //String path = Tool.iconRessource + Tool.ShapeSimplePoligon.icon;
+        //System.out.println("Path : " + path);
+
+        // Image imgIcn = new Image(new File(path).toURI().toString());
+        
+        //Image imgIcon = new Image("file:"+path);
+
+        //Image imgIcon = new Image("file:" + path, 8, 8, false, true);
+
+        //drawer.setCursor(new ImageCursor(imgIcon));
+
+        // drawer.setCursor(new ImageCursor(imgIcon, imgIcon.getWidth() / 2,
+        // imgIcon.getHeight() / 2));
+
+        /*
+         * , image.getWidth() / 2, image.getHeight() /2));
+         */
     }
 
     /* */
@@ -75,11 +106,16 @@ public class SimplePolygonToolState extends ToolState {
 
     @Override
     public void mouseMoved(DrawerContext context, MouseEvent event) {
+
+        Point overPoint = poly.containPoint(new Point(event.getX(), event.getY()));
+        if (overPoint != null) {
+            overPoint.x += 10;
+        }
+
         if (inPlace) {
             currentPlacedPoint.set(event.getX(), event.getY());
             poly.convertToOrigin(currentPlacedPoint);
-        }
-        else {
+        } else {
             if (currentPointToPlace == null)
                 currentPointToPlace = new Point();
             currentPointToPlace.set(event.getX(), event.getY());
@@ -89,6 +125,8 @@ public class SimplePolygonToolState extends ToolState {
 
     @Override
     public void paint(InterfaceGraphicVisitor painter) {
+        // painter.setSelected(selected);
+
         painter.visit(poly);
         if (!inPlace)
             if (currentPointToPlace != null)

@@ -203,14 +203,14 @@ public class PrincipalGui extends JFrame {
         JToolBar toolBarTop = new JToolBar();
         toolBarTop.setFloatable(false);
         getContentPane().add(toolBarTop, BorderLayout.NORTH);
-        
+
         JToolBar appToolbar = new JToolBar();
         appToolbar.setFloatable(false);
         toolBarTop.add(appToolbar);
-        
-                JButton btnNew = new JButton("New");
-                appToolbar.add(btnNew);
-                btnNew.setIcon(new ImageIcon("icons/action/page_add.png"));
+
+        JButton btnNew = new JButton("New");
+        appToolbar.add(btnNew);
+        btnNew.setIcon(new ImageIcon("icons/action/page_add.png"));
 
         toolBarTop.addSeparator();
 
@@ -219,7 +219,7 @@ public class PrincipalGui extends JFrame {
          * ImageIcon("icons/page_add.png")); toolBarTop.add(btnNew);
          */
 
-        //toolBarTop.addSeparator();
+        // toolBarTop.addSeparator();
 
         JToolBar drawerActionToolBar = dad.getToolBar();
         drawerActionToolBar.setFloatable(false);
