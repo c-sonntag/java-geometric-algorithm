@@ -30,7 +30,7 @@ public class Drawer extends Canvas {
     private final DrawerScene ds;
     private final DrawerContext context;
 
-    private final GraphicPainter gp = new GraphicPainter();
+    private final GraphicPainter gp = new GraphicPainter(getGraphicsContext2D());
 
     // public Drawer(double width, double height) {
     public Drawer(DrawerScene ds) {
@@ -95,9 +95,6 @@ public class Drawer extends Canvas {
 
         GraphicsContext gc = getGraphicsContext2D();
         gc.clearRect(0, 0, width, height);
-
-        /** @TODO dessiner avec l'adaptor */
-        gp.setGraphicsContext(gc);
 
         //
         for (AbstractLayer layer : ds.getLayerMannager()) {

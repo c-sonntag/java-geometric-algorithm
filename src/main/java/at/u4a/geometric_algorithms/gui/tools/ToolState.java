@@ -1,12 +1,9 @@
 package at.u4a.geometric_algorithms.gui.tools;
 
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGraphicVisitor;
-import at.u4a.geometric_algorithms.graphic_visitor.InterfaceShapePainterVisitor;
 import at.u4a.geometric_algorithms.gui.element.Drawer;
 import at.u4a.geometric_algorithms.gui.element.DrawerContext;
-import at.u4a.geometric_algorithms.gui.tools.ToolState.State;
 import javafx.scene.Cursor;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 
@@ -47,7 +44,8 @@ public abstract class ToolState {
     /* ACTION GENERAL */
 
     public void mouseEntered(Drawer drawer) {
-        drawer.setCursor(Cursor.CROSSHAIR);
+        drawer.setCursor(Cursor.NONE);
+        //drawer.setCursor(Cursor.CROSSHAIR);
     }
 
     public void mouseExited(Drawer drawer) {

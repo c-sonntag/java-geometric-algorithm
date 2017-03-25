@@ -6,13 +6,14 @@ import java.util.List;
 
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceShapePainterVisitor;
 
-public class Polygon extends AbstractShape implements Iterable<Segment> {
+public class Polygon extends AbstractShape implements InterfaceContainer<Segment> {
 
     private class SegmentIterator implements Iterator<Segment> {
 
         private final Iterator<Point> perimeter_it = perimeter.iterator();
         private Point startPoint = null, point = null, lastPoint = null;
-        // private final Segment genSegment = new Segment(); @TODO voir si possible avec un seul segment généré
+        // private final Segment genSegment = new Segment(); @TODO voir si
+        // possible avec un seul segment généré
 
         private SegmentIterator() {
             doNext();
@@ -83,28 +84,38 @@ public class Polygon extends AbstractShape implements Iterable<Segment> {
      */
 
     public boolean contains(Point p) {
-        if (containPoint(p) != null)
+        if (containPoint(p, 0) != null)
             return true;
-        if (containSegment(p) != null)
+        if (containSegment(p, 0) != null)
             return true;
         //
         return false;
     }
 
-    public Point containPoint(Point p) {
+    @Override
+    public boolean contains(Point p, float epsilon) {
+        if (containPoint(p, epsilon) != null)
+            return true;
+        if (containSegment(p, epsilon) != null)
+            return true;
+        //
+        return false;
+    }
+
+    public Point containPoint(Point p, float epsilon) {
         final Point pToOrigin = new Point(p);
         convertToOrigin(pToOrigin);
         for (Point q : perimeter)
-            if (q.contains(pToOrigin))
+            if (q.contains(pToOrigin, epsilon))
                 return q;
         return null;
     }
 
-    public Segment containSegment(Point p) {
+    public Segment containSegment(Point p, float epsilon) {
         final Point pToOrigin = new Point(p);
         convertToOrigin(pToOrigin);
         for (Segment s : this)
-            if (s.contains(pToOrigin))
+            if (s.contains(pToOrigin, epsilon))
                 return s;
         return null;
     }
@@ -116,6 +127,11 @@ public class Polygon extends AbstractShape implements Iterable<Segment> {
     @Override
     public void accept(InterfaceShapePainterVisitor visitor) {
         visitor.visit(this);
+    }
+
+    @Override
+    public void clear() {
+        perimeter.clear();
     }
 
 }

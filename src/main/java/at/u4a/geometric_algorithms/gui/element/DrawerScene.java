@@ -164,5 +164,10 @@ public class DrawerScene {
     public ToolState getCurrentState() {
         return currentState;
     }
+    
+    public void addInActiveLayer() {
+        
+        
+    }
 
 }

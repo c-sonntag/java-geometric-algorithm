@@ -4,15 +4,15 @@ import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGeometricPainterVisi
 
 public class Point implements InterfaceGeometric {
 
-    public final static double POINT_RAYON = 1.5; 
-    
+    public final static float POINT_RAYON = 1.5f;
+
     public double x, y;
 
     public Point(Point p) {
         this.x = p.x;
         this.y = p.y;
     }
-    
+
     public Point(double x, double y) {
         this.x = x;
         this.y = y;
@@ -32,11 +32,20 @@ public class Point implements InterfaceGeometric {
         this.x = x;
         this.y = y;
     }
+    
+    public void translate(Point p) {
+        this.x += p.x;
+        this.y += p.y;
+    }
 
     public boolean contains(Point p) {
-        
-        return (x == p.x) && (y == p.y);
+        return (Math.abs(x - p.x) <= POINT_RAYON) && (Math.abs(y - p.y) <= POINT_RAYON);
+        //return (x == p.x) && (y == p.y);
     }
+
+    //public boolean contains(Point p, float epsilon) {
+    //    return (Math.abs(x - p.x) <= epsilon) && (Math.abs(y - p.y) <= epsilon);
+    //}
 
     public double distance(Point p) {
         double xDistance = p.x - x, yDistance = p.y - y;

@@ -22,9 +22,18 @@ public class Line implements InterfaceGeometric {
         this.a.set(other.a);
         this.b.set(other.b);
     }
+    
+    public void translate(Point p) {
+        a.translate(p);
+        b.translate(p);
+    }
 
     public boolean contains(Point p) {
         return distance(p) <= EPSILON;
+    }
+    
+    public boolean contains(Point p, float epsilon) {
+        return distance(p) <= epsilon;
     }
 
     /** Formule de distance récuperé dans le Partiel 2016/2017 de PCOO */

@@ -4,8 +4,6 @@ import java.util.EnumSet;
 
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGraphicVisitor;
 import at.u4a.geometric_algorithms.gui.tools.Tool;
-import at.u4a.geometric_algorithms.gui.tools.ToolState;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -51,10 +49,12 @@ public class DrawerContext {
     
     public void valid() {
         ds.getCurrentState().valid(drawer);
+        repaint();
     }
 
     public void cancel() {
         ds.getCurrentState().cancel(drawer);
+        repaint();
     }
 
     public Boolean needValidOperation() {

@@ -10,11 +10,12 @@ import at.u4a.geometric_algorithms.geometric.Rectangle;
 import at.u4a.geometric_algorithms.geometric.Segment;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 
 public class GraphicPainter implements InterfaceGraphicVisitor {
 
-    /** La couleur d'un point a l'ecran. */
-    private final static Color pointColor = Color.GRAY;
+    /// ** La couleur d'un point a l'ecran. */
+    // private final static Color pointColor = Color.GRAY;
 
     /** La couleur d'un segment a l'ecran. */
     private final static Color segmentColor = Color.BLUE;
@@ -25,14 +26,31 @@ public class GraphicPainter implements InterfaceGraphicVisitor {
     /** La couleur d'un point selectionne a l'ecran. */
     private final static Color selectedColor = Color.RED;
 
+    private Paint PointPaint = Color.GRAY; // gc.getStroke();
+
+    // gc.getStroke();
+
+    // private final static BasicStroke stokeDotted = new BasicStroke(3.0f,
+    // BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, dash, 0.0f));
+
     /* ACESS */
 
     protected boolean isSelected = false;
     protected boolean isOverlay = false;
+    protected boolean isWorkedConstruct = false;
+    protected boolean isDotted = false;
 
     protected Color color = null; // strockeColor, fillColor, selected Color ...
 
-    protected GraphicsContext gc = null;
+    protected final GraphicsContext gc;
+
+    /* INITIALIZER */
+
+    public GraphicPainter(GraphicsContext gc) {
+        this.gc = gc;
+    }
+
+    /* SETTING */
 
     public void setOverlay(boolean overlay) {
         isOverlay = overlay;
@@ -46,45 +64,95 @@ public class GraphicPainter implements InterfaceGraphicVisitor {
         this.color = color;
     }
 
-    public void setGraphicsContext(GraphicsContext gc) {
-        this.gc = gc;
+    public void setWorkedConstruct(boolean b) {
+        this.isWorkedConstruct = b;
     }
 
-    @Override
-    public GraphicsContext getGraphicsContext() {
-        return this.gc;
+    public void setDotted(boolean b) {
+        this.isDotted = b;
+
+        //
+        if (b) {
+            gc.setLineDashes(5, 15);
+        } else {
+            gc.setLineDashes(1);
+        }
+    }
+
+    public boolean getDotted() {
+        return this.isDotted;
+    }
+
+    // public void setGraphicsContext(GraphicsContext gc) {
+    // this.gc = gc;
+    // }
+
+    /* PROTECTED */
+
+    private Paint currentPaintStroke = null, currentPaintFill = null;
+
+    protected void saveCurrentPaint() {
+        currentPaintStroke = gc.getStroke();
+        currentPaintFill = gc.getFill();
+    }
+
+    protected void restoreLastPaint() {
+        if (currentPaintStroke != null)
+            gc.setStroke(currentPaintStroke);
+        if (currentPaintFill != null)
+            gc.setFill(currentPaintFill);
+    }
+
+    protected void setPointPaint() {
+        // gc.setFill(isSelected ? selectedColor : pointColor);
+        gc.setFill(Color.GRAY);
+        gc.setStroke(Color.BLACK);
     }
 
     /* GEOMETRIC */
 
     public void visit(Point p) {
-        gc.setFill(isSelected ? selectedColor : pointColor);
-        gc.setStroke(Color.BLACK);
+        saveCurrentPaint();
+        setPointPaint();
         gc.fillOval((int) (p.x - 2 * Point.POINT_RAYON), (int) (p.y - 2 * Point.POINT_RAYON), 2 * 2 * Point.POINT_RAYON, 2 * 2 * Point.POINT_RAYON);
         gc.strokeOval((int) (p.x - 2 * Point.POINT_RAYON), (int) (p.y - 2 * Point.POINT_RAYON), 2 * 2 * Point.POINT_RAYON, 2 * 2 * Point.POINT_RAYON);
+        restoreLastPaint();
     }
 
     /** TODO doit dessiner une ligne et non un segment ! */
     public void visit(Line l) {
-        gc.setStroke(isSelected ? selectedColor : segmentColor);
+        // gc.setStroke(isSelected ? selectedColor : segmentColor);
         gc.strokeLine((int) l.a.x, (int) l.a.y, (int) l.b.x, (int) l.b.y);
     }
 
     public void visit(Segment s) {
-        gc.setStroke(isSelected ? selectedColor : segmentColor);
+        // gc.setStroke(isSelected ? selectedColor : segmentColor);
         gc.strokeLine((int) s.a.x, (int) s.a.y, (int) s.b.x, (int) s.b.y);
     }
 
     /* SHAPES */
 
     public void visit(Polygon poly) {
+        //
         final Segment sToOrigin = new Segment();
-        for (Segment s : poly) {
+
+        //
+        Iterator<Segment> s_it = poly.iterator();
+        Segment s = null;
+
+        //
+        boolean defaultDotted = getDotted();
+        while (s_it.hasNext()) {
+            s = s_it.next();
+            if (!s_it.hasNext() && isWorkedConstruct)
+                setDotted(true);
+
             sToOrigin.set(s);
             poly.convertToStandard(sToOrigin.a);
             poly.convertToStandard(sToOrigin.b);
             visit(sToOrigin);
         }
+        setDotted(defaultDotted);
         final Point pToOrigin = new Point();
         for (Point p : poly.perimeter) {
             pToOrigin.set(p);

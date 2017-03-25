@@ -1,6 +1,7 @@
 package at.u4a.geometric_algorithms.gui.tools.state;
 
-
+import at.u4a.geometric_algorithms.geometric.Point;
+import at.u4a.geometric_algorithms.geometric.Rectangle;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGraphicVisitor;
 import at.u4a.geometric_algorithms.gui.element.DrawerContext;
 import at.u4a.geometric_algorithms.gui.tools.ToolState;
@@ -14,7 +15,7 @@ public class SelectionToolState extends ToolState {
 
     @Override
     public void mousePressed(DrawerContext context, MouseEvent event) {
-        //context.setState(new CircleDrawerState1(x, y));
+        // context.setState(new CircleDrawerState1(x, y));
     }
 
     @Override
@@ -32,12 +33,13 @@ public class SelectionToolState extends ToolState {
 
     @Override
     public void paint(InterfaceGraphicVisitor painter) {
-        GraphicsContext context = painter.getGraphicsContext();
-        context.setStroke(Color.BLACK);
-        context.strokeLine(x - 5, y, x + 5, y);
-        context.strokeLine(x, y - 5, x, y + 5);
-        context.strokeRect(x, y, 200, 200);
-        context.strokeLine(x, y - 5, x, y + 5);
+        painter.visit(new Rectangle(new Point(x, y), new Point(200, 200)));
+        /*
+         * GraphicsContext context = painter.getGrapicsContext();
+         * context.setStroke(Color.BLACK); context.strokeLine(x - 5, y, x + 5,
+         * y); context.strokeLine(x, y - 5, x, y + 5); context.strokeRect(x, y,
+         * 200, 200); context.strokeLine(x, y - 5, x, y + 5);
+         */
     }
 
 }

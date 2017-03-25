@@ -6,7 +6,11 @@ public interface InterfaceGeometric {
     
     boolean contains(Point p);
     
+    boolean contains(Point p, float epsilon);
+    
     double distance(Point p);
+    
+    void translate(Point p);
     
     void accept(InterfaceGeometricPainterVisitor visitor);
 

@@ -7,7 +7,7 @@ import java.util.NoSuchElementException;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGeometricPainterVisitor;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceShapePainterVisitor;
 
-public class CloudOfSegments extends AbstractShape {
+public class CloudOfSegments extends AbstractShape implements InterfaceContainer<Segment> {
 
     final public ArrayList<Segment> cloud = new ArrayList<Segment>();
 
@@ -26,12 +26,12 @@ public class CloudOfSegments extends AbstractShape {
         return segments;
     }
 
-    public boolean contains(Point p) {
+    @Override
+    public boolean contains(Point p, float epsilon) {
         for (Segment s : cloud) {
             if (s.contains(p))
                 return true;
         }
-
         return false;
     }
 
@@ -56,6 +56,16 @@ public class CloudOfSegments extends AbstractShape {
     @Override
     public void accept(InterfaceShapePainterVisitor visitor) {
         visitor.visit(this);
+    }
+
+    @Override
+    public Iterator<Segment> iterator() {
+        return cloud.iterator();
+    }
+
+    @Override
+    public void clear() {
+        cloud.clear();
     }
 
 }

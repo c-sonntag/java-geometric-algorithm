@@ -19,12 +19,17 @@ public class Rectangle extends AbstractShape {
     }
 
     public boolean contains(Point p) {
+        return contains(p, 0);
+    }
+
+    @Override
+    public boolean contains(Point p, float epsilon) {
         final Point oppositeSide = getOppositeSide();
         return
-        /* MinHorizontal */ (Math.min(origin.x, oppositeSide.x) >= p.x) &&
-        /* MinVertical */ (Math.min(origin.y, oppositeSide.y) >= p.y) &&
-        /* TopHorizontal */ (Math.max(origin.x, oppositeSide.x) < p.y) &&
-        /* TopVertical */ (Math.max(origin.y, oppositeSide.y) < p.y);
+        /* MinHorizontal */ (Math.min(origin.x, oppositeSide.x) >= (p.x + epsilon)) &&
+        /* MinVertical */ (Math.min(origin.y, oppositeSide.y) >= (p.y + epsilon)) &&
+        /* TopHorizontal */ (Math.max(origin.x, oppositeSide.x) < (p.y - epsilon)) &&
+        /* TopVertical */ (Math.max(origin.y, oppositeSide.y) < (p.y - epsilon));
     }
 
     public final Point getOppositeSide() {

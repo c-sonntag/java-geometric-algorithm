@@ -9,8 +9,12 @@ public interface InterfaceGraphicVisitor extends InterfaceShapePainterVisitor, I
     public void setOverlay(boolean overlay) ;
     public void setSelected(boolean selected) ;
     public void setColor(Color color) ;
-    public void setGraphicsContext(GraphicsContext gc);
     
-    public GraphicsContext getGraphicsContext();
+    public void setWorkedConstruct(boolean b);
+    public void setDotted(boolean b);
+    public boolean getDotted();
+    
+    //public GraphicsContext getGraphicsContext();*
+    //public void setGraphicsContext(GraphicsContext gc);
     
 }

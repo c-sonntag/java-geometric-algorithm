@@ -16,7 +16,7 @@ public abstract class AbstractShape implements InterfaceGeometric {
     }
 
     public void translate(Point newOrigin) {
-        origin.set(newOrigin);
+        origin.translate(newOrigin);
     }
     
     public void convertToOrigin(Point p) {
@@ -29,13 +29,17 @@ public abstract class AbstractShape implements InterfaceGeometric {
         p.y = p.y + origin.y;
     }
     
+    public boolean contains(Point p) {
+        return contains(p, 0);
+    }
+    
+    
     @Override
     public void accept(InterfaceGeometricPainterVisitor visitor) {
         // Nothing here !
     }
     
     public abstract void accept(InterfaceShapePainterVisitor visitor);
-    
     
 
 }
