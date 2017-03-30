@@ -55,9 +55,9 @@ public class PrincipalGui extends JFrame {
     private static final long serialVersionUID = 7047807079976701109L;
 
     // Initialize Final Variable
-    private final LayerTree treeLayer = new LayerTree();
     private final DrawerAction dad = new DrawerAction();
     private final DrawerScene ds = new DrawerScene(dad);
+    private final LayerTree treeLayer = new LayerTree(ds.getLayerMannager());
 
     /**
      * Launch the application.

@@ -38,6 +38,11 @@ public class DirectSelectionToolState extends ToolState {
     protected boolean inMove = false;
     protected Point startPoint = null;
     protected Point translatePoint = null;
+    
+    
+    public void mouseEntered(Drawer drawer) {
+        drawer.setCursor(Cursor.CROSSHAIR);
+    }
 
     @Override
     public void mousePressed(DrawerContext context, MouseEvent event) {

@@ -29,9 +29,9 @@ public abstract class AbstractShape implements InterfaceGeometric {
         p.y = p.y + origin.y;
     }
     
-    public boolean contains(Point p) {
-        return contains(p, 0);
-    }
+    //public boolean contains(Point p) {
+    //    return contains(p, 0);
+    //}
     
     
     @Override

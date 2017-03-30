@@ -27,12 +27,17 @@ public class CloudOfSegments extends AbstractShape implements InterfaceContainer
     }
 
     @Override
-    public boolean contains(Point p, float epsilon) {
+    public boolean contains(Point p) {
+        return (getContains(p) != null);
+    }
+
+    @Override
+    public InterfaceGeometric getContains(Point p) {
         for (Segment s : cloud) {
             if (s.contains(p))
-                return true;
+                return s;
         }
-        return false;
+        return null;
     }
 
     /** Distance entre un point et le segment du nuage le plus proche */

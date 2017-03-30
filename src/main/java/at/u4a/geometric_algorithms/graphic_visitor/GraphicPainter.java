@@ -73,7 +73,7 @@ public class GraphicPainter implements InterfaceGraphicVisitor {
 
         //
         if (b) {
-            gc.setLineDashes(5, 15);
+            gc.setLineDashes(5, 10);
         } else {
             gc.setLineDashes(1);
         }

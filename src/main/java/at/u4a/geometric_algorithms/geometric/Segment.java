@@ -16,8 +16,8 @@ public class Segment extends Line {
         return
         /* minX */ ((p.x >= Math.min(a.x, b.x)) &&
         /* maxX */ (p.x <= Math.max(a.x, b.x)) &&
-        /* minY */ (p.y >= Math.min(a.x, b.x)) &&
-        /* maxY */ (p.y <= Math.max(a.x, b.x))) ?
+        /* minY */ (p.y >= Math.min(a.y, b.y)) &&
+        /* maxY */ (p.y <= Math.max(a.y, b.y))) ?
         /* In Range */ super.contains(p) :
         /* Out Range */ false;
     }

@@ -83,39 +83,39 @@ public class Polygon extends AbstractShape implements InterfaceContainer<Segment
      * } return segments; }
      */
 
-    public boolean contains(Point p) {
-        if (containPoint(p, 0) != null)
-            return true;
-        if (containSegment(p, 0) != null)
-            return true;
-        //
-        return false;
-    }
-
     @Override
-    public boolean contains(Point p, float epsilon) {
-        if (containPoint(p, epsilon) != null)
-            return true;
-        if (containSegment(p, epsilon) != null)
-            return true;
-        //
-        return false;
+    public boolean contains(Point p) {
+        return (getContains(p) != null);
+    }
+    
+    
+    @Override
+    public InterfaceGeometric getContains(Point p) {
+        Point isP = containPoint(p);
+        if (isP != null)
+            return isP;
+        
+        Segment isS = containSegment(p);
+        if (isS != null)
+            return isS;
+        
+        return null;
     }
 
-    public Point containPoint(Point p, float epsilon) {
+    public Point containPoint(Point p) {
         final Point pToOrigin = new Point(p);
         convertToOrigin(pToOrigin);
         for (Point q : perimeter)
-            if (q.contains(pToOrigin, epsilon))
+            if (q.contains(pToOrigin))
                 return q;
         return null;
     }
 
-    public Segment containSegment(Point p, float epsilon) {
+    public Segment containSegment(Point p) {
         final Point pToOrigin = new Point(p);
         convertToOrigin(pToOrigin);
         for (Segment s : this)
-            if (s.contains(pToOrigin, epsilon))
+            if (s.contains(pToOrigin))
                 return s;
         return null;
     }

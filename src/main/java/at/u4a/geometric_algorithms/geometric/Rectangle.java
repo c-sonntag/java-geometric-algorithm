@@ -1,10 +1,10 @@
 package at.u4a.geometric_algorithms.geometric;
 
-import java.util.ArrayList;
-
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceShapePainterVisitor;
 
 public class Rectangle extends AbstractShape {
+    
+    private static final float EPSILON = 1f;
 
     public final Point size;
 
@@ -18,18 +18,22 @@ public class Rectangle extends AbstractShape {
         this.size = size;
     }
 
-    public boolean contains(Point p) {
-        return contains(p, 0);
-    }
-
     @Override
-    public boolean contains(Point p, float epsilon) {
+    public boolean contains(Point p) {
         final Point oppositeSide = getOppositeSide();
         return
-        /* MinHorizontal */ (Math.min(origin.x, oppositeSide.x) >= (p.x + epsilon)) &&
-        /* MinVertical */ (Math.min(origin.y, oppositeSide.y) >= (p.y + epsilon)) &&
-        /* TopHorizontal */ (Math.max(origin.x, oppositeSide.x) < (p.y - epsilon)) &&
-        /* TopVertical */ (Math.max(origin.y, oppositeSide.y) < (p.y - epsilon));
+        /* MinHorizontal */ (Math.min(origin.x, oppositeSide.x) >= (p.x + EPSILON)) &&
+        /* MinVertical */ (Math.min(origin.y, oppositeSide.y) >= (p.y + EPSILON)) &&
+        /* TopHorizontal */ (Math.max(origin.x, oppositeSide.x) < (p.y - EPSILON)) &&
+        /* TopVertical */ (Math.max(origin.y, oppositeSide.y) < (p.y - EPSILON));
+    }
+    
+    @Override
+    public InterfaceGeometric getContains(Point p) {
+        if (contains(p))
+            return this;
+        else
+            return null;
     }
 
     public final Point getOppositeSide() {
