@@ -16,10 +16,12 @@ public abstract class AbstractLayer {
     }
 
     /* PRIVATE VAR */
-
+    
     private String layerName;
 
     private AbstractLayer parent;
+    
+    private boolean active;
 
     /* PROTECTED */
 
@@ -67,6 +69,14 @@ public abstract class AbstractLayer {
 
     public AbstractLayer getParent() {
         return parent;
+    }
+    
+    public boolean isActive() {
+        return active;
+    }
+    
+    public void setActive(boolean b) {
+        active = b;
     }
 
 }
