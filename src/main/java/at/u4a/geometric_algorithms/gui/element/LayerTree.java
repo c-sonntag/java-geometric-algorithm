@@ -1,9 +1,11 @@
 package at.u4a.geometric_algorithms.gui.element;
 
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -60,7 +62,7 @@ public class LayerTree extends JTree {
 
     protected final LayerMannager lm;
     protected final DrawerScene ds;
-    
+
     static int count = 0;
 
     public LayerTree(DrawerScene ds) {
@@ -231,7 +233,8 @@ public class LayerTree extends JTree {
 
         // private JCheckBox leafRenderer = new JCheckBox();
 
-        JPanel renderer = new JPanel();
+         //JPanel renderer = new JPanel();
+        JPanel renderer = new JPanel(new BorderLayout());
 
         private DefaultTreeCellRenderer defaultRenderer = new DefaultTreeCellRenderer();
 
@@ -252,24 +255,12 @@ public class LayerTree extends JTree {
             backgroundSelectionColor = defaultRenderer.getBackgroundSelectionColor();
             backgroundNonSelectionColor = defaultRenderer.getBackgroundNonSelectionColor();
 
-            //panel.setLayout(new BorderLayout(0, 0));
-            
-            renderer.setLayout(new GridLayout());
-            
-            JPanel toolBar = new JPanel();
-            renderer.add(toolBar, BorderLayout.WEST);
-            // toolBar.setLayout(new BorderLayout(0, 0));
 
-            // JPanel toolBar = renderer;
-
-            toolBar.setLayout(new BoxLayout(toolBar, BoxLayout.X_AXIS));
-            // toolBar.setBackground(Color.MAGENTA);
+            JPanel toolBar = new JPanel();    
+            //toolBar.setAlignmentX(Component.LEFT_ALIGNMENT);
+            renderer.add(toolBar);
+            //toolBar.setLayout(new GridLayout());
             toolBar.setOpaque(false);
-
-            // JToolBar toolBar = new JToolBar();
-            // toolBar.setRollover(true);
-            // toolBar.setFloatable(false);
-            // panel.add(toolBar, BorderLayout.CENTER);
 
             chckbxActive = new JCheckBox();
             chckbxActive.setSelected(true);
@@ -279,36 +270,38 @@ public class LayerTree extends JTree {
                 public void actionPerformed(ActionEvent arg0) {
                     saveNode();
                     ds.repaint();
-                    //setTool(btnTool.getTool());
                 }
             });
             toolBar.add(chckbxActive);
 
             // toolBar.addSeparator();
             // toolBar.add(rigidArea);
-            toolBar.add(Box.createRigidArea(rigidAreaSize));
+            //toolBar.add(Box.createRigidArea(rigidAreaSize));
 
             lblCategoryGen = new LabelCategory(LayerCategory.Geometry);
             toolBar.add(lblCategoryGen);
 
             // toolBar.addSeparator();
             // toolBar.add(rigidArea);
-            toolBar.add(Box.createRigidArea(rigidAreaSize));
+            //toolBar.add(Box.createRigidArea(rigidAreaSize));
 
             lblLayerType = new JLabel("_LayerType_");
+            lblLayerType.setText(String.valueOf(count) + " ");
             lblLayerType.setIcon(new ImageIcon("R:\\Java_Shared\\java-licence-3-informatique\\GeometricAlgorithms\\icons\\tools\\shape_circle.png"));
             toolBar.add(lblLayerType);
 
+            count++;
+
             // toolBar.addSeparator();
             // toolBar.add(rigidArea);
-            toolBar.add(Box.createRigidArea(rigidAreaSize));
+            //toolBar.add(Box.createRigidArea(rigidAreaSize));
 
             lblLayerName = new JLabel("_LayerName_");
             toolBar.add(lblLayerName);
 
             // toolBar.addSeparator();
             // toolBar.add(rigidArea);
-            toolBar.add(Box.createRigidArea(rigidAreaSize));
+            //toolBar.add(Box.createRigidArea(rigidAreaSize));
 
             ColorChooserButton ccTest1 = new ColorChooserButton(Color.CYAN);
             ccTest1.setToolTipText("Yooo");
@@ -320,13 +313,13 @@ public class LayerTree extends JTree {
 
             // toolBar.addSeparator();
             // toolBar.add(rigidArea);
-            toolBar.add(Box.createRigidArea(rigidAreaSize));
+            //toolBar.add(Box.createRigidArea(rigidAreaSize));
 
-            //toolBar.pack();
-            
-            //JPanel panel_1 = new JPanel();
-            //toolBar.add(panel_1);
-            //panel_1.setLayout(new BoxLayout(panel_1, BoxLayout.X_AXIS));
+            // toolBar.pack();
+
+            // JPanel panel_1 = new JPanel();
+            // toolBar.add(panel_1);
+            // panel_1.setLayout(new BoxLayout(panel_1, BoxLayout.X_AXIS));
 
         }
 
@@ -342,7 +335,7 @@ public class LayerTree extends JTree {
 
         public void update(AbstractLayer node) {
             lblCategoryGen.set(node.getCategory());
-            lblLayerType.setText(node.getLayerType());
+            // lblLayerType.setText(node.getLayerType());
             lblLayerType.setIcon(node.getLayerTypeIcon());
             lblLayerName.setText(node.getLayerName());
             chckbxActive.setSelected(node.isActive());
@@ -352,7 +345,7 @@ public class LayerTree extends JTree {
             renderer.revalidate();
             currentNode = node;
         }
-        
+
         protected void saveNode() {
             if (currentNode == null)
                 return;
@@ -362,15 +355,15 @@ public class LayerTree extends JTree {
             /** @todo gerer le rename */
             // currentNode.setLayerName(lblLayerName.getText());
         }
-        
+
         protected AbstractLayer getNode() {
             if (currentNode == null)
                 return null;
-            
+
             saveNode();
             return currentNode;
         }
-        
+
         protected JPanel getRenderer() {
             return renderer;
         }
@@ -417,6 +410,9 @@ public class LayerTree extends JTree {
             if (returnValue == null) {
                 returnValue = defaultRenderer.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
             }
+
+            System.out.println("LayerNodeRenderer\t Width(" + String.valueOf(returnValue.getPreferredSize().getWidth()) + ") Height(" + String.valueOf(returnValue.getPreferredSize().getHeight()) + ")  ");
+
             return returnValue;
         }
 
@@ -464,10 +460,10 @@ public class LayerTree extends JTree {
             // CheckBoxNode checkBoxNode = new CheckBoxNode(render.getName(),
             // render.get);
             // return new AbstractLayer("a", true);
-            //AbstractLayer node = renderer.getNode();
-            //ds.repaint();
-            
-            //return null;
+            // AbstractLayer node = renderer.getNode();
+            // ds.repaint();
+
+            // return null;
             return renderer.getNode();
         }
 
@@ -491,9 +487,8 @@ public class LayerTree extends JTree {
         public Component getTreeCellEditorComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row) {
 
             Component editor = renderer.getTreeCellRendererComponent(tree, value, true, expanded, leaf, row, true);
-            fireEditingStopped();
 
-            editor = renderer.getTreeCellRendererComponent(tree, value, true, expanded, leaf, row, true);
+            System.out.println("LayerNodeEditor\t Width(" + String.valueOf(editor.getPreferredSize().getWidth()) + ") Height(" + String.valueOf(editor.getPreferredSize().getHeight()) + ")  ");
 
             ItemListener itemListener = new ItemListener() {
 
@@ -509,9 +504,12 @@ public class LayerTree extends JTree {
             // }
 
             if (editor instanceof JPanel) {
+
+                // ((JPanel) editor). addItemListener(itemListener);
+
                 fireEditingStopped();
                 // fireTreeNodesChanged();
-                fireEditingCanceled();
+                // fireEditingCanceled();
 
                 // ((JPanel) editor).addFocusListener(l);
 

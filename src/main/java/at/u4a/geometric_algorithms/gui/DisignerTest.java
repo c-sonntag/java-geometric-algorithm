@@ -29,6 +29,7 @@ import com.jgoodies.forms.layout.RowSpec;
 
 import at.u4a.geometric_algorithms.gui.element.ColorChooserButton;
 import at.u4a.geometric_algorithms.gui.element.LabelCategory;
+import at.u4a.geometric_algorithms.gui.layer.LayerCategory;
 import net.miginfocom.swing.MigLayout;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -44,6 +45,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.JPopupMenu;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.CardLayout;
 
 public class DisignerTest {
 
@@ -104,7 +107,7 @@ public class DisignerTest {
         
         toolBar.addSeparator();
         
-        LabelCategory lblCategoryGen = new LabelCategory("F", "Function");
+        LabelCategory lblCategoryGen = new LabelCategory();
         toolBar.add(lblCategoryGen);
         
         toolBar.addSeparator();
@@ -162,7 +165,7 @@ private void testLayerTreeLayerInfoWithPanel() {
         //toolBar.addSeparator();
         toolBar.add(Box.createRigidArea(new Dimension(5,0)));
         
-        LabelCategory lblCategoryGen = new LabelCategory("F", "Function");
+        LabelCategory lblCategoryGen = new LabelCategory(LayerCategory.Algorithm);
         toolBar.add(lblCategoryGen);
         
         //toolBar.addSeparator();
@@ -189,6 +192,11 @@ private void testLayerTreeLayerInfoWithPanel() {
         ColorChooserButton ccTest2 = new ColorChooserButton(Color.CYAN);
         ccTest2.setToolTipText("YoooPP");
         toolBar.add(ccTest2);
+        
+        JPanel panel = new JPanel();
+        panel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        toolBar.add(panel);
+        panel.setLayout(new GridLayout(1, 0, 0, 0));
 
         //setMenuToBottomLeftAlignement(mnNewMenu);
         
