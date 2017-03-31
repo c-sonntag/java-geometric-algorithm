@@ -10,7 +10,7 @@ import at.u4a.geometric_algorithms.geometric.Polygon;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGraphicVisitor;
 import at.u4a.geometric_algorithms.gui.element.Drawer;
 import at.u4a.geometric_algorithms.gui.element.DrawerContext;
-import at.u4a.geometric_algorithms.gui.layer.Geometric;
+import at.u4a.geometric_algorithms.gui.layer.GeometricLayer;
 import at.u4a.geometric_algorithms.gui.tools.Tool;
 import at.u4a.geometric_algorithms.gui.tools.ToolState;
 import javafx.scene.Cursor;

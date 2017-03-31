@@ -33,6 +33,8 @@ public class ColorChooserButton extends JButton {
             }
         });
         
+        setPreferredSize(new Dimension(11, 11));
+        
         //setPreferredSize(new Dimension(10,10));
         setBorderPainted(false); 
         setContentAreaFilled(false); 

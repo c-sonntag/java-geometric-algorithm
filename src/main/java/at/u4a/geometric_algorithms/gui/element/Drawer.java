@@ -11,7 +11,7 @@ import at.u4a.geometric_algorithms.geometric.Point;
 import at.u4a.geometric_algorithms.geometric.Rectangle;
 import at.u4a.geometric_algorithms.graphic_visitor.GraphicPainter;
 import at.u4a.geometric_algorithms.gui.layer.AbstractLayer;
-import at.u4a.geometric_algorithms.gui.layer.Geometric;
+import at.u4a.geometric_algorithms.gui.layer.GeometricLayer;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 
@@ -56,12 +56,12 @@ public class Drawer extends Canvas {
         // Redraw canvas when size changes.
         widthProperty().addListener(evt -> repaint());
         heightProperty().addListener(evt -> repaint());
-        
+
         // Add DrawerAction
         ds.getDrawerAction().addDrawerActionListenerOfValid(context::valid);
         ds.getDrawerAction().addDrawerActionListenerOfCancel(context::cancel);
 
-        ds.getLayerMannager().addLayer(new Geometric<Rectangle>(new Rectangle(new Point(10, 10), new Point(100, 100))));
+        ds.getLayerMannager().addLayer(new GeometricLayer<Rectangle>(new Rectangle(new Point(10, 10), new Point(100, 100))));
 
         //
         repaint();
@@ -98,7 +98,8 @@ public class Drawer extends Canvas {
 
         //
         for (AbstractLayer layer : ds.getLayerMannager()) {
-            layer.accept(gp);
+            if (layer.isActive())
+                layer.accept(gp);
 
             /*
              * layer. AbstractShape shape = layer.getShape();
@@ -116,6 +117,10 @@ public class Drawer extends Canvas {
 
     public DrawerScene getDS() {
         return ds;
+    }
+
+    public InterfaceDrawerAction getDA() {
+        return ds.getDrawerAction();
     }
 
 }

@@ -3,6 +3,8 @@ package at.u4a.geometric_algorithms.gui.layer;
 import java.awt.Color;
 import java.util.Vector;
 
+import javax.swing.ImageIcon;
+
 import at.u4a.geometric_algorithms.geometric.AbstractShape;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceShapePainterVisitor;
 
@@ -35,7 +37,7 @@ public abstract class AbstractLayer {
 
     abstract public String getLayerType();
 
-    abstract public String getLayerTypeIconName();
+    abstract public ImageIcon getLayerTypeIcon();
 
     abstract public Boolean isContener();
 
@@ -53,6 +55,7 @@ public abstract class AbstractLayer {
 
     public AbstractLayer(AbstractLayer parent) {
         this.parent = parent;
+        this.active = true;
     }
 
     public String getLayerName() {
@@ -77,6 +80,10 @@ public abstract class AbstractLayer {
     
     public void setActive(boolean b) {
         active = b;
+    }
+    
+    public String toString() {
+        return getLayerName();
     }
 
 }

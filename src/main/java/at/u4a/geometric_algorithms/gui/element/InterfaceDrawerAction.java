@@ -9,6 +9,10 @@ public interface InterfaceDrawerAction {
     public void addDrawerActionListenerOfCancel(Runnable func);
 
     public void activeDrawerAction(boolean b);
+    
+    public void haveValid(boolean b);
+    
+    public void haveCancel(boolean b);
 
     public JToolBar getToolBar();
 

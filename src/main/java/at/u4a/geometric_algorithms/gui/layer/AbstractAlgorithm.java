@@ -19,6 +19,10 @@ public abstract class  AbstractAlgorithm extends AbstractLayer {
     public Boolean isContener() {
         return true;
     }
+    
+    public String toString() {
+        return "[" + getLayerName() + "]";
+    }
 
 
 }

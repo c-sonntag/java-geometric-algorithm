@@ -10,7 +10,8 @@ import at.u4a.geometric_algorithms.geometric.Polygon;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGraphicVisitor;
 import at.u4a.geometric_algorithms.gui.element.Drawer;
 import at.u4a.geometric_algorithms.gui.element.DrawerContext;
-import at.u4a.geometric_algorithms.gui.layer.Geometric;
+import at.u4a.geometric_algorithms.gui.element.InterfaceDrawerAction;
+import at.u4a.geometric_algorithms.gui.layer.GeometricLayer;
 import at.u4a.geometric_algorithms.gui.tools.Tool;
 import at.u4a.geometric_algorithms.gui.tools.ToolState;
 import javafx.scene.Cursor;
@@ -19,6 +20,8 @@ import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 
 public class SimplePolygonToolState extends ToolState {
+
+    static int PolygonCount = 1;
 
     private Boolean inPlace = false;
     private Polygon poly = new Polygon();
@@ -30,18 +33,35 @@ public class SimplePolygonToolState extends ToolState {
 
     /* */
 
+    private InterfaceDrawerAction da;
+
+    private void refreshDA() {
+        if (da != null) {
+            da.haveValid(poly.perimeter.size() > 2);
+            da.haveCancel(poly.perimeter.size() > 1);
+        }
+    }
+
+    public void init(Drawer drawer) {
+        da = drawer.getDA();
+        refreshDA();
+    }
+
     public void valid(Drawer drawer) {
+        GeometricLayer<Polygon> polygonLayer = new GeometricLayer<Polygon>(poly);
+        polygonLayer.setLayerName("Polygon " + String.valueOf(PolygonCount));
+        PolygonCount++;
         
-        //
-        Geometric<Polygon> PolygonLayer = new Geometric<Polygon>(poly);
-        drawer.getDS().getLayerMannager().addLayer(PolygonLayer);
-        
+        drawer.getDS().getLayerMannager().addLayer(polygonLayer);
+
         //
         poly = new Polygon();
+        init(drawer);
     }
 
     public void cancel(Drawer drawer) {
         poly.clear();
+        init(drawer);
     }
 
     public Boolean needValidOperation() {
@@ -57,6 +77,9 @@ public class SimplePolygonToolState extends ToolState {
         poly.addPoint(currentPlacedPoint); // event.getX(), event.getY());
         inPlace = true;
         context.repaint();
+
+        //
+        refreshDA();
     }
 
     @Override
@@ -87,7 +110,7 @@ public class SimplePolygonToolState extends ToolState {
 
         InterfaceGeometric overIG = poly.getContains(new Point(event.getX(), event.getY()));
         if (overIG != null) {
-            overIG.translate(new Point(1,0));
+            overIG.translate(new Point(1, 0));
         }
 
         if (inPlace) {
@@ -108,8 +131,7 @@ public class SimplePolygonToolState extends ToolState {
         painter.setWorkedConstruct(true);
         painter.visit(poly);
         painter.setWorkedConstruct(false);
-        
-        
+
         if (!inPlace)
             if (currentPointToPlace != null)
                 painter.visit(currentPointToPlace);

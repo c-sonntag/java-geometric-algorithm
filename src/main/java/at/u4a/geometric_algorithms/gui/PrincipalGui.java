@@ -57,7 +57,7 @@ public class PrincipalGui extends JFrame {
     // Initialize Final Variable
     private final DrawerAction dad = new DrawerAction();
     private final DrawerScene ds = new DrawerScene(dad);
-    private final LayerTree treeLayer = new LayerTree(ds.getLayerMannager());
+    private final LayerTree treeLayer = new LayerTree(ds);
 
     /**
      * Launch the application.
@@ -357,6 +357,16 @@ public class PrincipalGui extends JFrame {
         @Override
         public JToolBar getToolBar() {
             return toolbar;
+        }
+
+        @Override
+        public void haveValid(boolean b) {
+           btnValid.setEnabled(b);
+        }
+
+        @Override
+        public void haveCancel(boolean b) {
+            btnCancel.setEnabled(b);
         }
 
     }

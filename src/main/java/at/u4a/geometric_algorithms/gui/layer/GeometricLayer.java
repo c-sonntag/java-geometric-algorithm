@@ -2,14 +2,16 @@ package at.u4a.geometric_algorithms.gui.layer;
 
 import java.util.Vector;
 
+import javax.swing.ImageIcon;
+
 import at.u4a.geometric_algorithms.geometric.AbstractShape;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceShapePainterVisitor;
 
-public class Geometric<TShape extends AbstractShape> extends AbstractLayer {
+public class GeometricLayer<TShape extends AbstractShape> extends AbstractLayer {
 
     private TShape shape;
 
-    public Geometric(TShape shape) {
+    public GeometricLayer(TShape shape) {
         this.shape = shape;
     }
 
@@ -40,12 +42,14 @@ public class Geometric<TShape extends AbstractShape> extends AbstractLayer {
 
     @Override
     public String getLayerType() {
-        return "An Geometric shape ..."; /** @TODO Gerer le type */
+        return shape.getClass().getSimpleName();
+        //return "An Geometric shape ..."; /** @TODO Gerer le type */
     }
 
     @Override
-    public String getLayerTypeIconName() {
-        return "test.png";               /** @TODO Gerer l'icone */
+    public ImageIcon getLayerTypeIcon() {
+        return new ImageIcon("R:\\Java_Shared\\java-licence-3-informatique\\GeometricAlgorithms\\icons\\tools\\shape_circle.png");
+        //return "test.png";               /** @TODO Gerer l'icone */
     }
 
     @Override

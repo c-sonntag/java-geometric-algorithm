@@ -33,6 +33,7 @@ import net.miginfocom.swing.MigLayout;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JToolBar;
 import javax.swing.event.ChangeEvent;
@@ -42,6 +43,7 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JPopupMenu;
 import java.awt.Component;
+import java.awt.Dimension;
 
 public class DisignerTest {
 
@@ -158,22 +160,27 @@ private void testLayerTreeLayerInfoWithPanel() {
         toolBar.add(chckbxActive);
         
         //toolBar.addSeparator();
+        toolBar.add(Box.createRigidArea(new Dimension(5,0)));
         
         LabelCategory lblCategoryGen = new LabelCategory("F", "Function");
         toolBar.add(lblCategoryGen);
         
         //toolBar.addSeparator();
+        toolBar.add(Box.createRigidArea(new Dimension(5,0)));
         
         JLabel lblLayerType = new JLabel("_LayerType_");
         lblLayerType.setIcon(new ImageIcon("R:\\Java_Shared\\java-licence-3-informatique\\GeometricAlgorithms\\icons\\tools\\shape_circle.png"));
         toolBar.add(lblLayerType);
         
         //toolBar.addSeparator();
+        toolBar.add(Box.createRigidArea(new Dimension(5,0)));
         
         JLabel lblLayerName = new JLabel("_LayerName_");
         toolBar.add(lblLayerName);
         
         //toolBar.addSeparator();
+        
+        toolBar.add(Box.createRigidArea(new Dimension(5,0)));
         
         ColorChooserButton ccTest1 = new ColorChooserButton(Color.CYAN);
         ccTest1.setToolTipText("Yooo");

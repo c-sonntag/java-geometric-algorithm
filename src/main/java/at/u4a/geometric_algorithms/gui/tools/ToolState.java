@@ -9,13 +9,23 @@ import javafx.scene.input.MouseEvent;
 
 public abstract class ToolState {
 
-    /* SATE ACTION */
+    /* STATE ACTION */
 
     public enum State {
         Waiting, Started, Finish
     };
 
     protected ToolState.State currentState = State.Waiting;
+
+    public ToolState.State getState() {
+        return currentState;
+    }
+
+    /* DrawerAction Command */
+
+    public void init(Drawer drawer) {
+        // Nothing
+    }
 
     public void valid(Drawer drawer) {
         // Nothing
@@ -27,10 +37,6 @@ public abstract class ToolState {
 
     public Boolean needValidOperation() {
         return false;
-    }
-
-    public ToolState.State getState() {
-        return currentState;
     }
 
     /* ACTION IN CANVAS */
@@ -45,7 +51,7 @@ public abstract class ToolState {
 
     public void mouseEntered(Drawer drawer) {
         drawer.setCursor(Cursor.NONE);
-        //drawer.setCursor(Cursor.CROSSHAIR);
+        // drawer.setCursor(Cursor.CROSSHAIR);
     }
 
     public void mouseExited(Drawer drawer) {

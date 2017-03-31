@@ -53,10 +53,10 @@ public class DrawerScene {
                     drawer.setHeight(newSceneHeight.doubleValue());
                 }
             });
-            
+
             scene.getRoot().setCursor(Cursor.WAIT);
             root.setCursor(Cursor.WAIT);
-            
+
             //
             fxPanel.setScene(scene);
         }
@@ -91,7 +91,7 @@ public class DrawerScene {
     public JFXPanel getPanel() {
         return fxPanel;
     }
-    
+
     public InterfaceDrawerAction getDrawerAction() {
         return da;
     }
@@ -135,8 +135,11 @@ public class DrawerScene {
 
         this.currentTool = tool;
         this.currentState = tool.supplier.get();
+
+        if (fx != null)
+            this.currentState.init(fx.drawer);
+
         this.da.activeDrawerAction(currentState.needValidOperation());
-        
 
         //
         repaint();
@@ -164,10 +167,9 @@ public class DrawerScene {
     public ToolState getCurrentState() {
         return currentState;
     }
-    
+
     public void addInActiveLayer() {
-        
-        
+
     }
 
 }
