@@ -63,8 +63,6 @@ public class LayerTree extends JTree {
     protected final LayerMannager lm;
     protected final DrawerScene ds;
 
-    static int count = 0;
-
     public LayerTree(DrawerScene ds) {
 
         // super(simpleTest());
@@ -173,61 +171,7 @@ public class LayerTree extends JTree {
     // !!!!!!!!!!!! //
     // !!!!!!!!!!!! //
 
-    // private static Vector editorLayerTest() {
-    // AbstractLayer accessibilityOptions[] = { new AbstractLayer("A", false),
-    // new AbstractLayer("B", true) };
-    // AbstractLayer browsingOptions[] = { new AbstractLayer("C", true), new
-    // AbstractLayer("D", true), new AbstractLayer("E", true), new
-    // AbstractLayer("F", false) };
-    // Vector<AbstractLayer> accessVector = new
-    // TreeNodeVector<AbstractLayer>("G", accessibilityOptions);
-    // Vector<AbstractLayer> browseVector = new
-    // TreeNodeVector<AbstractLayer>("H", browsingOptions);
-    // Object rootNodes[] = { accessVector, browseVector };
-    // Vector<Object> rootVector = new TreeNodeVector<Object>("Root",
-    // rootNodes);
-    //
-    // return rootVector;
-    // }
-
-    // static class TreeNodeVector<E> extends Vector<E> {
-    // String name;
-    //
-    // TreeNodeVector(String name) {
-    // this.name = name;
-    // }
-    //
-    // TreeNodeVector(String name, E elements[]) {
-    // this.name = name;
-    // for (int i = 0, n = elements.length; i < n; i++) {
-    // add(elements[i]);
-    // }
-    // }
-    //
-    // public String toString() {
-    // return "[" + name + "]";
-    // }
-    // }
-
-    // class LeafCellEditor extends DefaultTreeCellEditor {
-    //
-    // public LeafCellEditor(JTree tree, DefaultTreeCellRenderer renderer,
-    // TreeCellEditor editor) {
-    // super(tree, renderer, editor);
-    // }
-    //
-    // public boolean isCellEditable(EventObject event) {
-    // boolean returnValue = super.isCellEditable(event);
-    // if (returnValue) {
-    // Object node = tree.getLastSelectedPathComponent();
-    // if ((node != null) && (node instanceof TreeNode)) {
-    // TreeNode treeNode = (TreeNode) node;
-    // returnValue = treeNode.isLeaf();
-    // }
-    // }
-    // return returnValue;
-    // }
-    // }
+   
 
     class LayerNodeRenderer implements TreeCellRenderer {
 
@@ -286,7 +230,6 @@ public class LayerTree extends JTree {
             //toolBar.add(Box.createRigidArea(rigidAreaSize));
 
             lblLayerType = new JLabel("_LayerType_");
-            lblLayerType.setText(String.valueOf(count) + " ");
             lblLayerType.setIcon(new ImageIcon("R:\\Java_Shared\\java-licence-3-informatique\\GeometricAlgorithms\\icons\\tools\\shape_circle.png"));
             toolBar.add(lblLayerType);
 
@@ -335,7 +278,7 @@ public class LayerTree extends JTree {
 
         public void update(AbstractLayer node) {
             lblCategoryGen.set(node.getCategory());
-            // lblLayerType.setText(node.getLayerType());
+            lblLayerType.setText(node.getLayerType());
             lblLayerType.setIcon(node.getLayerTypeIcon());
             lblLayerName.setText(node.getLayerName());
             chckbxActive.setSelected(node.isActive());
@@ -411,8 +354,6 @@ public class LayerTree extends JTree {
                 returnValue = defaultRenderer.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
             }
 
-            System.out.println("LayerNodeRenderer\t Width(" + String.valueOf(returnValue.getPreferredSize().getWidth()) + ") Height(" + String.valueOf(returnValue.getPreferredSize().getHeight()) + ")  ");
-
             return returnValue;
         }
 
@@ -487,8 +428,6 @@ public class LayerTree extends JTree {
         public Component getTreeCellEditorComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row) {
 
             Component editor = renderer.getTreeCellRendererComponent(tree, value, true, expanded, leaf, row, true);
-
-            System.out.println("LayerNodeEditor\t Width(" + String.valueOf(editor.getPreferredSize().getWidth()) + ") Height(" + String.valueOf(editor.getPreferredSize().getHeight()) + ")  ");
 
             ItemListener itemListener = new ItemListener() {
 
