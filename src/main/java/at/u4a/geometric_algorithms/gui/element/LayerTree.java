@@ -233,8 +233,6 @@ public class LayerTree extends JTree {
             lblLayerType.setIcon(new ImageIcon("R:\\Java_Shared\\java-licence-3-informatique\\GeometricAlgorithms\\icons\\tools\\shape_circle.png"));
             toolBar.add(lblLayerType);
 
-            count++;
-
             // toolBar.addSeparator();
             // toolBar.add(rigidArea);
             //toolBar.add(Box.createRigidArea(rigidAreaSize));
