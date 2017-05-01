@@ -33,8 +33,8 @@ public class LayerMannager implements Iterable<AbstractLayer> {
 
     public void addLayer(AbstractLayer layer) {
         layers.add(layer);
-        //if (controllerTree != null)
-        //    controllerTree.reload();
+        // if (controllerTree != null)
+        // controllerTree.reload();
         refresh();
     }
 
@@ -47,12 +47,16 @@ public class LayerMannager implements Iterable<AbstractLayer> {
         return layers.iterator();
     }
 
-    public AbstractLayer getAddLayer() {
-        return selectedLayer;
-    }
+    // public AbstractLayer getAddLayer() {
+    // return selectedLayer;
+    // }
 
     public AbstractLayer getSelectedLayer() {
         return selectedLayer;
+    }
+
+    public void setSelectedLayer(AbstractLayer l) {
+        selectedLayer = l;
     }
 
     public void setControllerTree(LayerTree controllerTree) {

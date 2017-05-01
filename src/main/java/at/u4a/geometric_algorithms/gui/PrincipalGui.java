@@ -18,7 +18,7 @@ import javax.swing.SwingConstants;
 
 import at.u4a.geometric_algorithms.gui.element.DrawerScene;
 import at.u4a.geometric_algorithms.gui.element.InterfaceDrawerAction;
-import at.u4a.geometric_algorithms.gui.element.LabelCategory;
+import at.u4a.geometric_algorithms.gui.element.LayerCategoryLabel;
 import at.u4a.geometric_algorithms.gui.element.LayerTree;
 import at.u4a.geometric_algorithms.gui.element.StatusBar;
 import at.u4a.geometric_algorithms.gui.element.ToolButton;
@@ -275,7 +275,7 @@ public class PrincipalGui extends JFrame {
 
         JMenu mnNewMenu = new JMenu("F");
 
-        mnNewMenu.setFont(LabelCategory.font);
+        mnNewMenu.setFont(LayerCategoryLabel.font);
         menuBar.add(mnNewMenu);
 
         JMenuItem mntmNewMenuItem = new JMenuItem("Triangul");

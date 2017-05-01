@@ -28,7 +28,7 @@ import com.jgoodies.forms.layout.FormSpecs;
 import com.jgoodies.forms.layout.RowSpec;
 
 import at.u4a.geometric_algorithms.gui.element.ColorChooserButton;
-import at.u4a.geometric_algorithms.gui.element.LabelCategory;
+import at.u4a.geometric_algorithms.gui.element.LayerCategoryLabel;
 import at.u4a.geometric_algorithms.gui.layer.LayerCategory;
 import net.miginfocom.swing.MigLayout;
 import javax.swing.GroupLayout;
@@ -107,7 +107,7 @@ public class DisignerTest {
         
         toolBar.addSeparator();
         
-        LabelCategory lblCategoryGen = new LabelCategory();
+        LayerCategoryLabel lblCategoryGen = new LayerCategoryLabel();
         toolBar.add(lblCategoryGen);
         
         toolBar.addSeparator();
@@ -165,7 +165,7 @@ private void testLayerTreeLayerInfoWithPanel() {
         //toolBar.addSeparator();
         toolBar.add(Box.createRigidArea(new Dimension(5,0)));
         
-        LabelCategory lblCategoryGen = new LabelCategory(LayerCategory.Algorithm);
+        LayerCategoryLabel lblCategoryGen = new LayerCategoryLabel(LayerCategory.Algorithm);
         toolBar.add(lblCategoryGen);
         
         //toolBar.addSeparator();

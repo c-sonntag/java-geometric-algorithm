@@ -7,16 +7,16 @@ import javax.swing.border.EmptyBorder;
 
 import at.u4a.geometric_algorithms.gui.layer.LayerCategory;
 
-public class LabelCategory extends JLabel {
+public class LayerCategoryLabel extends JLabel {
     
     public static final Font font = new Font("Times New Roman", Font.BOLD | Font.ITALIC, 13);
 
-    public LabelCategory() {
+    public LayerCategoryLabel() {
         setFont(font);
         setBorder(new EmptyBorder(0, 0, 0, 2));
     }
     
-    public LabelCategory(LayerCategory cat) {
+    public LayerCategoryLabel(LayerCategory cat) {
         this();
         set(cat);
     }

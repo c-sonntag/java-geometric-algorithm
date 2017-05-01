@@ -147,6 +147,8 @@ public class LayerTree extends JTree {
 
     public void reload() {
         DefaultMutableTreeNode rootNode = (DefaultMutableTreeNode) treeModel.getRoot();
+        
+        lm.setSelectedLayer(null);
         rootNode.removeAllChildren();
         // rootNode.setUserObject(lm.getLayers()); // rename the root node
         // rootNode.add( new DefaultMutableTreeNode("another_child") );
@@ -171,13 +173,11 @@ public class LayerTree extends JTree {
     // !!!!!!!!!!!! //
     // !!!!!!!!!!!! //
 
-   
-
     class LayerNodeRenderer implements TreeCellRenderer {
 
         // private JCheckBox leafRenderer = new JCheckBox();
 
-         //JPanel renderer = new JPanel();
+        // JPanel renderer = new JPanel();
         JPanel renderer = new JPanel(new BorderLayout());
 
         private DefaultTreeCellRenderer defaultRenderer = new DefaultTreeCellRenderer();
@@ -199,11 +199,10 @@ public class LayerTree extends JTree {
             backgroundSelectionColor = defaultRenderer.getBackgroundSelectionColor();
             backgroundNonSelectionColor = defaultRenderer.getBackgroundNonSelectionColor();
 
-
-            JPanel toolBar = new JPanel();    
-            //toolBar.setAlignmentX(Component.LEFT_ALIGNMENT);
+            JPanel toolBar = new JPanel();
+            // toolBar.setAlignmentX(Component.LEFT_ALIGNMENT);
             renderer.add(toolBar);
-            //toolBar.setLayout(new GridLayout());
+            // toolBar.setLayout(new GridLayout());
             toolBar.setOpaque(false);
 
             chckbxActive = new JCheckBox();
@@ -220,14 +219,14 @@ public class LayerTree extends JTree {
 
             // toolBar.addSeparator();
             // toolBar.add(rigidArea);
-            //toolBar.add(Box.createRigidArea(rigidAreaSize));
+            // toolBar.add(Box.createRigidArea(rigidAreaSize));
 
-            lblCategoryGen = new LabelCategory(LayerCategory.Geometry);
+            lblCategoryGen = new LayerCategoryLabel(LayerCategory.Geometry);
             toolBar.add(lblCategoryGen);
 
             // toolBar.addSeparator();
             // toolBar.add(rigidArea);
-            //toolBar.add(Box.createRigidArea(rigidAreaSize));
+            // toolBar.add(Box.createRigidArea(rigidAreaSize));
 
             lblLayerType = new JLabel("_LayerType_");
             lblLayerType.setIcon(new ImageIcon("R:\\Java_Shared\\java-licence-3-informatique\\GeometricAlgorithms\\icons\\tools\\shape_circle.png"));
@@ -235,14 +234,14 @@ public class LayerTree extends JTree {
 
             // toolBar.addSeparator();
             // toolBar.add(rigidArea);
-            //toolBar.add(Box.createRigidArea(rigidAreaSize));
+            // toolBar.add(Box.createRigidArea(rigidAreaSize));
 
             lblLayerName = new JLabel("_LayerName_");
             toolBar.add(lblLayerName);
 
             // toolBar.addSeparator();
             // toolBar.add(rigidArea);
-            //toolBar.add(Box.createRigidArea(rigidAreaSize));
+            // toolBar.add(Box.createRigidArea(rigidAreaSize));
 
             ColorChooserButton ccTest1 = new ColorChooserButton(Color.CYAN);
             ccTest1.setToolTipText("Yooo");
@@ -254,7 +253,7 @@ public class LayerTree extends JTree {
 
             // toolBar.addSeparator();
             // toolBar.add(rigidArea);
-            //toolBar.add(Box.createRigidArea(rigidAreaSize));
+            // toolBar.add(Box.createRigidArea(rigidAreaSize));
 
             // toolBar.pack();
 
@@ -264,7 +263,7 @@ public class LayerTree extends JTree {
 
         }
 
-        final LabelCategory lblCategoryGen;
+        final LayerCategoryLabel lblCategoryGen;
         final JLabel lblLayerName;
         final JCheckBox chckbxActive;
         final JLabel lblLayerType;
@@ -336,6 +335,8 @@ public class LayerTree extends JTree {
                     update(node);
 
                     if (selected) {
+                        lm.setSelectedLayer(node);
+
                         renderer.setBackground(backgroundSelectionColor);
                     } else {
                         renderer.setBackground(backgroundNonSelectionColor);
