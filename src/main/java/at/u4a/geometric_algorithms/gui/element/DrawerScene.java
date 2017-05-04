@@ -8,7 +8,7 @@ import java.util.Map.Entry;
 
 import javax.swing.JFrame;
 
-import at.u4a.geometric_algorithms.gui.layer.LayerMannager;
+import at.u4a.geometric_algorithms.gui.layer.LayerManager;
 import at.u4a.geometric_algorithms.gui.tools.Tool;
 import at.u4a.geometric_algorithms.gui.tools.ToolState;
 import javafx.application.Platform;
@@ -68,7 +68,7 @@ public class DrawerScene {
     private FX fx = null;
 
     // LayerManager
-    private final LayerMannager layers = new LayerMannager();
+    private final LayerManager layers = new LayerManager();
 
     // Tools
     private final Map<Tool, ToolButton> toolsItems = new HashMap<Tool, ToolButton>();
@@ -160,7 +160,7 @@ public class DrawerScene {
     // return drawer;
     // }
 
-    public LayerMannager getLayerMannager() {
+    public LayerManager getLayerMannager() {
         return layers;
     }
 

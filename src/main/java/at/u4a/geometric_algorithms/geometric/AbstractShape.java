@@ -41,5 +41,7 @@ public abstract class AbstractShape implements InterfaceGeometric {
     
     public abstract void accept(InterfaceShapePainterVisitor visitor);
     
+    //public abstract List<> getComposition();
+    
 
 }

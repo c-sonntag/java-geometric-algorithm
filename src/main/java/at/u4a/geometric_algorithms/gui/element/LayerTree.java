@@ -46,7 +46,7 @@ import javax.swing.tree.TreeSelectionModel;
 
 import at.u4a.geometric_algorithms.gui.layer.AbstractLayer;
 import at.u4a.geometric_algorithms.gui.layer.LayerCategory;
-import at.u4a.geometric_algorithms.gui.layer.LayerMannager;
+import at.u4a.geometric_algorithms.gui.layer.LayerManager;
 
 /**
  * 
@@ -60,7 +60,7 @@ import at.u4a.geometric_algorithms.gui.layer.LayerMannager;
 
 public class LayerTree extends JTree {
 
-    protected final LayerMannager lm;
+    protected final LayerManager lm;
     protected final DrawerScene ds;
 
     public LayerTree(DrawerScene ds) {

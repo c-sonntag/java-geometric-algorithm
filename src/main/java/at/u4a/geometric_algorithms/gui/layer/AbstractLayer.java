@@ -6,6 +6,8 @@ import java.util.Vector;
 import javax.swing.ImageIcon;
 
 import at.u4a.geometric_algorithms.geometric.AbstractShape;
+import at.u4a.geometric_algorithms.geometric.InterfaceGeometric;
+import at.u4a.geometric_algorithms.geometric.Point;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceShapePainterVisitor;
 
 public abstract class AbstractLayer {
@@ -29,7 +31,7 @@ public abstract class AbstractLayer {
 
     protected Vector<ColorSet> colors;
 
-    /* ABSTRACT PUBLIC FUNCTION */
+    /* ABSTRACT PUBLIC FUNCTION - LAYER */
 
     abstract public AbstractShape getShape();
 
@@ -47,6 +49,12 @@ public abstract class AbstractLayer {
 
     abstract public void accept(InterfaceShapePainterVisitor visitor);
 
+    /* ABSTRACT PUBLIC FUNCTION - SHAPES */
+    
+    abstract public boolean contains(Point p);
+    
+    /** @todo InterfaceGeometric getContains(Point p); */
+    
     /* PUBLIC FUCNTION */
 
     public AbstractLayer() {

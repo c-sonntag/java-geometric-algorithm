@@ -38,7 +38,7 @@ public class SimplePolygonToolState extends ToolState {
     private void refreshDA() {
         if (da != null) {
             da.haveValid(poly.perimeter.size() > 2);
-            da.haveCancel(poly.perimeter.size() > 1);
+            da.haveCancel(poly.perimeter.size() > 0);
         }
     }
 

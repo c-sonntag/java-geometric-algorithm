@@ -11,6 +11,7 @@ import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGraphicVisitor;
 import at.u4a.geometric_algorithms.gui.element.Drawer;
 import at.u4a.geometric_algorithms.gui.element.DrawerContext;
 import at.u4a.geometric_algorithms.gui.layer.GeometricLayer;
+import at.u4a.geometric_algorithms.gui.layer.LayerManager;
 import at.u4a.geometric_algorithms.gui.tools.Tool;
 import at.u4a.geometric_algorithms.gui.tools.ToolState;
 import javafx.scene.Cursor;
@@ -20,6 +21,14 @@ import javafx.scene.input.MouseEvent;
 
 public class DirectSelectionToolState extends ToolState {
 
+    private LayerManager lm = null;
+    
+    /* */
+
+    public void init(Drawer drawer) {
+        lm = drawer.getDS().getLayerMannager();
+    }
+    
     /* TOOLBAR */
 
     public void valid(Drawer drawer) {
@@ -38,10 +47,12 @@ public class DirectSelectionToolState extends ToolState {
     protected boolean inMove = false;
     protected Point startPoint = null;
     protected Point translatePoint = null;
-    
-    
+
     public void mouseEntered(Drawer drawer) {
-        drawer.setCursor(Cursor.CROSSHAIR);
+        if (ig != null)
+            drawer.setCursor(Cursor.CROSSHAIR);
+        else
+            drawer.setCursor(Cursor.DEFAULT);
     }
 
     @Override
@@ -75,6 +86,8 @@ public class DirectSelectionToolState extends ToolState {
     @Override
     public void mouseMoved(DrawerContext context, MouseEvent event) {
 
+        //context.
+        
         if (inMove == true && ig != null) {
             translatePoint.set(event.getX() - startPoint.x, event.getY() - startPoint.y);
             ig.translate(translatePoint);

@@ -24,7 +24,7 @@ public enum Tool {
     Escape(null, KeyCode.ESCAPE, ToolCategory.Invisible, null, NullToolState::new), //
 
     Selection("Outil Selection", KeyCode.V, ToolCategory.Transform, "selection.png", SelectionToolState::new), //
-    DirectSelection("Outil Selection directe", KeyCode.A, ToolCategory.Transform, "selection_direct.png"), //
+    DirectSelection("Outil Selection directe", KeyCode.A, ToolCategory.Transform, "selection_direct.png", DirectSelectionToolState::new), //
 
     CloudOfPoint("Outil Nuage de Point", KeyCode.P, ToolCategory.ShapeSetter, "cloud_of_point.png"), //
     LotOfSegment("Outil Ensemble de Segments", KeyCode.S, ToolCategory.ShapeSetter, "lot_of_segment.png"), //

@@ -208,9 +208,9 @@ public class PrincipalGui extends JFrame {
         appToolbar.setFloatable(false);
         toolBarTop.add(appToolbar);
 
-        JButton btnNew = new JButton("New");
-        appToolbar.add(btnNew);
-        btnNew.setIcon(new ImageIcon("icons/action/page_add.png"));
+        //JButton btnNew = new JButton("New");
+        //appToolbar.add(btnNew);
+        //btnNew.setIcon(new ImageIcon("icons/action/page_add.png"));
 
         toolBarTop.addSeparator();
 
