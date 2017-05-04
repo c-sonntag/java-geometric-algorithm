@@ -57,50 +57,64 @@ public class Rectangle extends AbstractShape {
 
     /* */
 
+    private List<InterfaceMapper> mappedComposition = null;
+
     @Override
     public List<InterfaceMapper> getMappedComposition() {
-        List<InterfaceMapper> l = new ArrayList<InterfaceMapper>();
+        //
+        if (mappedComposition != null)
+            return mappedComposition;
+
+        //
+        mappedComposition = new ArrayList<InterfaceMapper>();
 
         // Top left
         MappedPoint topLeftPoint = new MappedPoint((o) -> {
             o.set(this.origin);
         }, (o) -> {
-            this.origin.set(o);
+            size.set(size.x - (o.x - origin.x), size.y - (o.y - origin.y));
+            origin.set(o);
         });
-        l.add(topLeftPoint);
+        mappedComposition.add(topLeftPoint);
 
         // Top right
-        MappedPoint topRightPoint =new MappedPoint((o) -> {
-            o.set(this.origin.x + this.size.x, this.origin.y);
+        MappedPoint topRightPoint = new MappedPoint((o) -> {
+            o.set(this.origin.x + this.size.x + 200, this.origin.y);
         }, (o) -> {
-            this.origin.set(o.x - this.origin.x, o.y);
+            size.set(size.x - (o.x - origin.x), size.y - (o.y - origin.y));
+            origin.set(o.x - size.x, o.y - size.y);
+
+            // this.origin.set(o.x - this.origin.x, o.y);
         });
-        l.add(topRightPoint);
+        mappedComposition.add(topRightPoint);
 
         // Bottom left
-        MappedPoint bottomLeftPoint =new MappedPoint((o) -> {
+        MappedPoint bottomLeftPoint = new MappedPoint((o) -> {
             o.set(this.origin.x, this.origin.y + this.size.y);
         }, (o) -> {
             this.origin.set(o.x, o.y - this.origin.y);
         });
-        l.add(bottomLeftPoint);
+        mappedComposition.add(bottomLeftPoint);
 
         // Bottom right
-        MappedPoint bottomRightPoint =new MappedPoint((o) -> {
+        MappedPoint bottomRightPoint = new MappedPoint((o) -> {
             o.set(this.origin.x + this.size.x, this.origin.y + this.size.y);
         }, (o) -> {
-            this.origin.set(o.x - this.origin.x, o.y - this.origin.y);
+            this.size.set(o.x - this.origin.x, o.y - this.origin.y);
         });
-        l.add(bottomRightPoint);
+        mappedComposition.add(bottomRightPoint);
 
         // Lines
-        l.add(new MappedLine(topLeftPoint,topRightPoint));
-        l.add(new MappedLine(topRightPoint,bottomRightPoint));
-        l.add(new MappedLine(bottomRightPoint,bottomLeftPoint));
-        l.add(new MappedLine(bottomLeftPoint,topLeftPoint));
+
+        // mappedComposition.add(new MappedLine(topLeftPoint, topRightPoint));
+        // mappedComposition.add(new MappedLine(topRightPoint,
+        // bottomRightPoint));
+        // mappedComposition.add(new MappedLine(bottomRightPoint,
+        // bottomLeftPoint));
+        // mappedComposition.add(new MappedLine(bottomLeftPoint, topLeftPoint));
 
         //
-        return l;
+        return mappedComposition;
     }
 
 }

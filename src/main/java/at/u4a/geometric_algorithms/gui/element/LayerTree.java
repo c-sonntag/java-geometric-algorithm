@@ -174,11 +174,11 @@ public class LayerTree extends JTree {
         @SuppressWarnings("unchecked")
         Enumeration<DefaultMutableTreeNode> e = root.depthFirstEnumeration();
         while (e.hasMoreElements()) {
+            
             DefaultMutableTreeNode mutableNode = e.nextElement();
             Object userObject = mutableNode.getUserObject();
 
-            System.out.println("Node test : " + mutableNode.toString());
-
+            //
             if (userObject instanceof AbstractLayer) {
                 AbstractLayer al = (AbstractLayer) userObject;
                 if (n == al)
@@ -189,10 +189,7 @@ public class LayerTree extends JTree {
     }
 
     public void selectNode(AbstractLayer n) {
-        //
         DefaultMutableTreeNode rootNode = (DefaultMutableTreeNode) treeModel.getRoot();
-
-        //
         TreePath findNode = find(rootNode, n);
         if (findNode != null)
             setSelectionPath(findNode);

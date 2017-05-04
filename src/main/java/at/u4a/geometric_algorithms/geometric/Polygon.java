@@ -151,24 +151,23 @@ public class Polygon extends AbstractShape implements InterfaceContainer<Segment
 
     @Override
     public List<InterfaceMapper> getMappedComposition() {
-        List<InterfaceMapper> l = new ArrayList<InterfaceMapper>();
+        List<InterfaceMapper> mappedComposition = new ArrayList<InterfaceMapper>();
 
         // Points
         for (Point q : perimeter)
-            l.add(new MappedPoint((o) -> {
+            mappedComposition.add(new MappedPoint((o) -> {
                 o.set(this.origin.x + q.x, this.origin.y + q.y);
             }, (o) -> {
                 q.set(o.x - this.origin.x, o.y - this.origin.y);
             }));
 
-        
         // Segments
-        int listPointsSize = l.size();
+        int listPointsSize = mappedComposition.size();
         int count = 0;
 
         //
         MappedPoint lastPoint = null, firstPoint = null, endPoint = null;
-        for (InterfaceMapper qim : l) {
+        for (InterfaceMapper qim : mappedComposition) {
 
             MappedPoint qm = (MappedPoint) qim;
 
@@ -176,22 +175,21 @@ public class Polygon extends AbstractShape implements InterfaceContainer<Segment
             if ((count + 1) >= listPointsSize) {
                 endPoint = qm;
                 if (firstPoint != null)
-                    l.add(new MappedSegment(endPoint, firstPoint));
+                    mappedComposition.add(new MappedSegment(endPoint, firstPoint));
                 break;
             } else if (count == 0)
                 firstPoint = qm;
 
             //
             if (lastPoint != null)
-                l.add(new MappedSegment(lastPoint, qm));
+                mappedComposition.add(new MappedSegment(lastPoint, qm));
 
             //
             lastPoint = qm;
             count++;
         }
-
-        //
-        return l;
+        
+        return mappedComposition;
     }
 
 }

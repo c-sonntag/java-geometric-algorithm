@@ -2,9 +2,9 @@ package at.u4a.geometric_algorithms.geometric.mapper;
 
 import java.util.function.Consumer;
 
+import at.u4a.geometric_algorithms.geometric.Point;
 import at.u4a.geometric_algorithms.geometric.InterfaceGeometric;
 import at.u4a.geometric_algorithms.geometric.mapper.InterfaceMapper;
-import at.u4a.geometric_algorithms.geometric.Point;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGeometricPainterVisitor;
 
 public class MappedPoint extends Point implements InterfaceMapper {
@@ -15,20 +15,29 @@ public class MappedPoint extends Point implements InterfaceMapper {
     public MappedPoint(Consumer<Point> pointActualiser, Consumer<Point> pointModifier) {
         this.pointActualiser = pointActualiser;
         this.pointModifier = pointModifier;
+        pointActualiser.accept(this);
+    }
+    
+    /* */
+    
+    public void actualiser() {
+        pointActualiser.accept(this);
+    }
+    
+    public void modifier() {
+        pointModifier.accept(this);
     }
 
     /* */
 
     public void set(Point other) {
-        pointActualiser.accept(this);
         super.set(other);
-        pointModifier.accept(this);
+        //pointModifier.accept(this);
     }
 
     public void set(double x, double y) {
-        pointActualiser.accept(this);
         super.set(x, y);
-        pointModifier.accept(this);
+        //pointModifier.accept(this);
     }
     
     @Override

@@ -15,18 +15,18 @@ public class SelectionToolState extends ToolState {
 
     /* CONST STATIC */
 
-    static private final long MOUSE_MOVE_SCAN_MS = 10;
+    static protected final long MOUSE_MOVE_SCAN_MS = 10;
 
     //
 
-    static private final Cursor CURSOR_DEFAULT = Cursor.DEFAULT;
-    static private final Cursor CURSOR_MOVE = Cursor.MOVE;
-    static private final Cursor CURSOR_HAVE = Cursor.OPEN_HAND;
+    static protected final Cursor CURSOR_DEFAULT = Cursor.DEFAULT;
+    static protected final Cursor CURSOR_MOVE = Cursor.MOVE;
+    static protected final Cursor CURSOR_HAVE = Cursor.OPEN_HAND;
 
     /* */
 
-    private LayerManager lm = null;
-    private Drawer d = null;
+    protected LayerManager lm = null;
+    protected Drawer d = null;
 
     /* */
 
@@ -62,14 +62,25 @@ public class SelectionToolState extends ToolState {
 
     //
 
-    protected void setCursor(Drawer d) {
+    /* */
+
+    protected boolean isMove() {
+        return ig != null;
+    }
+
+    protected boolean isHave() {
+        return overlay != null;
+    }
+
+    /* */
+
+    private void setCursor(Drawer d) {
         if (d == null)
             return;
-
         //
-        if (ig != null)
+        if (isMove())
             d.setCursor(CURSOR_MOVE);
-        else if (overlay != null)
+        else if (isHave())
             d.setCursor(CURSOR_HAVE);
         else
             d.setCursor(CURSOR_DEFAULT);
@@ -79,11 +90,24 @@ public class SelectionToolState extends ToolState {
         setCursor(drawer);
     }
 
+    /* */
+
+    protected void setMoveComponent() {
+        if (overlay != null)
+            ig = overlay.getShape();
+    }
+
     @Override
     public void mousePressed(DrawerContext context, MouseEvent event) {
         if (overlay != null) {
             if (!inMove) {
-                ig = overlay.getShape();
+
+                //
+                setMoveComponent();
+                if (ig == null)
+                    return;
+
+                //
                 lastCurrentPoint.set(currentPoint);
                 inMove = true;
 
@@ -93,7 +117,6 @@ public class SelectionToolState extends ToolState {
 
             // Set selected
             lm.setSelectedLayer(overlay);
-            // lm.refresh();
         }
     }
 
@@ -120,6 +143,10 @@ public class SelectionToolState extends ToolState {
 
     private long moveScanChrono = 0;
 
+    protected void findOverlay(Point p) {
+        overlay = lm.getTopContainedShape(p);
+    }
+
     @Override
     public void mouseMoved(DrawerContext context, MouseEvent event) {
 
@@ -136,7 +163,7 @@ public class SelectionToolState extends ToolState {
             moveScanChrono = currentTimeMs;
 
             //
-            overlay = lm.getTopContainedShape(currentPoint);
+            findOverlay(currentPoint);
 
             //
             setCursor(d);

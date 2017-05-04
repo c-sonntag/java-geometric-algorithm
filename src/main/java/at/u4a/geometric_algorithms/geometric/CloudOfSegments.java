@@ -2,8 +2,11 @@ package at.u4a.geometric_algorithms.geometric;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 
+import at.u4a.geometric_algorithms.geometric.mapper.InterfaceMapper;
+import at.u4a.geometric_algorithms.geometric.mapper.MappedSegment;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGeometricPainterVisitor;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceShapePainterVisitor;
 
@@ -18,11 +21,9 @@ public class CloudOfSegments extends AbstractShape implements InterfaceContainer
             if (s.contains(p)) {
                 if (segments == null)
                     segments = new ArrayList<Segment>();
-
                 segments.add(s);
             }
         }
-
         return segments;
     }
 
@@ -71,6 +72,17 @@ public class CloudOfSegments extends AbstractShape implements InterfaceContainer
     @Override
     public void clear() {
         cloud.clear();
+    }
+
+    /* */
+
+    @Override
+    public List<InterfaceMapper> getMappedComposition() {
+        List<InterfaceMapper> mappedComposition = new ArrayList<InterfaceMapper>();
+        for (Segment s : cloud) {
+            mappedComposition.add(new MappedSegment(s.a, s.b));
+        }
+        return mappedComposition;
     }
 
 }

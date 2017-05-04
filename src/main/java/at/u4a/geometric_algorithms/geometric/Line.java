@@ -4,7 +4,7 @@ import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGeometricPainterVisi
 
 public class Line implements InterfaceGeometric {
 
-    private final static double EPSILON = 0.5;
+    private final static double EPSILON = 1;
 
     public final Point a, b;
 

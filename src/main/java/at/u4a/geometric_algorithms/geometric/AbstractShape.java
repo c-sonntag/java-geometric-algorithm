@@ -1,5 +1,6 @@
 package at.u4a.geometric_algorithms.geometric;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import at.u4a.geometric_algorithms.geometric.mapper.InterfaceMapper;
@@ -32,6 +33,7 @@ public abstract class AbstractShape implements InterfaceGeometric {
         p.y = p.y + origin.y;
     }
     
+    
     //public boolean contains(Point p) {
     //    return contains(p, 0);
     //}
@@ -42,9 +44,12 @@ public abstract class AbstractShape implements InterfaceGeometric {
         // Nothing here !
     }
     
+    /* VISITOR */
+    
     public abstract void accept(InterfaceShapePainterVisitor visitor);
     
-    public abstract List<InterfaceMapper> getMappedComposition();
+    /* MAPPED */
     
+    public abstract List<InterfaceMapper> getMappedComposition();
 
 }

@@ -8,6 +8,7 @@ import at.u4a.geometric_algorithms.geometric.Point;
 import at.u4a.geometric_algorithms.geometric.Polygon;
 import at.u4a.geometric_algorithms.geometric.Rectangle;
 import at.u4a.geometric_algorithms.geometric.Segment;
+import at.u4a.geometric_algorithms.geometric.mapper.InterfaceMapper;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -182,6 +183,17 @@ public class GraphicPainter implements InterfaceGraphicVisitor {
 
     public void visit(Rectangle rectangle) {
         
+        gc.setStroke(Color.RED);
+        for (InterfaceMapper im : rectangle.getMappedComposition())
+            im.accept(this);
+        
+        visit_0(rectangle);
+
+    }
+
+    public void visit_0(Rectangle rectangle) {
+        //gc.setFill(Color.BLUE);
+        gc.setStroke(Color.BLUE);
         //
         final Point oppositeSide = rectangle.getOppositeSide();
         gc.strokeRect( //
@@ -190,16 +202,16 @@ public class GraphicPainter implements InterfaceGraphicVisitor {
                 Math.abs(oppositeSide.x - rectangle.origin.x), // SizeHorizontal
                 Math.abs(oppositeSide.y - rectangle.origin.y) // SizeVertical
         );
-        
+
         // Border point
         final Point border = new Point();
         border.set(rectangle.origin);
         visit(border);
         border.set(rectangle.origin.x + rectangle.size.x, rectangle.origin.y);
         visit(border);
-        border.set(rectangle.origin.x + rectangle.size.x, rectangle.origin.y+ rectangle.size.y);
+        border.set(rectangle.origin.x + rectangle.size.x, rectangle.origin.y + rectangle.size.y);
         visit(border);
-        border.set(rectangle.origin.x, rectangle.origin.y+ rectangle.size.y);
+        border.set(rectangle.origin.x, rectangle.origin.y + rectangle.size.y);
         visit(border);
 
     }

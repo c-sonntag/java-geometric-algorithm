@@ -47,7 +47,6 @@ public class LayerManager implements Iterable<AbstractLayer> {
 
     public void setSelectedLayer(AbstractLayer l) {
         selectedLayer = l;
-        System.out.println("Selected layer : " + selectedLayer);
         //
         if (controllerTree != null)
             controllerTree.selectNode(l);
@@ -93,13 +92,15 @@ public class LayerManager implements Iterable<AbstractLayer> {
 
         // Always Selected Layer(s if container) are get at the top
         if (selectedLayer != null)
-            if (selectedLayer.contains(p))
-                return selectedLayer;
+            if (selectedLayer.isActive())
+                if (selectedLayer.contains(p))
+                    return selectedLayer;
 
         //
         for (AbstractLayer layer : layers)
-            if (layer.contains(p))
-                return layer;
+            if (layer.isActive())
+                if (layer.contains(p))
+                    return layer;
 
         //
         return null;
