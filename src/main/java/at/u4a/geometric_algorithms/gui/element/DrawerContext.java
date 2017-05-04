@@ -34,55 +34,70 @@ public class DrawerContext {
         if (toolChoose != null)
             ds.setTool(toolChoose);
     }
+    
+    /* */
+    
+    public Drawer getDrawer() {
+        return drawer;
+    }
+    
 
     /* */
 
     public void paint(InterfaceGraphicVisitor visitor) {
-        ds.getCurrentState().paint(visitor);
+        if (ds.getCurrentState() != null)
+            ds.getCurrentState().paint(visitor);
     }
-    
+
     public void repaint() {
         drawer.repaint();
     }
 
     /* */
-    
+
     public void valid() {
-        ds.getCurrentState().valid(drawer);
+        if (ds.getCurrentState() != null)
+            ds.getCurrentState().valid(drawer);
         repaint();
     }
 
     public void cancel() {
-        ds.getCurrentState().cancel(drawer);
+        if (ds.getCurrentState() != null)
+            ds.getCurrentState().cancel(drawer);
         repaint();
     }
 
     public Boolean needValidOperation() {
-        return  ds.getCurrentState().needValidOperation();
+        return (ds.getCurrentState() != null) ? ds.getCurrentState().needValidOperation() : false;
     }
-        
+
     /* */
 
     public void mouseEntered(MouseEvent event) {
-        ds.getCurrentState().mouseEntered(drawer);
+        if (ds.getCurrentState() != null)
+            ds.getCurrentState().mouseEntered(drawer);
     }
 
     public void mouseExited(MouseEvent event) {
-        ds.getCurrentState().mouseExited(drawer);
+        if (ds.getCurrentState() != null)
+            ds.getCurrentState().mouseExited(drawer);
     }
 
     /* */
 
     public void mousePressed(MouseEvent event) {
-        ds.getCurrentState().mousePressed(this, event);
+        if (ds.getCurrentState() != null)
+            ds.getCurrentState().mousePressed(this, event);
     }
 
     public void mouseReleased(MouseEvent event) {
-        ds.getCurrentState().mouseReleased(this, event);
+        if (ds.getCurrentState() != null)
+            ds.getCurrentState().mouseReleased(this, event);
     }
 
     public void mouseMoved(MouseEvent event) {
-        ds.getCurrentState().mouseMoved(this, event);
+        if (ds.getCurrentState() != null)
+            ds.getCurrentState().mouseMoved(this, event);
     }
 
 }

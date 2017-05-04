@@ -1,11 +1,7 @@
 package at.u4a.geometric_algorithms.gui.tools.state;
 
-import java.util.List;
-
-import at.u4a.geometric_algorithms.geometric.AbstractShape;
 import at.u4a.geometric_algorithms.geometric.InterfaceGeometric;
 import at.u4a.geometric_algorithms.geometric.Point;
-import at.u4a.geometric_algorithms.geometric.Rectangle;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGraphicVisitor;
 import at.u4a.geometric_algorithms.gui.element.Drawer;
 import at.u4a.geometric_algorithms.gui.element.DrawerContext;
@@ -13,16 +9,19 @@ import at.u4a.geometric_algorithms.gui.layer.AbstractLayer;
 import at.u4a.geometric_algorithms.gui.layer.LayerManager;
 import at.u4a.geometric_algorithms.gui.tools.ToolState;
 import javafx.scene.Cursor;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.paint.Color;
 
 public class SelectionToolState extends ToolState {
 
     /* CONST STATIC */
 
-    private final long MOUSE_MOVE_SCAN_MS = 10;
-    private final Cursor DEFAULT_CURSOR = Cursor.DEFAULT;
+    static private final long MOUSE_MOVE_SCAN_MS = 10;
+
+    //
+
+    static private final Cursor CURSOR_DEFAULT = Cursor.DEFAULT;
+    static private final Cursor CURSOR_MOVE = Cursor.MOVE;
+    static private final Cursor CURSOR_HAVE = Cursor.OPEN_HAND;
 
     /* */
 
@@ -51,35 +50,65 @@ public class SelectionToolState extends ToolState {
     /* MOUSE */
 
     protected AbstractLayer overlay = null;
-    protected InterfaceGeometric ig = null;
-    protected boolean inMove = false;
-
     protected Point currentPoint = new Point();
 
-    public void mouseEntered(Drawer drawer) {
+    //
+
+    protected Point lastCurrentPoint = new Point();
+    protected Point translatePoint = new Point();
+    protected InterfaceGeometric ig = null;
+
+    protected boolean inMove = false;
+
+    //
+
+    protected void setCursor(Drawer d) {
+        if (d == null)
+            return;
+
+        //
         if (ig != null)
-            drawer.setCursor(Cursor.MOVE);
+            d.setCursor(CURSOR_MOVE);
+        else if (overlay != null)
+            d.setCursor(CURSOR_HAVE);
         else
-            drawer.setCursor(DEFAULT_CURSOR);
+            d.setCursor(CURSOR_DEFAULT);
+    }
+
+    public void mouseEntered(Drawer drawer) {
+        setCursor(drawer);
     }
 
     @Override
     public void mousePressed(DrawerContext context, MouseEvent event) {
+        if (overlay != null) {
+            if (!inMove) {
+                ig = overlay.getShape();
+                lastCurrentPoint.set(currentPoint);
+                inMove = true;
 
-        if (ig != null) {
-            inMove = true;
-            // startPoint = new Point(event.getX(), event.getY());
-            // translatePoint = new Point(0, 0);
+                //
+                setCursor(d);
+            }
+            
+            // Set selected
+            if (event.getClickCount() == 2) {
+                lm.setSelectedLayer(overlay);
+                //lm.refresh();
+            }
         }
-
-        /*
-         * if (!isLeftClick(event)) return; if (currentState != State.Started)
-         * return; // addPlace(context, event.getX(), event.getY());
-         */
     }
 
     @Override
     public void mouseReleased(DrawerContext context, MouseEvent event) {
+
+        if (inMove) {
+            ig = null;
+            inMove = false;
+
+            //
+            setCursor(d);
+        }
 
         // inMove = false;
 
@@ -109,22 +138,16 @@ public class SelectionToolState extends ToolState {
             moveScanChrono = currentTimeMs;
 
             //
-            if(lm == null)
-                return;
-            
-            ///
             overlay = lm.getTopContainedShape(currentPoint);
 
             //
-            if ((overlay != null) && (d != null)) {
-                d.setCursor(Cursor.CROSSHAIR);
-            } else {
-                d.setCursor(DEFAULT_CURSOR);
-            }
+            setCursor(d);
 
-            // this.x = event.getX();
-            // this.y = event.getY();
-            // context.repaint();
+        } else if (ig != null) {
+            translatePoint.set(currentPoint.x - lastCurrentPoint.x, currentPoint.y - lastCurrentPoint.y);
+            ig.translate(translatePoint);
+            lastCurrentPoint.set(currentPoint);
+            context.repaint();
         }
 
     }

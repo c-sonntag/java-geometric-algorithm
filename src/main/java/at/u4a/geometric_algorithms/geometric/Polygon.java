@@ -4,9 +4,16 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import at.u4a.geometric_algorithms.geometric.mapper.InterfaceMapper;
+import at.u4a.geometric_algorithms.geometric.mapper.MappedLine;
+import at.u4a.geometric_algorithms.geometric.mapper.SimplePoint;
+import at.u4a.geometric_algorithms.geometric.mapper.MappedPoint;
+import at.u4a.geometric_algorithms.geometric.mapper.MappedSegment;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceShapePainterVisitor;
 
 public class Polygon extends AbstractShape implements InterfaceContainer<Segment> {
+
+    /* INTERNAL CLASS */
 
     private class SegmentIterator implements Iterator<Segment> {
 
@@ -45,11 +52,17 @@ public class Polygon extends AbstractShape implements InterfaceContainer<Segment
         }
     }
 
+    /* STATIC */
+
     static public enum Type {
         Simple, Convex, Monotone
     }
 
+    /* PUBLIC VARIABLES */
+
     final public ArrayList<Point> perimeter = new ArrayList<Point>();
+
+    /* FUNCTION */
 
     public Polygon() {
         super();
@@ -87,18 +100,18 @@ public class Polygon extends AbstractShape implements InterfaceContainer<Segment
     public boolean contains(Point p) {
         return (getContains(p) != null);
     }
-    
-    
+
     @Override
+    /** @todo Touver la zone interieur */
     public InterfaceGeometric getContains(Point p) {
         Point isP = containPoint(p);
         if (isP != null)
             return isP;
-        
+
         Segment isS = containSegment(p);
         if (isS != null)
             return isS;
-        
+
         return null;
     }
 
@@ -132,6 +145,53 @@ public class Polygon extends AbstractShape implements InterfaceContainer<Segment
     @Override
     public void clear() {
         perimeter.clear();
+    }
+
+    /* */
+
+    @Override
+    public List<InterfaceMapper> getMappedComposition() {
+        List<InterfaceMapper> l = new ArrayList<InterfaceMapper>();
+
+        // Points
+        for (Point q : perimeter)
+            l.add(new MappedPoint((o) -> {
+                o.set(this.origin.x + q.x, this.origin.y + q.y);
+            }, (o) -> {
+                q.set(o.x - this.origin.x, o.y - this.origin.y);
+            }));
+
+        
+        // Segments
+        int listPointsSize = l.size();
+        int count = 0;
+
+        //
+        MappedPoint lastPoint = null, firstPoint = null, endPoint = null;
+        for (InterfaceMapper qim : l) {
+
+            MappedPoint qm = (MappedPoint) qim;
+
+            //
+            if ((count + 1) >= listPointsSize) {
+                endPoint = qm;
+                if (firstPoint != null)
+                    l.add(new MappedSegment(endPoint, firstPoint));
+                break;
+            } else if (count == 0)
+                firstPoint = qm;
+
+            //
+            if (lastPoint != null)
+                l.add(new MappedSegment(lastPoint, qm));
+
+            //
+            lastPoint = qm;
+            count++;
+        }
+
+        //
+        return l;
     }
 
 }

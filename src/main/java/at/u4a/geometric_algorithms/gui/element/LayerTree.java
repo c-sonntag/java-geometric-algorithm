@@ -164,6 +164,10 @@ public class LayerTree extends JTree {
         // this.createFileTree(rootNode, rootFile); // rescan the file structure
         ((DefaultTreeModel) treeModel).reload();
     }
+    
+    public void refresh() {
+        ((DefaultTreeModel) treeModel).reload();
+    }
 
     // !!!!!!!!!!!! //
     // !!!!!!!!!!!! //
@@ -279,6 +283,7 @@ public class LayerTree extends JTree {
             lblLayerType.setIcon(node.getLayerTypeIcon());
             lblLayerName.setText(node.getLayerName());
             chckbxActive.setSelected(node.isActive());
+            selec
             renderer.setVisible(true);
             renderer.doLayout();
             renderer.validate();

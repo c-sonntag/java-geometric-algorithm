@@ -43,13 +43,10 @@ public class Point implements InterfaceGeometric {
         return (Math.abs(x - p.x) <= POINT_DIAMETRE) && (Math.abs(y - p.y) <= POINT_DIAMETRE);
         // return (x == p.x) && (y == p.y);
     }
-    
+
     @Override
     public InterfaceGeometric getContains(Point p) {
-        if (contains(p))
-            return this;
-        else
-            return null;
+        return contains(p) ? this : null;
     }
 
     // public boolean contains(Point p, float epsilon) {

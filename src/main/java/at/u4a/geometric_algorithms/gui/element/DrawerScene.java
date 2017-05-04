@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.swing.JFrame;
-
 import at.u4a.geometric_algorithms.gui.layer.LayerManager;
 import at.u4a.geometric_algorithms.gui.tools.Tool;
 import at.u4a.geometric_algorithms.gui.tools.ToolState;
@@ -19,10 +17,10 @@ import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
 
 public class DrawerScene {
+
+    private static final Cursor CURSOR_NO_TOOLS = Cursor.WAIT;
 
     private class FX {
         final Group root = new Group();
@@ -54,8 +52,8 @@ public class DrawerScene {
                 }
             });
 
-            scene.getRoot().setCursor(Cursor.WAIT);
-            root.setCursor(Cursor.WAIT);
+            scene.getRoot().setCursor(CURSOR_NO_TOOLS);
+            root.setCursor(CURSOR_NO_TOOLS);
 
             //
             fxPanel.setScene(scene);
@@ -83,9 +81,11 @@ public class DrawerScene {
         Platform.runLater(new Runnable() {
             public void run() {
                 fx = new DrawerScene.FX();
+                setTool(null);
+                // setTool(Tool.Selection);
             }
         });
-        setTool(Tool.Selection);
+
     }
 
     public JFXPanel getPanel() {
@@ -114,12 +114,14 @@ public class DrawerScene {
      */
     public void setTool(Tool tool) {
 
-        for (Entry<Tool, ToolButton> toolControlEntry : toolsItems.entrySet()) {
-            toolControlEntry.getValue().setActive(tool.equals(toolControlEntry.getKey()));
-        }
+        //
+        if (fx == null)
+            throw new RuntimeException("Need FX is initialized");
 
-        if (tool == currentTool)
-            return;
+        //
+        for (Entry<Tool, ToolButton> toolControlEntry : toolsItems.entrySet()) {
+            toolControlEntry.getValue().setActive((tool == null) ? false : tool.equals(toolControlEntry.getKey()));
+        }
 
         //
         /*
@@ -133,20 +135,28 @@ public class DrawerScene {
          * toolControlEntry.getValue().data.btn.setSelected(false); } }
          */
 
-        this.currentTool = tool;
-        this.currentState = tool.supplier.get();
+        //
+        if (tool == null) {
+            this.currentState = null;
+            this.da.activeDrawerAction(false);
 
-        if (fx != null)
-            this.currentState.init(fx.drawer);
+        } else if (tool != currentTool) {
 
-        this.da.activeDrawerAction(currentState.needValidOperation());
+            this.currentTool = tool;
+
+            this.currentState = tool.supplier.get();
+            this.currentState.init(fx.drawer); // Need fx !
+            this.da.activeDrawerAction(currentState.needValidOperation());
+
+        }
 
         //
         repaint();
     }
 
     public void refresh() {
-        setTool(currentTool);
+        if (fx != null)
+            setTool(currentTool);
     }
 
     public void repaint() {

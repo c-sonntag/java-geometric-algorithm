@@ -1,20 +1,48 @@
 package at.u4a.geometric_algorithms.gui.tools.state;
 
-import at.u4a.geometric_algorithms.geometric.Point;
+import at.u4a.geometric_algorithms.geometric.Polygon;
 import at.u4a.geometric_algorithms.geometric.Rectangle;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGraphicVisitor;
+import at.u4a.geometric_algorithms.gui.element.Drawer;
 import at.u4a.geometric_algorithms.gui.element.DrawerContext;
+import at.u4a.geometric_algorithms.gui.layer.GeometricLayer;
 import at.u4a.geometric_algorithms.gui.tools.ToolState;
-import at.u4a.geometric_algorithms.gui.tools.ToolState.State;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.paint.Color;
 
 public class RectangleDrawerState extends ToolState {
 
-    private final Rectangle rectangle = new Rectangle();
+    private Rectangle rectangle = new Rectangle();
 
+    /* */
+    
+    static int RectangleCount = 1;
+    
+    public void valid(Drawer drawer) {
+        
+        GeometricLayer<Rectangle> rectangleLayer = new GeometricLayer<Rectangle>(rectangle);
+        rectangleLayer.setLayerName("r" + String.valueOf(RectangleCount));
+        RectangleCount++;
+        
+        drawer.getDS().getLayerMannager().addLayer(rectangleLayer);
+
+        //
+        rectangle = new Rectangle();
+        init(drawer);
+    }
+
+    public void init(Drawer drawer) {
+        rectangle.origin.set(0, 0);
+        rectangle.size.set(0, 0);
+        currentState = State.Waiting;
+    }
+    
+    public void cancel(Drawer drawer) {
+        init(drawer);
+    }
+    
+    
+    /* */
+    
     @Override
     public void mousePressed(DrawerContext context, MouseEvent event) {
         if (!isLeftClick(event))
@@ -33,7 +61,9 @@ public class RectangleDrawerState extends ToolState {
         //
         currentState = State.Finish;
         setSize(event.getX(), event.getY());
-
+        
+        //
+        valid(context.getDrawer());
     }
 
     @Override
@@ -52,12 +82,6 @@ public class RectangleDrawerState extends ToolState {
     @Override
     public void paint(InterfaceGraphicVisitor painter) {
         painter.visit(rectangle);
-        // painter.visit(currentPointToPlace);
-
-        /*
-         * context.setStroke(Color.BLACK); context.strokeLine(x - 5, y, x + 5,
-         * y); context.strokeLine(x, y - 5, x, y + 5);
-         */
     }
 
 }

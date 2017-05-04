@@ -181,10 +181,27 @@ public class GraphicPainter implements InterfaceGraphicVisitor {
     }
 
     public void visit(Rectangle rectangle) {
-        gc.setStroke(Color.RED);
-
+        
+        //
         final Point oppositeSide = rectangle.getOppositeSide();
-        gc.strokeRect(/* MinHorizontal */ Math.min(rectangle.origin.x, oppositeSide.x), /* MinVertical */ Math.min(rectangle.origin.y, oppositeSide.y), /* SizeHorizontal */ Math.abs(oppositeSide.x - rectangle.origin.x), /* SizeVertical */ Math.abs(oppositeSide.y - rectangle.origin.y));
+        gc.strokeRect( //
+                Math.min(rectangle.origin.x, oppositeSide.x), // MinHorizontal
+                Math.min(rectangle.origin.y, oppositeSide.y), // MinVertical
+                Math.abs(oppositeSide.x - rectangle.origin.x), // SizeHorizontal
+                Math.abs(oppositeSide.y - rectangle.origin.y) // SizeVertical
+        );
+        
+        // Border point
+        final Point border = new Point();
+        border.set(rectangle.origin);
+        visit(border);
+        border.set(rectangle.origin.x + rectangle.size.x, rectangle.origin.y);
+        visit(border);
+        border.set(rectangle.origin.x + rectangle.size.x, rectangle.origin.y+ rectangle.size.y);
+        visit(border);
+        border.set(rectangle.origin.x, rectangle.origin.y+ rectangle.size.y);
+        visit(border);
+
     }
 
 }

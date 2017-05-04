@@ -12,11 +12,7 @@ import at.u4a.geometric_algorithms.gui.element.Drawer;
 import at.u4a.geometric_algorithms.gui.element.DrawerContext;
 import at.u4a.geometric_algorithms.gui.element.InterfaceDrawerAction;
 import at.u4a.geometric_algorithms.gui.layer.GeometricLayer;
-import at.u4a.geometric_algorithms.gui.tools.Tool;
 import at.u4a.geometric_algorithms.gui.tools.ToolState;
-import javafx.scene.Cursor;
-import javafx.scene.ImageCursor;
-import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 
 public class SimplePolygonToolState extends ToolState {
@@ -28,8 +24,6 @@ public class SimplePolygonToolState extends ToolState {
 
     private Point currentPlacedPoint = new Point();
     private Point currentPointToPlace = null;
-
-    // private double x, y;
 
     /* */
 
@@ -49,7 +43,7 @@ public class SimplePolygonToolState extends ToolState {
 
     public void valid(Drawer drawer) {
         GeometricLayer<Polygon> polygonLayer = new GeometricLayer<Polygon>(poly);
-        polygonLayer.setLayerName("Polygon " + String.valueOf(PolygonCount));
+        polygonLayer.setLayerName("p" + String.valueOf(PolygonCount));
         PolygonCount++;
         
         drawer.getDS().getLayerMannager().addLayer(polygonLayer);
@@ -108,10 +102,10 @@ public class SimplePolygonToolState extends ToolState {
     @Override
     public void mouseMoved(DrawerContext context, MouseEvent event) {
 
-        InterfaceGeometric overIG = poly.getContains(new Point(event.getX(), event.getY()));
-        if (overIG != null) {
-            overIG.translate(new Point(1, 0));
-        }
+        //InterfaceGeometric overIG = poly.getContains(new Point(event.getX(), event.getY()));
+        //if (overIG != null) {
+        //    overIG.translate(new Point(1, 0));
+        //}
 
         if (inPlace) {
             currentPlacedPoint.set(event.getX(), event.getY());
