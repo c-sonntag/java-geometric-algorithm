@@ -14,6 +14,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.print.Book;
+import java.util.Enumeration;
 import java.util.EventObject;
 import java.util.Random;
 import java.util.Vector;
@@ -79,6 +80,9 @@ public class LayerTree extends JTree {
         this.setCellRenderer(renderer);
         this.setEditable(true);
         this.setCellEditor(new LayerNodeEditor(this));
+
+        //
+        getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 
         /// ///
 
@@ -147,7 +151,7 @@ public class LayerTree extends JTree {
 
     public void reload() {
         DefaultMutableTreeNode rootNode = (DefaultMutableTreeNode) treeModel.getRoot();
-        
+
         lm.setSelectedLayer(null);
         rootNode.removeAllChildren();
         // rootNode.setUserObject(lm.getLayers()); // rename the root node
@@ -164,9 +168,34 @@ public class LayerTree extends JTree {
         // this.createFileTree(rootNode, rootFile); // rescan the file structure
         ((DefaultTreeModel) treeModel).reload();
     }
-    
-    public void refresh() {
-        ((DefaultTreeModel) treeModel).reload();
+
+    /** @see http://stackoverflow.com/questions/8210630/how-to-search-a-particular-node-in-jtree-and-make-that-node-expanded */
+    private TreePath find(DefaultMutableTreeNode root, AbstractLayer n) {
+        @SuppressWarnings("unchecked")
+        Enumeration<DefaultMutableTreeNode> e = root.depthFirstEnumeration();
+        while (e.hasMoreElements()) {
+            DefaultMutableTreeNode mutableNode = e.nextElement();
+            Object userObject = mutableNode.getUserObject();
+
+            System.out.println("Node test : " + mutableNode.toString());
+
+            if (userObject instanceof AbstractLayer) {
+                AbstractLayer al = (AbstractLayer) userObject;
+                if (n == al)
+                    return new TreePath(mutableNode.getPath());
+            }
+        }
+        return null;
+    }
+
+    public void selectNode(AbstractLayer n) {
+        //
+        DefaultMutableTreeNode rootNode = (DefaultMutableTreeNode) treeModel.getRoot();
+
+        //
+        TreePath findNode = find(rootNode, n);
+        if (findNode != null)
+            setSelectionPath(findNode);
     }
 
     // !!!!!!!!!!!! //
@@ -283,11 +312,13 @@ public class LayerTree extends JTree {
             lblLayerType.setIcon(node.getLayerTypeIcon());
             lblLayerName.setText(node.getLayerName());
             chckbxActive.setSelected(node.isActive());
-            selec
             renderer.setVisible(true);
             renderer.doLayout();
             renderer.validate();
             renderer.revalidate();
+
+            // defaultRenderer.se
+
             currentNode = node;
         }
 

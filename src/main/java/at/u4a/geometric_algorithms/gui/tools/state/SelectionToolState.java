@@ -90,12 +90,10 @@ public class SelectionToolState extends ToolState {
                 //
                 setCursor(d);
             }
-            
+
             // Set selected
-            if (event.getClickCount() == 2) {
-                lm.setSelectedLayer(overlay);
-                //lm.refresh();
-            }
+            lm.setSelectedLayer(overlay);
+            // lm.refresh();
         }
     }
 

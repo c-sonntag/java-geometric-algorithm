@@ -50,7 +50,7 @@ public class LayerManager implements Iterable<AbstractLayer> {
         System.out.println("Selected layer : " + selectedLayer);
         //
         if (controllerTree != null)
-            controllerTree.refresh();
+            controllerTree.selectNode(l);
     }
 
     /* */

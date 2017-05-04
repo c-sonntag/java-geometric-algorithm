@@ -1,5 +1,6 @@
 package at.u4a.geometric_algorithms.gui.tools.state;
 
+import at.u4a.geometric_algorithms.geometric.Point;
 import at.u4a.geometric_algorithms.geometric.Polygon;
 import at.u4a.geometric_algorithms.geometric.Rectangle;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGraphicVisitor;
@@ -11,19 +12,31 @@ import javafx.scene.input.MouseEvent;
 
 public class RectangleDrawerState extends ToolState {
 
+    /* CONST STATIC */
+
+    private static final Point MIN_SIZE = new Point(5, 5);
+
+    /* */
+
     private Rectangle rectangle = new Rectangle();
 
     /* */
-    
+
     static int RectangleCount = 1;
-    
+
     public void valid(Drawer drawer) {
+
+        //
+        if (((Math.abs(rectangle.size.x) < MIN_SIZE.x) && (Math.abs(rectangle.size.y) < MIN_SIZE.y)))
+            init(drawer);
         
+        //
         GeometricLayer<Rectangle> rectangleLayer = new GeometricLayer<Rectangle>(rectangle);
         rectangleLayer.setLayerName("r" + String.valueOf(RectangleCount));
         RectangleCount++;
-        
+
         drawer.getDS().getLayerMannager().addLayer(rectangleLayer);
+        currentState = State.Finish;
 
         //
         rectangle = new Rectangle();
@@ -35,18 +48,20 @@ public class RectangleDrawerState extends ToolState {
         rectangle.size.set(0, 0);
         currentState = State.Waiting;
     }
-    
+
     public void cancel(Drawer drawer) {
         init(drawer);
     }
-    
-    
+
     /* */
-    
+
     @Override
     public void mousePressed(DrawerContext context, MouseEvent event) {
-        if (!isLeftClick(event))
+        if (!isLeftClick(event)) {
+            cancel(null);
             return;
+        }
+        
         //
         if (currentState == State.Waiting) {
             currentState = State.Started;
@@ -56,10 +71,12 @@ public class RectangleDrawerState extends ToolState {
 
     @Override
     public void mouseReleased(DrawerContext context, MouseEvent event) {
-        if (!isLeftClick(event))
+        if (!isLeftClick(event) || (currentState != State.Started)) {
+            cancel(null);
             return;
+        }
+        
         //
-        currentState = State.Finish;
         setSize(event.getX(), event.getY());
         
         //
