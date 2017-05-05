@@ -4,9 +4,11 @@ import java.io.File;
 
 import javax.swing.ImageIcon;
 
+import at.u4a.geometric_algorithms.geometric.CloudOfSegments;
 import at.u4a.geometric_algorithms.geometric.InterfaceGeometric;
 import at.u4a.geometric_algorithms.geometric.Point;
 import at.u4a.geometric_algorithms.geometric.Polygon;
+import at.u4a.geometric_algorithms.geometric.Segment;
 import at.u4a.geometric_algorithms.geometric.mapper.InterfaceMapper;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGraphicVisitor;
 import at.u4a.geometric_algorithms.gui.element.Drawer;
@@ -14,16 +16,19 @@ import at.u4a.geometric_algorithms.gui.element.DrawerContext;
 import at.u4a.geometric_algorithms.gui.element.InterfaceDrawerAction;
 import at.u4a.geometric_algorithms.gui.layer.GeometricLayer;
 import at.u4a.geometric_algorithms.gui.tools.ToolState;
+import at.u4a.geometric_algorithms.gui.tools.ToolState.State;
 import javafx.scene.input.MouseEvent;
 
-public class SimplePolygonToolState extends ToolState {
-    
+public class CloudOfSegmentsToolState extends ToolState {
+
+    private static final Point MIN_SEGMENT_SIZE = new Point(5, 5);
+
     /* */
 
     class DirectSelectionPolygonTool extends DirectSelectionToolState {
 
         protected void findOverlay(Point p) {
-            for (InterfaceMapper c : poly.getMappedComposition()) {
+            for (InterfaceMapper c : cof.getMappedComposition()) {
                 if (c.contains(p)) {
                     overlayComposant = c;
                     return;
@@ -31,7 +36,7 @@ public class SimplePolygonToolState extends ToolState {
             }
             overlayComposant = null;
         }
-        
+
         protected void setSelected() {
             // Nothing
         }
@@ -40,15 +45,21 @@ public class SimplePolygonToolState extends ToolState {
 
     /* */
 
-    static int PolygonCount = 1;
+    static int ColoudOfSegmentsCount = 1;
 
-    private Boolean inPlace = false;
-    private Polygon poly = new Polygon();
+    private CloudOfSegments cof = new CloudOfSegments();
+    private Segment s = new Segment();
 
-    private Point currentPlacedPoint = new Point();
     private Point currentPointToPlace = null;
 
     private DirectSelectionPolygonTool directSelectionTool = new DirectSelectionPolygonTool();
+
+    /* */
+
+    public void mouseExited(Drawer drawer) {
+        currentPointToPlace = null;
+        super.mouseExited(drawer);
+    }
 
     /* */
 
@@ -56,8 +67,8 @@ public class SimplePolygonToolState extends ToolState {
 
     private void refreshDA() {
         if (da != null) {
-            da.haveValid(poly.perimeter.size() > 2);
-            da.haveCancel(poly.perimeter.size() > 0);
+            da.haveValid(cof.cloud.size() > 0);
+            da.haveCancel((cof.cloud.size() > 0) || (currentState != State.Waiting));
         }
     }
 
@@ -70,19 +81,19 @@ public class SimplePolygonToolState extends ToolState {
     }
 
     public void valid(Drawer drawer) {
-        GeometricLayer<Polygon> polygonLayer = new GeometricLayer<Polygon>(poly);
-        polygonLayer.setLayerName("p" + String.valueOf(PolygonCount));
-        PolygonCount++;
+        GeometricLayer<CloudOfSegments> cofLayer = new GeometricLayer<CloudOfSegments>(cof);
+        cofLayer.setLayerName("cof" + String.valueOf(ColoudOfSegmentsCount));
+        ColoudOfSegmentsCount++;
 
-        drawer.getDS().getLayerMannager().addLayer(polygonLayer);
+        drawer.getDS().getLayerMannager().addLayer(cofLayer);
 
         //
-        poly = new Polygon();
+        cof = new CloudOfSegments();
         init(drawer);
     }
 
     public void cancel(Drawer drawer) {
-        poly.clear();
+        cof.clear();
         init(drawer);
     }
 
@@ -92,18 +103,6 @@ public class SimplePolygonToolState extends ToolState {
 
     /* */
 
-    private void addPlace(DrawerContext context, double x, double y) {
-        currentPlacedPoint = new Point(x, y);
-        poly.convertToOrigin(currentPlacedPoint);
-        // currentPlacedPoint = poly.getByOrigin(x, y);
-        poly.addPoint(currentPlacedPoint); // event.getX(), event.getY());
-        inPlace = true;
-        context.repaint();
-
-        //
-        refreshDA();
-    }
-
     @Override
     public void mousePressed(DrawerContext context, MouseEvent event) {
 
@@ -112,12 +111,16 @@ public class SimplePolygonToolState extends ToolState {
         if (directSelectionTool.isHave())
             return;
 
+        //
         if (!isLeftClick(event))
             return;
-        if (currentState != State.Started)
+        if (currentState != State.Waiting)
             return;
         //
-        addPlace(context, event.getX(), event.getY());
+        currentState = State.Started;
+        s.a.set(currentPointToPlace);
+        cof.convertToOrigin(s.a);
+        refreshDA();
     }
 
     @Override
@@ -132,36 +135,42 @@ public class SimplePolygonToolState extends ToolState {
         if (!isLeftClick(event))
             return;
         //
-        if (currentState == State.Waiting) {
-            currentState = State.Started;
-            poly.origin.set(event.getX(), event.getY());
-            addPlace(context, event.getX(), event.getY());
+        if (currentState == State.Started) {
+
+            //
+            s.b.set(event.getX(), event.getY());
+            cof.convertToOrigin(s.b);
+
+            if (((Math.abs(s.a.x - s.b.x) >= MIN_SEGMENT_SIZE.x) && (Math.abs(s.a.y - s.b.y) >= MIN_SEGMENT_SIZE.y))) {
+                //
+                cof.cloud.add(s);
+                s = new Segment();
+                //
+                refreshDA();
+            }
         }
-        inPlace = false;
+
+        currentState = State.Waiting;
     }
 
     @Override
     public void mouseMoved(DrawerContext context, MouseEvent event) {
 
-        // InterfaceGeometric overIG = poly.getContains(new Point(event.getX(),
-        // event.getY()));
-        // if (overIG != null) {
-        // overIG.translate(new Point(1, 0));
-        // }
+        if (currentState == State.Started) {
 
-        if (inPlace) {
-            currentPlacedPoint.set(event.getX(), event.getY());
-            poly.convertToOrigin(currentPlacedPoint);
+            s.b.set(event.getX(), event.getY());
+            cof.convertToOrigin(s.b);
 
         } else {
 
             directSelectionTool.mouseMoved(context, event);
             if (!directSelectionTool.isHave()) {
-                
+
                 if (currentPointToPlace == null)
                     currentPointToPlace = new Point();
+
                 currentPointToPlace.set(event.getX(), event.getY());
-                
+
             }
         }
 
@@ -172,19 +181,19 @@ public class SimplePolygonToolState extends ToolState {
     public void paint(InterfaceGraphicVisitor painter) {
         // painter.setSelected(selected);
 
-        painter.setWorkedConstruct(true);
-        painter.visit(poly);
-        painter.setWorkedConstruct(false);
+        painter.visit(cof);
 
-        if (!inPlace)
-            if (currentPointToPlace != null)
-                if (!directSelectionTool.isHave())
+        if (!directSelectionTool.isHave())
+            if (currentState == State.Started) {
+                if (s != null) {
+                    painter.setDotted(true);
+                    painter.visit(s);
+                    painter.setDotted(false);
+                }
+            } else {
+                if (currentPointToPlace != null)
                     painter.visit(currentPointToPlace);
-
-        /*
-         * context.setStroke(Color.BLACK); context.strokeLine(x - 5, y, x + 5,
-         * y); context.strokeLine(x, y - 5, x, y + 5);
-         */
+            }
     }
 
 }

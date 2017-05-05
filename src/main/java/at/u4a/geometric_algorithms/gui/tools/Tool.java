@@ -26,8 +26,8 @@ public enum Tool {
     Selection("Outil Selection", KeyCode.V, ToolCategory.Transform, "selection.png", SelectionToolState::new), //
     DirectSelection("Outil Selection directe", KeyCode.A, ToolCategory.Transform, "selection_direct.png", DirectSelectionToolState::new), //
 
-    CloudOfPoint("Outil Nuage de Point", KeyCode.P, ToolCategory.ShapeSetter, "cloud_of_point.png"), //
-    LotOfSegment("Outil Ensemble de Segments", KeyCode.S, ToolCategory.ShapeSetter, "lot_of_segment.png"), //
+    CloudOfPoint("Outil Nuage de Point", KeyCode.P, ToolCategory.ShapeSetter, "cloud_of_point.png", CloudOfPointsToolState::new), //
+    LotOfSegment("Outil Ensemble de Segments", KeyCode.S, ToolCategory.ShapeSetter, "lot_of_segment.png", CloudOfSegmentsToolState::new), //
     TraceOfPoint("Outil Tracé de Point", KeyCode.T, ToolCategory.ShapeSetter, "trace_of_point.png"), //
 
     ShapeRectangle("Outil Rectangle", EnumSet.of(KeyCode.SHIFT, KeyCode.R), ToolCategory.Shape, "shape_square.png", RectangleDrawerState::new), //

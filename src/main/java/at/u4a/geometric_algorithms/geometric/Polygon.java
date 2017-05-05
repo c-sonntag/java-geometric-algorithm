@@ -151,44 +151,34 @@ public class Polygon extends AbstractShape implements InterfaceContainer<Segment
 
     @Override
     public List<InterfaceMapper> getMappedComposition() {
-        List<InterfaceMapper> mappedComposition = new ArrayList<InterfaceMapper>();
+        ArrayList<InterfaceMapper> mappedComposition = new ArrayList<InterfaceMapper>();
 
         // Points
         for (Point q : perimeter)
             mappedComposition.add(new MappedPoint((o) -> {
-                o.set(this.origin.x + q.x, this.origin.y + q.y);
+                o.set(origin.x + q.x, origin.y + q.y);
             }, (o) -> {
-                q.set(o.x - this.origin.x, o.y - this.origin.y);
+                q.set(o.x - origin.x, o.y - origin.y);
             }));
 
         // Segments
-        int listPointsSize = mappedComposition.size();
+        int listPointSize = mappedComposition.size();
         int count = 0;
 
         //
-        MappedPoint lastPoint = null, firstPoint = null, endPoint = null;
-        for (InterfaceMapper qim : mappedComposition) {
+        MappedPoint lastPoint = null;
+        for (int i = 0; i < listPointSize; i++) {
 
-            MappedPoint qm = (MappedPoint) qim;
-
-            //
-            if ((count + 1) >= listPointsSize) {
-                endPoint = qm;
-                if (firstPoint != null)
-                    mappedComposition.add(new MappedSegment(endPoint, firstPoint));
-                break;
-            } else if (count == 0)
-                firstPoint = qm;
-
-            //
+            MappedPoint qm = (MappedPoint) mappedComposition.get(i);
             if (lastPoint != null)
                 mappedComposition.add(new MappedSegment(lastPoint, qm));
-
             //
             lastPoint = qm;
-            count++;
         }
-        
+        if (listPointSize > 1)
+            mappedComposition.add(new MappedSegment((MappedPoint) mappedComposition.get(0), (MappedPoint) mappedComposition.get(listPointSize - 1)));
+
+        //
         return mappedComposition;
     }
 

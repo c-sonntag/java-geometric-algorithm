@@ -79,12 +79,10 @@ public class Rectangle extends AbstractShape {
 
         // Top right
         MappedPoint topRightPoint = new MappedPoint((o) -> {
-            o.set(this.origin.x + this.size.x + 200, this.origin.y);
+            o.set(this.origin.x + this.size.x, this.origin.y);
         }, (o) -> {
-            size.set(size.x - (o.x - origin.x), size.y - (o.y - origin.y));
-            origin.set(o.x - size.x, o.y - size.y);
-
-            // this.origin.set(o.x - this.origin.x, o.y);
+            size.set(o.x - origin.x, size.y - (o.y - origin.y));
+            origin.set(origin.x, o.y);
         });
         mappedComposition.add(topRightPoint);
 
@@ -92,7 +90,8 @@ public class Rectangle extends AbstractShape {
         MappedPoint bottomLeftPoint = new MappedPoint((o) -> {
             o.set(this.origin.x, this.origin.y + this.size.y);
         }, (o) -> {
-            this.origin.set(o.x, o.y - this.origin.y);
+            size.set(size.x - (o.x - origin.x), o.y - origin.y);
+            origin.set(o.x, origin.y);
         });
         mappedComposition.add(bottomLeftPoint);
 
@@ -100,18 +99,17 @@ public class Rectangle extends AbstractShape {
         MappedPoint bottomRightPoint = new MappedPoint((o) -> {
             o.set(this.origin.x + this.size.x, this.origin.y + this.size.y);
         }, (o) -> {
-            this.size.set(o.x - this.origin.x, o.y - this.origin.y);
+            size.set(o.x - origin.x, o.y - origin.y);
         });
         mappedComposition.add(bottomRightPoint);
 
         // Lines
 
-        // mappedComposition.add(new MappedLine(topLeftPoint, topRightPoint));
-        // mappedComposition.add(new MappedLine(topRightPoint,
-        // bottomRightPoint));
-        // mappedComposition.add(new MappedLine(bottomRightPoint,
-        // bottomLeftPoint));
-        // mappedComposition.add(new MappedLine(bottomLeftPoint, topLeftPoint));
+        /** @tofo faire les lignes */
+        //mappedComposition.add(new MappedLine(topLeftPoint, topRightPoint));
+        //mappedComposition.add(new MappedLine(topRightPoint, bottomRightPoint));
+        //mappedComposition.add(new MappedLine(bottomRightPoint, bottomLeftPoint));
+        //mappedComposition.add(new MappedLine(bottomLeftPoint, topLeftPoint));
 
         //
         return mappedComposition;

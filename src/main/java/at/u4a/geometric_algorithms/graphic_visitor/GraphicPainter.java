@@ -2,6 +2,7 @@ package at.u4a.geometric_algorithms.graphic_visitor;
 
 import java.util.Iterator;
 
+import at.u4a.geometric_algorithms.geometric.CloudOfPoints;
 import at.u4a.geometric_algorithms.geometric.CloudOfSegments;
 import at.u4a.geometric_algorithms.geometric.Line;
 import at.u4a.geometric_algorithms.geometric.Point;
@@ -9,6 +10,7 @@ import at.u4a.geometric_algorithms.geometric.Polygon;
 import at.u4a.geometric_algorithms.geometric.Rectangle;
 import at.u4a.geometric_algorithms.geometric.Segment;
 import at.u4a.geometric_algorithms.geometric.mapper.InterfaceMapper;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -121,14 +123,58 @@ public class GraphicPainter implements InterfaceGraphicVisitor {
     }
 
     /** TODO doit dessiner une ligne et non un segment ! */
-    public void visit(Line l) {
-        // gc.setStroke(isSelected ? selectedColor : segmentColor);
+    public void visit_unit(Line l) {
+        Canvas c = gc.getCanvas();
+
+        double screenWidth = c.getWidth();
+        double screenHeight = c.getHeight();
+
+        final double sizeX = Math.abs(l.a.x - l.b.x);
+        final double sizeY = Math.abs(l.a.y - l.b.y);
+
+        // final double factorX = x / y ;
+        // final double factorY = y / x ;
+
+        final boolean isVertical = Math.abs(l.a.x - l.b.x) >= Math.abs(l.a.y - l.b.y);
+
+        final double factor = (isVertical ? (sizeY / sizeX) : (sizeX / sizeY));
+        final int add = (int) (isVertical ? Math.min(l.a.x, l.b.x) : Math.min(l.a.y, l.b.y));
+
+        if (isVertical) {
+            // gc.strokeLine((int) l.a.x, (int) l.a.y, (int) l.b.x, (int)
+            // l.b.y);
+        } else {
+            // gc.strokeLine(0, (int) (factor *) , (int) l.b.x, (int) l.b.y);
+        }
+
+        // double b_x = Math.max(l.a.x , l.b.x ) + sizeX * factorX;
+        // double b_x = Math.max(l.a.x , l.b.x ) + sizeX * factorX;
+
+        // final boolean isVertical = Math.abs( l.a.x - l.b.x ) >= Math.abs(
+        // l.a.y - l.b.y );
+        // final double factorX = Math.min(l.a.x , l.b.x) / Math.max(l.a.x ,
+        // l.b.x);
+        // final double factorY = Math.min(l.a.y , l.b.y) / Math.max(l.a.y ,
+        // l.b.y);
+
         gc.strokeLine((int) l.a.x, (int) l.a.y, (int) l.b.x, (int) l.b.y);
     }
 
-    public void visit(Segment s) {
-        // gc.setStroke(isSelected ? selectedColor : segmentColor);
+    public void visit(Line l) {
+        visit_unit(l);
+        visit(l.a);
+        visit(l.b);
+    }
+
+    public void visit_unit(Segment s) {
         gc.strokeLine((int) s.a.x, (int) s.a.y, (int) s.b.x, (int) s.b.y);
+
+    }
+
+    public void visit(Segment s) {
+        visit_unit(s);
+        visit(s.a);
+        visit(s.b);
     }
 
     /* SHAPES */
@@ -151,7 +197,7 @@ public class GraphicPainter implements InterfaceGraphicVisitor {
             sToOrigin.set(s);
             poly.convertToStandard(sToOrigin.a);
             poly.convertToStandard(sToOrigin.b);
-            visit(sToOrigin);
+            visit_unit(sToOrigin);
         }
         setDotted(defaultDotted);
         final Point pToOrigin = new Point();
@@ -162,6 +208,7 @@ public class GraphicPainter implements InterfaceGraphicVisitor {
         }
     }
 
+    /** @todo other */
     public void visit_onetracing(Polygon poly) { // visit_onetracing
         Segment segment = new Segment();
         Point point = new Point(), lastPoint = null;
@@ -171,29 +218,41 @@ public class GraphicPainter implements InterfaceGraphicVisitor {
             if (lastPoint != null) {
                 segment.a.set(poly.origin.x + lastPoint.x, poly.origin.y + lastPoint.y);
                 segment.b.set(point);
-                visit(segment);
+                visit_unit(segment);
             }
             lastPoint = p;
         }
     }
 
     public void visit(CloudOfSegments clouds) {
-
+        final Segment sToOrigin = new Segment();
+        for (Segment s : clouds) {
+            sToOrigin.set(s);
+            clouds.convertToStandard(sToOrigin.a);
+            clouds.convertToStandard(sToOrigin.b);
+            visit(sToOrigin);
+        }
     }
 
-    public void visit(Rectangle rectangle) {
-        
+    public void visit(CloudOfPoints clouds) {
+        final Point pToOrigin = new Point();
+        for (Point p : clouds) {
+            pToOrigin.set(p);
+            clouds.convertToStandard(pToOrigin);
+            visit(pToOrigin);
+        }
+            
+    }
+
+    /** @todo test */
+    public void visit_fromcomposition(Rectangle rectangle) {
+
         gc.setStroke(Color.RED);
         for (InterfaceMapper im : rectangle.getMappedComposition())
             im.accept(this);
-        
-        visit_0(rectangle);
-
     }
 
-    public void visit_0(Rectangle rectangle) {
-        //gc.setFill(Color.BLUE);
-        gc.setStroke(Color.BLUE);
+    public void visit(Rectangle rectangle) {
         //
         final Point oppositeSide = rectangle.getOppositeSide();
         gc.strokeRect( //

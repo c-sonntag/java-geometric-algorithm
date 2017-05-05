@@ -32,9 +32,4 @@ public class DirectSelectionToolState extends SelectionToolState {
         }
         overlayComposant = null;
     }
-    
-    
-    
-    
-
 }

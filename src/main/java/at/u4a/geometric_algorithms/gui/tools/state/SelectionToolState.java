@@ -96,10 +96,15 @@ public class SelectionToolState extends ToolState {
         if (overlay != null)
             ig = overlay.getShape();
     }
+    
+    protected void setSelected() {
+        if (overlay != null)
+            lm.setSelectedLayer(overlay);
+    }
 
     @Override
     public void mousePressed(DrawerContext context, MouseEvent event) {
-        if (overlay != null) {
+        if (isHave()) {
             if (!inMove) {
 
                 //
@@ -114,10 +119,8 @@ public class SelectionToolState extends ToolState {
                 //
                 setCursor(d);
             }
-
-            // Set selected
-            lm.setSelectedLayer(overlay);
         }
+        setSelected();
     }
 
     @Override

@@ -9,5 +9,7 @@ public interface InterfaceShapePainterVisitor {
     public void visit(Rectangle poly);
 
     public void visit(CloudOfSegments clouds);
+    
+    public void visit(CloudOfPoints clouds);
 
 }

@@ -34,10 +34,7 @@ public class Line implements InterfaceGeometric {
 
     @Override
     public InterfaceGeometric getContains(Point p) {
-        if (contains(p))
-            return this;
-        else
-            return null;
+        return contains(p) ? this : null;
     }
 
     /** Formule de distance récuperé dans le Partiel 2016/2017 de PCOO */

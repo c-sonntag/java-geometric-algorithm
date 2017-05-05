@@ -7,25 +7,25 @@ import java.util.NoSuchElementException;
 
 import at.u4a.geometric_algorithms.geometric.mapper.InterfaceMapper;
 import at.u4a.geometric_algorithms.geometric.mapper.MappedPoint;
-import at.u4a.geometric_algorithms.geometric.mapper.MappedSegment;
 import at.u4a.geometric_algorithms.geometric.mapper.SimplePoint;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceShapePainterVisitor;
 
-public class CloudOfSegments extends AbstractShape implements InterfaceContainer<Segment> {
+public class CloudOfPoints extends AbstractShape implements InterfaceContainer<Point> {
 
-    final public ArrayList<Segment> cloud = new ArrayList<Segment>();
+    final public ArrayList<Point> cloud = new ArrayList<Point>();
 
-    public ArrayList<Segment> getOnPosition(Point p) {
-        ArrayList<Segment> segments = null;
-
-        for (Segment s : cloud) {
-            if (s.contains(p)) {
-                if (segments == null)
-                    segments = new ArrayList<Segment>();
-                segments.add(s);
+    public ArrayList<Point> getOnPosition(Point p) {
+        ArrayList<Point> points = null;
+        final Point pToOrigin = new Point(p);
+        convertToOrigin(pToOrigin);
+        for (Point pc : cloud) {
+            if (pc.contains(pToOrigin)) {
+                if (points == null)
+                    points = new ArrayList<Point>();
+                points.add(pc);
             }
         }
-        return segments;
+        return points;
     }
 
     @Override
@@ -35,19 +35,21 @@ public class CloudOfSegments extends AbstractShape implements InterfaceContainer
 
     @Override
     public InterfaceGeometric getContains(Point p) {
-        for (Segment s : cloud) {
-            if (s.contains(p))
+        final Point pToOrigin = new Point(p);
+        convertToOrigin(pToOrigin);
+        for (Point s : cloud) {
+            if (s.contains(pToOrigin))
                 return s;
         }
         return null;
     }
 
-    /** Distance entre un point et le segment du nuage le plus proche */
+    /** Distance entre un point et le point du nuage le plus proche */
     public double distance(Point p) {
         if (cloud.isEmpty())
             throw new NoSuchElementException("No element in cloud");
 
-        Iterator<Segment> cloudIt = cloud.iterator();
+        Iterator<Point> cloudIt = cloud.iterator();
 
         double minDistance = cloudIt.next().distance(p);
 
@@ -66,7 +68,7 @@ public class CloudOfSegments extends AbstractShape implements InterfaceContainer
     }
 
     @Override
-    public Iterator<Segment> iterator() {
+    public Iterator<Point> iterator() {
         return cloud.iterator();
     }
 
@@ -80,22 +82,12 @@ public class CloudOfSegments extends AbstractShape implements InterfaceContainer
     @Override
     public List<InterfaceMapper> getMappedComposition() {
         List<InterfaceMapper> mappedComposition = new ArrayList<InterfaceMapper>();
-        // Points on the top
-        for (Segment s : cloud) {
+        for (Point p : cloud) {
             mappedComposition.add(new MappedPoint((o) -> {
-                o.set(origin.x + s.a.x, origin.y + s.a.y);
+                o.set(origin.x + p.x, origin.y + p.y);
             }, (o) -> {
-                s.a.set(o.x - origin.x, o.y - origin.y);
+                p.set(o.x - origin.x, o.y - origin.y);
             }));
-            mappedComposition.add(new MappedPoint((o) -> {
-                o.set(origin.x + s.b.x, origin.y + s.b.y);
-            }, (o) -> {
-                s.b.set(o.x - origin.x, o.y - origin.y);
-            }));
-        }
-        // Lines at second on the top
-        for (Segment s : cloud) {
-            mappedComposition.add(new MappedSegment(s.a, s.b));
         }
         return mappedComposition;
     }
