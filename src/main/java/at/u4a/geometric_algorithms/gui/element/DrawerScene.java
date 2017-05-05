@@ -66,7 +66,7 @@ public class DrawerScene {
     private FX fx = null;
 
     // LayerManager
-    private final LayerManager layers = new LayerManager();
+    private final LayerManager layers = new LayerManager(this);
 
     // Tools
     private final Map<Tool, ToolButton> toolsItems = new HashMap<Tool, ToolButton>();
@@ -163,6 +163,7 @@ public class DrawerScene {
         if (fx != null)
             fx.drawer.repaint();
     }
+    
 
     /* */
 

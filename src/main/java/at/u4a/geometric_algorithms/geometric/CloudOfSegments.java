@@ -17,9 +17,10 @@ public class CloudOfSegments extends AbstractShape implements InterfaceContainer
 
     public ArrayList<Segment> getOnPosition(Point p) {
         ArrayList<Segment> segments = null;
-
+        final Point pToOrigin = new Point(p);
+        convertToOrigin(pToOrigin);
         for (Segment s : cloud) {
-            if (s.contains(p)) {
+            if (s.contains(pToOrigin)) {
                 if (segments == null)
                     segments = new ArrayList<Segment>();
                 segments.add(s);
@@ -35,8 +36,10 @@ public class CloudOfSegments extends AbstractShape implements InterfaceContainer
 
     @Override
     public InterfaceGeometric getContains(Point p) {
+        final Point pToOrigin = new Point(p);
+        convertToOrigin(pToOrigin);
         for (Segment s : cloud) {
-            if (s.contains(p))
+            if (s.contains(pToOrigin))
                 return s;
         }
         return null;
@@ -80,6 +83,7 @@ public class CloudOfSegments extends AbstractShape implements InterfaceContainer
     @Override
     public List<InterfaceMapper> getMappedComposition() {
         List<InterfaceMapper> mappedComposition = new ArrayList<InterfaceMapper>();
+        
         // Points on the top
         for (Segment s : cloud) {
             mappedComposition.add(new MappedPoint((o) -> {
@@ -93,10 +97,17 @@ public class CloudOfSegments extends AbstractShape implements InterfaceContainer
                 s.b.set(o.x - origin.x, o.y - origin.y);
             }));
         }
+        
         // Lines at second on the top
-        for (Segment s : cloud) {
-            mappedComposition.add(new MappedSegment(s.a, s.b));
+        int listPointSize = mappedComposition.size();
+        for (int i = 0; i < listPointSize; i += 2) {
+            mappedComposition.add(new MappedSegment(//
+                    (MappedPoint) mappedComposition.get(i), //
+                    (MappedPoint) mappedComposition.get(i + 1) //
+            ));
         }
+        
+        //
         return mappedComposition;
     }
 

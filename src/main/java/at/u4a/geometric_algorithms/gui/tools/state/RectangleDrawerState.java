@@ -19,6 +19,14 @@ public class RectangleDrawerState extends ToolState {
     /* */
 
     private Rectangle rectangle = new Rectangle();
+    private Point currentPointToPlace;
+
+    /* */
+
+    public void mouseExited(Drawer drawer) {
+        currentPointToPlace = null;
+        super.mouseExited(drawer);
+    }
 
     /* */
 
@@ -29,7 +37,7 @@ public class RectangleDrawerState extends ToolState {
         //
         if (((Math.abs(rectangle.size.x) < MIN_SIZE.x) && (Math.abs(rectangle.size.y) < MIN_SIZE.y)))
             init(drawer);
-        
+
         //
         GeometricLayer<Rectangle> rectangleLayer = new GeometricLayer<Rectangle>(rectangle);
         rectangleLayer.setLayerName("r" + String.valueOf(RectangleCount));
@@ -61,7 +69,7 @@ public class RectangleDrawerState extends ToolState {
             cancel(null);
             return;
         }
-        
+
         //
         if (currentState == State.Waiting) {
             currentState = State.Started;
@@ -75,20 +83,24 @@ public class RectangleDrawerState extends ToolState {
             cancel(null);
             return;
         }
-        
+
         //
         setSize(event.getX(), event.getY());
-        
+
         //
         valid(context.getDrawer());
     }
 
     @Override
     public void mouseMoved(DrawerContext context, MouseEvent event) {
-        if (currentState != State.Started)
-            return;
-        //
-        setSize(event.getX(), event.getY());
+        if (currentState != State.Started) {
+            if (currentPointToPlace == null)
+                currentPointToPlace = new Point();
+            currentPointToPlace.set(event.getX(), event.getY());  
+        }
+        else {
+            setSize(event.getX(), event.getY());
+        }
         context.repaint();
     }
 
@@ -98,7 +110,11 @@ public class RectangleDrawerState extends ToolState {
 
     @Override
     public void paint(InterfaceGraphicVisitor painter) {
-        painter.visit(rectangle);
+        
+        if (currentState != State.Waiting)
+            painter.visit(rectangle);
+        else if (currentPointToPlace != null)
+            painter.visit(currentPointToPlace);
     }
 
 }

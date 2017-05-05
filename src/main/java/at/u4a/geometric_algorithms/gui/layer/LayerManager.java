@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Vector;
 
 import at.u4a.geometric_algorithms.geometric.Point;
+import at.u4a.geometric_algorithms.gui.element.DrawerScene;
 import at.u4a.geometric_algorithms.gui.element.LayerTree;
 
 public class LayerManager implements Iterable<AbstractLayer> {
@@ -14,6 +15,14 @@ public class LayerManager implements Iterable<AbstractLayer> {
     LayerTree controllerTree = null;
 
     private AbstractLayer selectedLayer = null;
+
+    /* */
+
+    private final DrawerScene ds;
+
+    public LayerManager(DrawerScene ds) {
+        this.ds = ds;
+    }
 
     /* */
 
@@ -27,6 +36,12 @@ public class LayerManager implements Iterable<AbstractLayer> {
     public void refresh() {
         if (controllerTree != null)
             controllerTree.reload();
+    }
+
+    public void clear() {
+        layers.clear();
+        refresh();
+        ds.refresh();
     }
 
     /* */

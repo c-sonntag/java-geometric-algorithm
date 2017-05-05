@@ -135,25 +135,39 @@ public class PrincipalGui extends JFrame {
         menuBar.add(mnFile);
 
         JMenuItem mntmNew = new JMenuItem("New");
+        mntmNew.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                ds.getLayerMannager().clear();
+            }
+        });
         mntmNew.setIcon(new ImageIcon("icons/action/page_add.png"));
         mnFile.add(mntmNew);
 
         JMenuItem mntmOpen = new JMenuItem("Open");
+        mntmOpen.setEnabled(false);
         mntmOpen.setIcon(new ImageIcon("icons/action/page_edit.png"));
         mnFile.add(mntmOpen);
 
         JMenuItem mntmSave = new JMenuItem("Save");
+        mntmSave.setEnabled(false);
         mntmSave.setIcon(new ImageIcon("icons/action/page_save.png"));
         mnFile.add(mntmSave);
 
         mnFile.addSeparator();
 
         JMenuItem mntmOther = new JMenuItem("Other");
+        mntmOther.setEnabled(false);
         mnFile.add(mntmOther);
 
         mnFile.addSeparator();
 
         JMenuItem mntmExit = new JMenuItem("Exit");
+        mntmExit.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                setVisible(false);
+                dispose(); 
+            }
+        });
         mntmExit.setIcon(new ImageIcon("icons/action/page_delete.png"));
         mnFile.add(mntmExit);
 

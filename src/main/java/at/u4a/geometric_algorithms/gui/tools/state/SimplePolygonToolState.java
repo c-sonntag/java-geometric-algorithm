@@ -50,8 +50,17 @@ public class SimplePolygonToolState extends ToolState {
 
     private DirectSelectionPolygonTool directSelectionTool = new DirectSelectionPolygonTool();
 
+    
     /* */
 
+    public void mouseExited(Drawer drawer) {
+        currentPointToPlace = null;
+        super.mouseExited(drawer);
+    }
+    
+    /* */
+    
+    
     private InterfaceDrawerAction da;
 
     private void refreshDA() {
