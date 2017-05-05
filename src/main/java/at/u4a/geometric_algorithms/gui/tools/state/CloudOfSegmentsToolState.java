@@ -1,13 +1,7 @@
 package at.u4a.geometric_algorithms.gui.tools.state;
 
-import java.io.File;
-
-import javax.swing.ImageIcon;
-
 import at.u4a.geometric_algorithms.geometric.CloudOfSegments;
-import at.u4a.geometric_algorithms.geometric.InterfaceGeometric;
 import at.u4a.geometric_algorithms.geometric.Point;
-import at.u4a.geometric_algorithms.geometric.Polygon;
 import at.u4a.geometric_algorithms.geometric.Segment;
 import at.u4a.geometric_algorithms.geometric.mapper.InterfaceMapper;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGraphicVisitor;
@@ -16,7 +10,6 @@ import at.u4a.geometric_algorithms.gui.element.DrawerContext;
 import at.u4a.geometric_algorithms.gui.element.InterfaceDrawerAction;
 import at.u4a.geometric_algorithms.gui.layer.GeometricLayer;
 import at.u4a.geometric_algorithms.gui.tools.ToolState;
-import at.u4a.geometric_algorithms.gui.tools.ToolState.State;
 import javafx.scene.input.MouseEvent;
 
 public class CloudOfSegmentsToolState extends ToolState {

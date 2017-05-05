@@ -20,7 +20,7 @@ import javafx.scene.paint.Color;
 
 public class DrawerScene {
 
-    private static final Cursor CURSOR_NO_TOOLS = Cursor.WAIT;
+    private static final Cursor CURSOR_NO_TOOLS = Cursor.NONE;
 
     private class FX {
         final Group root = new Group();
@@ -62,11 +62,13 @@ public class DrawerScene {
 
     // FX to Swing
     private final InterfaceDrawerAction da;
+    private final InterfaceLayerAction la;
+    
     private final JFXPanel fxPanel = new JFXPanel();
     private FX fx = null;
 
     // LayerManager
-    private final LayerManager layers = new LayerManager(this);
+    private final LayerManager layers;
 
     // Tools
     private final Map<Tool, ToolButton> toolsItems = new HashMap<Tool, ToolButton>();
@@ -75,8 +77,11 @@ public class DrawerScene {
     private Tool currentTool;
     private ToolState currentState;
 
-    public DrawerScene(InterfaceDrawerAction da) {
+    public DrawerScene(InterfaceDrawerAction da, InterfaceLayerAction la) {
         this.da = da;
+        this.la = la;
+        //
+        layers = new LayerManager(this);
         //
         Platform.runLater(new Runnable() {
             public void run() {
@@ -94,6 +99,10 @@ public class DrawerScene {
 
     public InterfaceDrawerAction getDrawerAction() {
         return da;
+    }
+    
+    public InterfaceLayerAction getLayerAction() {
+        return la;
     }
 
     public void addToolButton(ToolButton btnTool) {

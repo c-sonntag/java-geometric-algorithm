@@ -18,6 +18,7 @@ import javax.swing.SwingConstants;
 
 import at.u4a.geometric_algorithms.gui.element.DrawerScene;
 import at.u4a.geometric_algorithms.gui.element.InterfaceDrawerAction;
+import at.u4a.geometric_algorithms.gui.element.InterfaceLayerAction;
 import at.u4a.geometric_algorithms.gui.element.LayerCategoryLabel;
 import at.u4a.geometric_algorithms.gui.element.LayerTree;
 import at.u4a.geometric_algorithms.gui.element.StatusBar;
@@ -28,17 +29,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import java.awt.event.ActionListener;
-import java.util.concurrent.Callable;
 import java.awt.event.ActionEvent;
-import java.awt.GridLayout;
-import java.awt.CardLayout;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import net.miginfocom.swing.MigLayout;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
-import java.awt.FlowLayout;
 
 /**
  * Gui principale de l'application Geométrie Algorithmique
@@ -54,10 +45,15 @@ public class PrincipalGui extends JFrame {
 
     private static final long serialVersionUID = 7047807079976701109L;
 
-    // Initialize Final Variable
-    private final DrawerAction dad = new DrawerAction();
-    private final DrawerScene ds = new DrawerScene(dad);
+    /* Initialize Final Variable */
+
+    private final DrawerAction da = new DrawerAction();
+    private final LayerAction la = new LayerAction();
+    
+    private final DrawerScene ds = new DrawerScene(da,la);
     private final LayerTree treeLayer = new LayerTree(ds);
+    
+    
 
     /**
      * Launch the application.
@@ -165,7 +161,7 @@ public class PrincipalGui extends JFrame {
         mntmExit.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 setVisible(false);
-                dispose(); 
+                dispose();
             }
         });
         mntmExit.setIcon(new ImageIcon("icons/action/page_delete.png"));
@@ -222,9 +218,9 @@ public class PrincipalGui extends JFrame {
         appToolbar.setFloatable(false);
         toolBarTop.add(appToolbar);
 
-        //JButton btnNew = new JButton("New");
-        //appToolbar.add(btnNew);
-        //btnNew.setIcon(new ImageIcon("icons/action/page_add.png"));
+        // JButton btnNew = new JButton("New");
+        // appToolbar.add(btnNew);
+        // btnNew.setIcon(new ImageIcon("icons/action/page_add.png"));
 
         toolBarTop.addSeparator();
 
@@ -235,7 +231,7 @@ public class PrincipalGui extends JFrame {
 
         // toolBarTop.addSeparator();
 
-        JToolBar drawerActionToolBar = dad.getToolBar();
+        JToolBar drawerActionToolBar = da.getToolBar();
         drawerActionToolBar.setFloatable(false);
         toolBarTop.add(drawerActionToolBar);
     }
@@ -268,42 +264,10 @@ public class PrincipalGui extends JFrame {
 
         /* TOOLBAR */
 
-        JToolBar toolBarLayer = new JToolBar();
-        toolBarLayer.setRollover(true);
-        toolBarLayer.setFloatable(false);
-        panelLayer.add(toolBarLayer, BorderLayout.SOUTH);
-
-        /* TOOLBAR - MENUBAR */
-
-        JPanel panelMenuBar = new JPanel();
-        panelMenuBar.setLayout(new BoxLayout(panelMenuBar, BoxLayout.X_AXIS));
-        toolBarLayer.add(panelMenuBar);
-
-        JMenuBar menuBar = new JMenuBar();
-        menuBar.setAlignmentY(Component.CENTER_ALIGNMENT);
-        menuBar.setBorderPainted(false);
-        panelMenuBar.add(menuBar);
-
-        // menuBar.setOpaque(false);
-        // mnNewMenu.setVerticalAlignment(SwingConstants.BOTTOM);
-
-        JMenu mnNewMenu = new JMenu("F");
-
-        mnNewMenu.setFont(LayerCategoryLabel.font);
-        menuBar.add(mnNewMenu);
-
-        JMenuItem mntmNewMenuItem = new JMenuItem("Triangul");
-        mnNewMenu.add(mntmNewMenuItem);
-
-        setMenuToBottomLeftAlignement(mnNewMenu);
-
-        /* TOOLBAR - BUTTON */
-
-        JButton btnLayerDelete = new JButton("");
-        btnLayerDelete.setEnabled(false);
-        btnLayerDelete.setToolTipText("Delete layer");
-        btnLayerDelete.setIcon(new ImageIcon("icons/action/cancel.png"));
-        toolBarLayer.add(btnLayerDelete);
+        JToolBar layerActionToolBar = la.getToolBar();
+        layerActionToolBar.setRollover(true);
+        layerActionToolBar.setFloatable(false);
+        panelLayer.add(layerActionToolBar, BorderLayout.SOUTH);
 
         /* TREE */
 
@@ -314,14 +278,80 @@ public class PrincipalGui extends JFrame {
         return panelLayer;
     }
 
-    /**
-     * This function need to have a content in Menu for change alignement
-     */
-    private void setMenuToBottomLeftAlignement(JMenu m) {
-        m.setMenuLocation((int) -(m.getPopupMenu().getPreferredSize().getWidth() - m.getPreferredSize().getWidth()), (int) -m.getPopupMenu().getPreferredSize().getHeight());
-    }
+   
 
-    /* InterfaceDrawerAction */
+    private class LayerAction implements InterfaceLayerAction {
+
+        private final JButton btnLayerDelete;
+        private final JToolBar toolbar;
+
+        public LayerAction() {
+
+            toolbar = new JToolBar();
+            
+            /* TOOLBAR - MENUBAR */
+
+            JPanel panelMenuBar = new JPanel();
+            panelMenuBar.setLayout(new BoxLayout(panelMenuBar, BoxLayout.X_AXIS));
+            toolbar.add(panelMenuBar);
+
+            JMenuBar menuBar = new JMenuBar();
+            menuBar.setAlignmentY(Component.CENTER_ALIGNMENT);
+            menuBar.setBorderPainted(false);
+            panelMenuBar.add(menuBar);
+
+            // menuBar.setOpaque(false);
+            // mnNewMenu.setVerticalAlignment(SwingConstants.BOTTOM);
+
+            JMenu mnNewMenu = new JMenu("F");
+
+            mnNewMenu.setFont(LayerCategoryLabel.font);
+            menuBar.add(mnNewMenu);
+
+            JMenuItem mntmNewMenuItem = new JMenuItem("Triangul");
+            mnNewMenu.add(mntmNewMenuItem);
+
+            setMenuToBottomLeftAlignement(mnNewMenu);
+
+            /* TOOLBAR - BUTTON */
+
+            btnLayerDelete = new JButton("");
+            btnLayerDelete.setEnabled(false);
+            btnLayerDelete.setToolTipText("Delete layer");
+            btnLayerDelete.setIcon(new ImageIcon("icons/action/cancel.png"));
+           
+
+            toolbar.add(btnLayerDelete);
+
+        }
+
+        @Override
+        public void addLayerActionListenerOfDelete(Runnable func) {
+            btnLayerDelete.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent arg0) {
+                    func.run();
+                }
+            });
+        }
+
+        @Override
+        public void setDelete(boolean b) {
+            btnLayerDelete.setEnabled(b);
+        }
+        
+        @Override
+        public JToolBar getToolBar() {
+            return toolbar;
+        }
+        
+        /**
+         * This function need to have a content in Menu for change alignement
+         */
+        private void setMenuToBottomLeftAlignement(JMenu m) {
+            m.setMenuLocation((int) -(m.getPopupMenu().getPreferredSize().getWidth() - m.getPreferredSize().getWidth()), (int) -m.getPopupMenu().getPreferredSize().getHeight());
+        }
+
+    }
 
     private class DrawerAction implements InterfaceDrawerAction {
 
@@ -375,7 +405,7 @@ public class PrincipalGui extends JFrame {
 
         @Override
         public void haveValid(boolean b) {
-           btnValid.setEnabled(b);
+            btnValid.setEnabled(b);
         }
 
         @Override

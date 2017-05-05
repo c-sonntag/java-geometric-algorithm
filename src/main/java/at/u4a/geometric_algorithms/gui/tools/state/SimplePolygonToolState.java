@@ -1,10 +1,5 @@
 package at.u4a.geometric_algorithms.gui.tools.state;
 
-import java.io.File;
-
-import javax.swing.ImageIcon;
-
-import at.u4a.geometric_algorithms.geometric.InterfaceGeometric;
 import at.u4a.geometric_algorithms.geometric.Point;
 import at.u4a.geometric_algorithms.geometric.Polygon;
 import at.u4a.geometric_algorithms.geometric.mapper.InterfaceMapper;

@@ -7,12 +7,15 @@ import java.util.Vector;
 
 import at.u4a.geometric_algorithms.geometric.Point;
 import at.u4a.geometric_algorithms.gui.element.DrawerScene;
+import at.u4a.geometric_algorithms.gui.element.InterfaceLayerAction;
 import at.u4a.geometric_algorithms.gui.element.LayerTree;
 
 public class LayerManager implements Iterable<AbstractLayer> {
 
     private final Vector<AbstractLayer> layers = new Vector<AbstractLayer>();
     LayerTree controllerTree = null;
+
+    private final InterfaceLayerAction la;
 
     private AbstractLayer selectedLayer = null;
 
@@ -22,26 +25,37 @@ public class LayerManager implements Iterable<AbstractLayer> {
 
     public LayerManager(DrawerScene ds) {
         this.ds = ds;
+        this.la = ds.getLayerAction();
+
+        //
+        la.addLayerActionListenerOfDelete(() -> {
+            if (selectedLayer != null)
+                deleteLayer(selectedLayer);
+        });
+
     }
 
     /* */
 
     public void addLayer(AbstractLayer layer) {
         layers.add(layer);
-        // if (controllerTree != null)
-        // controllerTree.reload();
         refresh();
     }
 
     public void refresh() {
-        if (controllerTree != null)
+        if (controllerTree != null) {
+            AbstractLayer oldSelectedLayer = selectedLayer;
             controllerTree.reload();
+            if (oldSelectedLayer != null)
+                setSelectedLayer(oldSelectedLayer);
+        }
     }
 
     public void clear() {
         layers.clear();
         refresh();
         ds.refresh();
+        setSelectedLayer(null);
     }
 
     /* */
@@ -65,6 +79,17 @@ public class LayerManager implements Iterable<AbstractLayer> {
         //
         if (controllerTree != null)
             controllerTree.selectNode(l);
+        //
+        la.setDelete(selectedLayer != null);
+
+    }
+
+    public void deleteLayer(AbstractLayer l) {
+        if (selectedLayer == l)
+            setSelectedLayer(null);
+        layers.remove(l);
+        refresh();
+        ds.refresh();
     }
 
     /* */

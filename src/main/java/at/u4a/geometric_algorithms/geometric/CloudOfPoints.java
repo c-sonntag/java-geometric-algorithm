@@ -7,7 +7,6 @@ import java.util.NoSuchElementException;
 
 import at.u4a.geometric_algorithms.geometric.mapper.InterfaceMapper;
 import at.u4a.geometric_algorithms.geometric.mapper.MappedPoint;
-import at.u4a.geometric_algorithms.geometric.mapper.SimplePoint;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceShapePainterVisitor;
 
 public class CloudOfPoints extends AbstractShape implements InterfaceContainer<Point> {

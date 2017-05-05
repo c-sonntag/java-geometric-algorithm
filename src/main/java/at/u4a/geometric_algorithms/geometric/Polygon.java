@@ -5,8 +5,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import at.u4a.geometric_algorithms.geometric.mapper.InterfaceMapper;
-import at.u4a.geometric_algorithms.geometric.mapper.MappedLine;
-import at.u4a.geometric_algorithms.geometric.mapper.SimplePoint;
 import at.u4a.geometric_algorithms.geometric.mapper.MappedPoint;
 import at.u4a.geometric_algorithms.geometric.mapper.MappedSegment;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceShapePainterVisitor;
@@ -19,8 +17,6 @@ public class Polygon extends AbstractShape implements InterfaceContainer<Segment
 
         private final Iterator<Point> perimeter_it = perimeter.iterator();
         private Point startPoint = null, point = null, lastPoint = null;
-        // private final Segment genSegment = new Segment(); @TODO voir si
-        // possible avec un seul segment généré
 
         private SegmentIterator() {
             doNext();
