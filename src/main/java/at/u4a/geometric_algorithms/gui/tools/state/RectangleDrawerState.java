@@ -6,6 +6,7 @@ import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGraphicVisitor;
 import at.u4a.geometric_algorithms.gui.element.Drawer;
 import at.u4a.geometric_algorithms.gui.element.DrawerContext;
 import at.u4a.geometric_algorithms.gui.layer.GeometricLayer;
+import at.u4a.geometric_algorithms.gui.tools.Tool;
 import at.u4a.geometric_algorithms.gui.tools.ToolState;
 import javafx.scene.input.MouseEvent;
 
@@ -40,7 +41,7 @@ public class RectangleDrawerState extends ToolState {
         }
 
         //
-        GeometricLayer<Rectangle> rectangleLayer = new GeometricLayer<Rectangle>(rectangle);
+        GeometricLayer<Rectangle> rectangleLayer = new GeometricLayer<Rectangle>(rectangle,Tool.ShapeRectangle);
         rectangleLayer.setLayerName("r" + String.valueOf(RectangleCount));
         RectangleCount++;
 

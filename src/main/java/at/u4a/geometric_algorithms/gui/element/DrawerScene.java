@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import at.u4a.geometric_algorithms.algorithm.AlgorithmManager;
 import at.u4a.geometric_algorithms.gui.layer.LayerManager;
 import at.u4a.geometric_algorithms.gui.tools.Tool;
 import at.u4a.geometric_algorithms.gui.tools.ToolState;
@@ -69,6 +70,8 @@ public class DrawerScene {
 
     // LayerManager
     private final LayerManager layers;
+    
+    private final AlgorithmManager am;
 
     // Tools
     private final Map<Tool, ToolButton> toolsItems = new HashMap<Tool, ToolButton>();
@@ -82,6 +85,7 @@ public class DrawerScene {
         this.la = la;
         //
         layers = new LayerManager(this);
+        am = new AlgorithmManager(layers);;
         //
         Platform.runLater(new Runnable() {
             public void run() {
@@ -93,6 +97,8 @@ public class DrawerScene {
 
     }
 
+    /* OBJ GETTER */
+    
     public JFXPanel getPanel() {
         return fxPanel;
     }
@@ -104,6 +110,16 @@ public class DrawerScene {
     public InterfaceLayerAction getLayerAction() {
         return la;
     }
+    
+    public LayerManager getLayerMannager() {
+        return layers;
+    }
+    
+    public AlgorithmManager getAlgorithmManager() {
+        return am;
+    }
+    
+    /* */
 
     public void addToolButton(ToolButton btnTool) {
 
@@ -179,10 +195,6 @@ public class DrawerScene {
     // public Drawer drawer() {
     // return drawer;
     // }
-
-    public LayerManager getLayerMannager() {
-        return layers;
-    }
 
     public ToolState getCurrentState() {
         return currentState;

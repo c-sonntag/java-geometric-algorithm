@@ -8,6 +8,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import javax.swing.ImageIcon;
+
 import at.u4a.geometric_algorithms.gui.tools.state.*;
 
 public enum Tool {
@@ -92,7 +94,6 @@ public enum Tool {
 
     /* PRIVATE */
 
-
     private Tool(String tip, KeyCode code, ToolCategory category, String icon) {
         this(tip, EnumSet.of(code), category, icon);
     }
@@ -111,6 +112,14 @@ public enum Tool {
         this.category = category;
         this.icon = icon;
         this.supplier = supplier;
+    }
+
+    private ImageIcon mutableImageIcon = null;
+    
+    public ImageIcon getImageIcon() {
+        if (mutableImageIcon == null)
+            mutableImageIcon = new ImageIcon(Tool.iconRessource + icon);
+        return mutableImageIcon;
     }
 
     /*

@@ -202,6 +202,8 @@ public class LayerTree extends JTree {
     // !!!!!!!!!!!! //
     // !!!!!!!!!!!! //
     // !!!!!!!!!!!! //
+    
+    static private final ImageIcon noLayerImageIcon = new ImageIcon("icons/layer/no_layer.png");
 
     class LayerNodeRenderer implements TreeCellRenderer {
 
@@ -258,8 +260,9 @@ public class LayerTree extends JTree {
             // toolBar.add(rigidArea);
             // toolBar.add(Box.createRigidArea(rigidAreaSize));
 
-            lblLayerType = new JLabel("_LayerType_");
-            lblLayerType.setIcon(new ImageIcon("R:\\Java_Shared\\java-licence-3-informatique\\GeometricAlgorithms\\icons\\tools\\shape_circle.png"));
+            //lblLayerType = new JLabel("_LayerType_");
+            lblLayerType = new JLabel("");
+            lblLayerType.setIcon(noLayerImageIcon);
             toolBar.add(lblLayerType);
 
             // toolBar.addSeparator();
@@ -305,7 +308,7 @@ public class LayerTree extends JTree {
 
         public void update(AbstractLayer node) {
             lblCategoryGen.set(node.getCategory());
-            lblLayerType.setText(node.getLayerType());
+            //lblLayerType.setText(node.getLayerType());
             lblLayerType.setIcon(node.getLayerTypeIcon());
             lblLayerName.setText(node.getLayerName());
             chckbxActive.setSelected(node.isActive());

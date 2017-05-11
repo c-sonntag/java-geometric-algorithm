@@ -14,7 +14,7 @@ public class ToolButton extends JToggleButton {
 
         String shortcut = tool.getKeyCodeStr();
         setToolTipText(tool.tip + (shortcut == null ? "" : (" (" + shortcut + ")")));
-        setIcon(new ImageIcon(Tool.iconRessource + tool.icon));
+        setIcon( tool.getImageIcon() );
         setFocusPainted(false);
         
         if (tool.supplier == null)

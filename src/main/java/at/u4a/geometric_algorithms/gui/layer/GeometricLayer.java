@@ -7,13 +7,16 @@ import javax.swing.ImageIcon;
 import at.u4a.geometric_algorithms.geometric.AbstractShape;
 import at.u4a.geometric_algorithms.geometric.Point;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceShapePainterVisitor;
+import at.u4a.geometric_algorithms.gui.tools.Tool;
 
 public class GeometricLayer<TShape extends AbstractShape> extends AbstractLayer {
 
-    private TShape shape;
+    private final TShape shape;
+    private final Tool toolType;
 
-    public GeometricLayer(TShape shape) {
+    public GeometricLayer(TShape shape, Tool toolType) {
         this.shape = shape;
+        this.toolType = toolType;
     }
 
     @Override
@@ -22,12 +25,12 @@ public class GeometricLayer<TShape extends AbstractShape> extends AbstractLayer 
     }
 
     @Override
-    public Boolean isContener() {
+    public boolean isContener() {
         return false;
     }
 
     @Override
-    public Boolean isDeletable() {
+    public boolean isDeletable() {
         return true;
     }
 
@@ -44,15 +47,11 @@ public class GeometricLayer<TShape extends AbstractShape> extends AbstractLayer 
     @Override
     public String getLayerType() {
         return shape.getClass().getSimpleName();
-        //return "An Geometric shape ..."; 
-        /** @TODO Gerer le type */
     }
 
     @Override
     public ImageIcon getLayerTypeIcon() {
-        return new ImageIcon("R:\\Java_Shared\\java-licence-3-informatique\\GeometricAlgorithms\\icons\\tools\\shape_circle.png");
-        //return "test.png";               
-        /** @TODO Gerer l'icone */
+        return toolType.getImageIcon();
     }
 
     @Override

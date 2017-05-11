@@ -9,6 +9,7 @@ import at.u4a.geometric_algorithms.gui.element.Drawer;
 import at.u4a.geometric_algorithms.gui.element.DrawerContext;
 import at.u4a.geometric_algorithms.gui.element.InterfaceDrawerAction;
 import at.u4a.geometric_algorithms.gui.layer.GeometricLayer;
+import at.u4a.geometric_algorithms.gui.tools.Tool;
 import at.u4a.geometric_algorithms.gui.tools.ToolState;
 import javafx.scene.input.MouseEvent;
 
@@ -74,7 +75,7 @@ public class CloudOfSegmentsToolState extends ToolState {
     }
 
     public void valid(Drawer drawer) {
-        GeometricLayer<CloudOfSegments> cofLayer = new GeometricLayer<CloudOfSegments>(cof);
+        GeometricLayer<CloudOfSegments> cofLayer = new GeometricLayer<CloudOfSegments>(cof,Tool.LotOfSegment);
         cofLayer.setLayerName("cof" + String.valueOf(ColoudOfSegmentsCount));
         ColoudOfSegmentsCount++;
 

@@ -15,6 +15,7 @@ import at.u4a.geometric_algorithms.gui.element.Drawer;
 import at.u4a.geometric_algorithms.gui.element.DrawerContext;
 import at.u4a.geometric_algorithms.gui.element.InterfaceDrawerAction;
 import at.u4a.geometric_algorithms.gui.layer.GeometricLayer;
+import at.u4a.geometric_algorithms.gui.tools.Tool;
 import at.u4a.geometric_algorithms.gui.tools.ToolState;
 import javafx.scene.input.MouseEvent;
 
@@ -77,7 +78,7 @@ public class CloudOfPointsToolState extends ToolState {
     }
 
     public void valid(Drawer drawer) {
-        GeometricLayer<CloudOfPoints> copLayer = new GeometricLayer<CloudOfPoints>(cop);
+        GeometricLayer<CloudOfPoints> copLayer = new GeometricLayer<CloudOfPoints>(cop,Tool.CloudOfPoint);
         copLayer.setLayerName("cop" + String.valueOf(ColoudOfSegmentsCount));
         ColoudOfSegmentsCount++;
 

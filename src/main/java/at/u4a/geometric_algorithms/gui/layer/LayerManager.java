@@ -93,6 +93,22 @@ public class LayerManager implements Iterable<AbstractLayer> {
         ds.refresh();
     }
 
+    public void remplaceLayer(AbstractLayer findLayer, AbstractLayer newLayer) {
+        
+        //
+        int findLayerIndex = layers.indexOf(findLayer);
+        if (findLayerIndex >= 0)
+            layers.set(findLayerIndex, newLayer);
+
+        //
+        if (selectedLayer == findLayer)
+            selectedLayer = newLayer;
+        
+        //
+        refresh();
+        ds.refresh();
+    }
+
     /* */
 
     public void setControllerTree(LayerTree controllerTree) {

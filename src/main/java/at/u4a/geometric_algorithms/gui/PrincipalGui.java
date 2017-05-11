@@ -17,6 +17,7 @@ import javax.swing.JButton;
 import javax.swing.SwingConstants;
 
 import at.u4a.geometric_algorithms.algorithm.AlgorithmManager;
+import at.u4a.geometric_algorithms.algorithm.AlgorithmManager.AlgorithmBuilderInterface;
 import at.u4a.geometric_algorithms.gui.layer.AbstractLayer;
 import at.u4a.geometric_algorithms.gui.layer.LayerCategory;
 import at.u4a.geometric_algorithms.gui.element.DrawerScene;
@@ -32,6 +33,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 import java.awt.event.ActionEvent;
 
 /**
@@ -49,8 +52,6 @@ public class PrincipalGui extends JFrame {
     private static final long serialVersionUID = 7047807079976701109L;
 
     /* Initialize Final Variable */
-
-    private final AlgorithmManager am = new AlgorithmManager();
 
     private final DrawerAction da = new DrawerAction();
     private final LayerAction la = new LayerAction();
@@ -89,6 +90,9 @@ public class PrincipalGui extends JFrame {
         initializeToolBarTop();
         initializeToolBarLeft();
         initializeStatusBar();
+
+        // Actionner
+        la.load(ds.getAlgorithmManager());
 
         // Third
         initializeContent();
@@ -281,13 +285,36 @@ public class PrincipalGui extends JFrame {
         return panelLayer;
     }
 
-    
-    
     private class LayerAction implements InterfaceLayerAction {
+
+        private class AlgorithmEntry {
+
+            public final AlgorithmBuilderInterface abi;
+            public final String name;
+            public final JMenuItem jmi;
+
+            public AlgorithmEntry(AlgorithmBuilderInterface _abi) {
+                this.abi = _abi;
+                this.name = abi.getName();
+                this.jmi = new JMenuItem(this.name);
+
+                this.jmi.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent arg0) {
+                        abi.acceptBuilder(am, ds.getLayerMannager().getSelectedLayer());
+                    }
+                });
+
+            }
+
+        }
 
         private final JMenu mnAlgorithmMenu;
         private final JButton btnLayerDelete;
         private final JToolBar toolbar;
+
+        private final List<AlgorithmEntry> algorithms;
+
+        private AlgorithmManager am;
 
         public LayerAction() {
 
@@ -308,17 +335,12 @@ public class PrincipalGui extends JFrame {
             // mnNewMenu.setVerticalAlignment(SwingConstants.BOTTOM);
 
             mnAlgorithmMenu = new JMenu(LayerCategory.Algorithm.symbol);
-            
+
             mnAlgorithmMenu.setToolTipText(LayerCategory.Algorithm.name);
             mnAlgorithmMenu.setFont(LayerCategoryLabel.font);
             menuBar.add(mnAlgorithmMenu);
 
-            for (String name : am.getAlgorithms()) {
-                JMenuItem mntmNewMenuItem = new JMenuItem(name);
-                mnAlgorithmMenu.add(mntmNewMenuItem);
-            }
-
-            setMenuToBottomLeftAlignement(mnAlgorithmMenu);
+            algorithms = new ArrayList<AlgorithmEntry>();
 
             /* TOOLBAR - BUTTON */
 
@@ -328,6 +350,23 @@ public class PrincipalGui extends JFrame {
             btnLayerDelete.setIcon(new ImageIcon("icons/action/cancel.png"));
 
             toolbar.add(btnLayerDelete);
+
+        }
+
+        public void load(AlgorithmManager am) {
+
+            this.am = am;
+
+            mnAlgorithmMenu.removeAll();
+            algorithms.clear();
+
+            for (AlgorithmBuilderInterface abi : am.getAlgorithms()) {
+                AlgorithmEntry ae = new AlgorithmEntry(abi);
+                algorithms.add(ae);
+                mnAlgorithmMenu.add(ae.jmi);
+            }
+
+            setMenuToBottomLeftAlignement(mnAlgorithmMenu);
 
         }
 
@@ -351,9 +390,19 @@ public class PrincipalGui extends JFrame {
                 mnAlgorithmMenu.setEnabled(false);
                 return;
             }
-            
+
             boolean atLeastOnAlgorithm = false;
-               
+            for (AlgorithmEntry ae : algorithms) {
+                if (ae.abi.canApply(l)) {
+                    ae.jmi.setEnabled(true);
+                    atLeastOnAlgorithm = true;
+                } else {
+                    ae.jmi.setEnabled(false);
+                }
+            }
+
+            mnAlgorithmMenu.setEnabled(atLeastOnAlgorithm);
+
         }
 
         @Override
@@ -367,7 +416,6 @@ public class PrincipalGui extends JFrame {
         private void setMenuToBottomLeftAlignement(JMenu m) {
             m.setMenuLocation((int) -(m.getPopupMenu().getPreferredSize().getWidth() - m.getPreferredSize().getWidth()), (int) -m.getPopupMenu().getPreferredSize().getHeight());
         }
-
 
     }
 

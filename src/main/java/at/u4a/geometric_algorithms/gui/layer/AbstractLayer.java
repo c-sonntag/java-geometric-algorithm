@@ -40,9 +40,9 @@ public abstract class AbstractLayer {
 
     abstract public ImageIcon getLayerTypeIcon();
 
-    abstract public Boolean isContener();
+    abstract public boolean isContener();
 
-    abstract public Boolean isDeletable();
+    abstract public boolean isDeletable();
 
     abstract public Vector<AbstractLayer> getSubLayer();
 
