@@ -4,6 +4,7 @@ import java.util.EnumSet;
 
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGraphicVisitor;
 import at.u4a.geometric_algorithms.gui.tools.Tool;
+import at.u4a.geometric_algorithms.gui.tools.ToolState;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -34,19 +35,20 @@ public class DrawerContext {
         if (toolChoose != null)
             ds.setTool(toolChoose);
     }
-    
+
     /* */
-    
+
     public Drawer getDrawer() {
         return drawer;
     }
-    
 
     /* */
 
     public void paint(InterfaceGraphicVisitor visitor) {
-        if (ds.getCurrentState() != null)
+        if (ds.getCurrentState() != null) {
+            visitor.setColor(ToolState.TOOL_PAINT_COLOR);
             ds.getCurrentState().paint(visitor);
+        }
     }
 
     public void repaint() {

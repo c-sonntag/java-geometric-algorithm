@@ -11,6 +11,7 @@ import at.u4a.geometric_algorithms.geometric.AbstractShape;
 import at.u4a.geometric_algorithms.geometric.Point;
 import at.u4a.geometric_algorithms.geometric.mapper.InterfaceMapper;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGraphicVisitor;
+import at.u4a.geometric_algorithms.gui.layer.AbstractLayer.ColorSet;
 
 public class AlgorithmLayer<TAlgorithm extends AbstractAlgorithm> extends AbstractLayer {
 
@@ -18,11 +19,19 @@ public class AlgorithmLayer<TAlgorithm extends AbstractAlgorithm> extends Abstra
     private final Algorithm algorithmType;
 
     private final Vector<AbstractLayer> subLayer;
+    
+    private final ColorSet algorithmColor;
 
     public AlgorithmLayer(TAlgorithm algorithm, Algorithm algorithmType, AbstractLayer... subLayer) {
         this.algorithm = algorithm;
         this.algorithmType = algorithmType;
         this.subLayer = new Vector<AbstractLayer>(Arrays.asList(subLayer));
+        
+        //
+        this.algorithmColor = new ColorSet(getLayerType() + " color", ColorSet.rand() );
+        this.colors = new Vector<ColorSet>();
+        this.colors.add( algorithmColor );
+
     }
 
     @Override
@@ -73,6 +82,7 @@ public class AlgorithmLayer<TAlgorithm extends AbstractAlgorithm> extends Abstra
             for (AbstractLayer al : subLayer)
                 al.accept(visitor);
             //
+            visitor.setColor(algorithmColor.color);
             algorithm.accept(subLayer, visitor);
         }
     }

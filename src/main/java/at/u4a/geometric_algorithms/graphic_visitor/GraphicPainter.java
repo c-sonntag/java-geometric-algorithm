@@ -64,7 +64,8 @@ public class GraphicPainter implements InterfaceGraphicVisitor {
     }
 
     public void setColor(Color color) {
-        this.color = color;
+        //this.color = color;
+        gc.setStroke(color);
     }
 
     public void setWorkedConstruct(boolean b) {

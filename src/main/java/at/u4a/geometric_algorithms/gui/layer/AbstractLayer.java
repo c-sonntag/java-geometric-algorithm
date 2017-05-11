@@ -1,8 +1,9 @@
 package at.u4a.geometric_algorithms.gui.layer;
 
-import java.awt.Color;
+import javafx.scene.paint.Color;
 import java.util.EnumSet;
 import java.util.Vector;
+import java.util.Random;
 
 import javax.swing.ImageIcon;
 
@@ -19,9 +20,46 @@ public abstract class AbstractLayer {
 
     /* PUBLIC STRUCT */
 
-    public class ColorSet {
+    public static class ColorSet {
         public Color color;
         public String name;
+
+        public ColorSet(String name, Color color) {
+            this.name = name;
+            this.color = color;
+        }
+
+        /** @see http://stackoverflow.com/a/30466507 */
+        public java.awt.Color getAwtColor() {
+            return new java.awt.Color((int) (color.getRed() * 255), (int) (color.getGreen() * 255), (int) (color.getBlue() * 255), (int) (color.getOpacity() * 255));
+            // Fx : return javafx.scene.paint.Color.rgb(color.getRed(),
+            // color.getGreen(), color.getBlue(), color.getAlpha() / 255.0);
+        }
+
+        public void setAwtColor(java.awt.Color newColor) {
+            color = javafx.scene.paint.Color.rgb(newColor.getRed(), newColor.getGreen(), newColor.getBlue(), newColor.getAlpha() / 255.0);
+        }
+
+        /*  */
+
+        private static Random rnd;
+
+        /** @see http://stackoverflow.com/a/4247219 */
+        public static Color rand() {
+
+            if (rnd == null) {
+                rnd = new Random();
+                rnd.setSeed(11235813);
+            }
+
+            final float hue = rnd.nextFloat();
+            // Saturation between 0.1 and 0.3
+            final float saturation = (rnd.nextInt(3000) + 7000) / 10000f;
+            final float luminance = 0.9f;
+            final Color color = Color.hsb(hue*360, saturation, luminance);
+
+            return color;
+        }
     }
 
     /* PRIVATE VAR */

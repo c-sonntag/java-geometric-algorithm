@@ -14,8 +14,10 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.print.Book;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.EventObject;
+import java.util.Iterator;
 import java.util.Random;
 import java.util.Vector;
 
@@ -45,7 +47,9 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+import at.u4a.geometric_algorithms.gui.element.ColorChooserButton.ColorChangedListener;
 import at.u4a.geometric_algorithms.gui.layer.AbstractLayer;
+import at.u4a.geometric_algorithms.gui.layer.AbstractLayer.ColorSet;
 import at.u4a.geometric_algorithms.gui.layer.LayerCategory;
 import at.u4a.geometric_algorithms.gui.layer.LayerManager;
 
@@ -244,7 +248,7 @@ public class LayerTree extends JTree {
             backgroundSelectionColor = defaultRenderer.getBackgroundSelectionColor();
             backgroundNonSelectionColor = defaultRenderer.getBackgroundNonSelectionColor();
 
-            JPanel toolBar = new JPanel();
+            toolBar = new JPanel();
             // toolBar.setAlignmentX(Component.LEFT_ALIGNMENT);
             renderer.add(toolBar);
             // toolBar.setLayout(new GridLayout());
@@ -289,13 +293,15 @@ public class LayerTree extends JTree {
             // toolBar.add(rigidArea);
             // toolBar.add(Box.createRigidArea(rigidAreaSize));
 
-            ColorChooserButton ccTest1 = new ColorChooserButton(Color.CYAN);
-            ccTest1.setToolTipText("Yooo");
-            toolBar.add(ccTest1);
+            colorChooserButtonList = new ArrayList<ColorChooserButton>();
 
-            ColorChooserButton ccTest2 = new ColorChooserButton(Color.CYAN);
-            ccTest2.setToolTipText("YoooPP");
-            toolBar.add(ccTest2);
+            // ColorChooserButton ccTest1 = new ColorChooserButton(Color.CYAN);
+            // ccTest1.setToolTipText("Yooo");
+            // toolBar.add(ccTest1);
+
+            // ColorChooserButton ccTest2 = new ColorChooserButton(Color.CYAN);
+            // ccTest2.setToolTipText("YoooPP");
+            // toolBar.add(ccTest2);
 
             // toolBar.addSeparator();
             // toolBar.add(rigidArea);
@@ -309,6 +315,10 @@ public class LayerTree extends JTree {
 
         }
 
+        private final JPanel toolBar;
+
+        final ArrayList<ColorChooserButton> colorChooserButtonList;
+
         final LayerCategoryLabel lblCategoryGen;
         final JLabel lblLayerName;
         final JCheckBox chckbxActive;
@@ -319,12 +329,66 @@ public class LayerTree extends JTree {
         final Color backgroundSelectionColor;
         final Color backgroundNonSelectionColor;
 
+        private void saveColor(Vector<ColorSet> css) {
+            if (css == null)
+                return;
+
+            if (!colorChooserButtonList.isEmpty()) {
+                Iterator<ColorChooserButton> ccb_it = colorChooserButtonList.iterator();
+                Iterator<ColorSet> css_it = css.iterator();
+                //
+                while (ccb_it.hasNext()) {
+                    ColorChooserButton ccb = ccb_it.next();
+                    ColorSet cs = css_it.next();
+                    cs.setAwtColor(ccb.getSelectedColor());
+                }
+                //
+                ds.repaint();
+            }
+        }
+
+        private void colorChanged(Color newColor) {
+            if (currentNode != null)
+                saveColor(currentNode.getColor());
+        }
+
+        private void reloadColor(Vector<ColorSet> css) {
+            if (css == null)
+                return;
+
+            //
+            if (!colorChooserButtonList.isEmpty()) {
+                Iterator<ColorChooserButton> ccb_it = colorChooserButtonList.iterator();
+                Iterator<ColorSet> css_it = css.iterator();
+                //
+                while (ccb_it.hasNext()) {
+                    ColorChooserButton ccb = ccb_it.next();
+                    ColorSet cs = css_it.next();
+                    ccb.setSelectedColor(cs.getAwtColor(), false);
+                }
+
+            } else {
+
+                //
+                for (ColorSet cs : css) {
+                    ColorChooserButton ccb = new ColorChooserButton(cs.getAwtColor());
+                    ccb.setToolTipText(cs.name);
+                    ccb.addColorChangedListener((c) -> colorChanged(c));
+                    colorChooserButtonList.add(ccb);
+                    toolBar.add(ccb);
+                }
+            }
+        }
+
         public void update(AbstractLayer node) {
             lblCategoryGen.set(node.getCategory());
             // lblLayerType.setText(node.getLayerType());
             lblLayerType.setIcon(node.getLayerTypeIcon());
             lblLayerName.setText(node.getLayerName());
             chckbxActive.setSelected(node.isActive());
+
+            reloadColor(node.getColor());
+
             renderer.setVisible(true);
             renderer.doLayout();
             renderer.validate();
@@ -341,6 +405,8 @@ public class LayerTree extends JTree {
 
             //
             currentNode.setActive(chckbxActive.isSelected());
+            saveColor(currentNode.getColor());
+
             /** @todo gerer le rename */
             // currentNode.setLayerName(lblLayerName.getText());
         }
@@ -358,13 +424,13 @@ public class LayerTree extends JTree {
         }
 
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-            
+
             Component returnValue = null;
-            
+
             if ((value != null) && (value instanceof DefaultMutableTreeNode)) {
 
                 Object userObject = ((DefaultMutableTreeNode) value).getUserObject();
-                
+
                 // if (userObject instanceof Employee) {
                 // Employee e = (Employee) userObject;
                 // firstNameLabel.setText(e.firstName);
@@ -391,12 +457,12 @@ public class LayerTree extends JTree {
                     } else {
                         renderer.setBackground(backgroundNonSelectionColor);
                     }
-                    
-                    //renderer.setEnabled(selected);
+
+                    // renderer.setEnabled(selected);
 
                     /** @todo voir plutot avec le parent */
-                    //renderer.setEnabled(tree.isEnabled());
-                    
+                    // renderer.setEnabled(tree.isEnabled());
+
                     returnValue = renderer;
 
                 }
@@ -438,7 +504,7 @@ public class LayerTree extends JTree {
     }
 
     class LayerNodeEditor extends AbstractCellEditor implements TreeCellEditor {
-        
+
         LayerNodeRenderer renderer = new LayerNodeRenderer();
 
         ChangeEvent changeEvent = null;
@@ -464,7 +530,7 @@ public class LayerTree extends JTree {
         public boolean isCellEditable(EventObject event) {
             boolean returnValue = false;
             if (event instanceof MouseEvent) {
-                
+
                 MouseEvent mouseEvent = (MouseEvent) event;
                 TreePath path = tree.getPathForLocation(mouseEvent.getX(), mouseEvent.getY());
 
@@ -473,12 +539,13 @@ public class LayerTree extends JTree {
                     if ((node != null) && (node instanceof DefaultMutableTreeNode)) {
                         DefaultMutableTreeNode treeNode = (DefaultMutableTreeNode) node;
                         Object userObject = treeNode.getUserObject();
-                        //returnValue = ((treeNode.isLeaf()) && (userObject instanceof AbstractLayer));
+                        // returnValue = ((treeNode.isLeaf()) && (userObject
+                        // instanceof AbstractLayer));
                         returnValue = (userObject instanceof AbstractLayer);
                     }
                 }
             }
-            
+
             return returnValue;
         }
 

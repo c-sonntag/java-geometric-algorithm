@@ -9,16 +9,25 @@ import at.u4a.geometric_algorithms.geometric.Point;
 import at.u4a.geometric_algorithms.geometric.mapper.InterfaceMapper;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGraphicVisitor;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceShapePainterVisitor;
+import at.u4a.geometric_algorithms.gui.layer.AbstractLayer.ColorSet;
 import at.u4a.geometric_algorithms.gui.tools.Tool;
 
 public class GeometricLayer<TShape extends AbstractShape> extends AbstractLayer {
 
     private final TShape shape;
     private final Tool toolType;
+    
+    private final ColorSet shapeColor;
 
     public GeometricLayer(TShape shape, Tool toolType) {
         this.shape = shape;
         this.toolType = toolType;
+        
+        //
+        this.shapeColor = new ColorSet(getLayerType() + " color", ColorSet.rand() );
+        this.colors = new Vector<ColorSet>();
+        this.colors.add( shapeColor );
+        
     }
 
     @Override
@@ -58,8 +67,10 @@ public class GeometricLayer<TShape extends AbstractShape> extends AbstractLayer 
 
     @Override
     public void accept(InterfaceGraphicVisitor visitor) {
-        if (isActive())
+        if (isActive()){
+            visitor.setColor(shapeColor.color);
             shape.accept((InterfaceShapePainterVisitor) visitor);
+        }
     }
 
     @Override

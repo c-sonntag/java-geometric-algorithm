@@ -6,9 +6,14 @@ import at.u4a.geometric_algorithms.gui.element.DrawerContext;
 import javafx.scene.Cursor;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
 
 public abstract class ToolState {
 
+    /* */
+    
+    public static final Color TOOL_PAINT_COLOR= Color.BLUE;
+    
     /* STATE ACTION */
 
     public enum State {

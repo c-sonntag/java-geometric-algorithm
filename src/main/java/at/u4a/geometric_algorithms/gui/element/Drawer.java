@@ -107,7 +107,8 @@ public class Drawer extends Canvas {
              * if( shape.contains(p) ) .accept(sp);
              */
         }
-
+            
+        
         this.context.paint(gp);
     }
 
