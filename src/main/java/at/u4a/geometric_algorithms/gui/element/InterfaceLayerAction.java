@@ -9,8 +9,6 @@ public interface InterfaceLayerAction {
 
     public void addLayerActionListenerOfDelete(Runnable func);
     
-    public void activeDeleteBtn(boolean b);
-    
     public void setActiveLayer(AbstractLayer l);
     
     public void applyAlgorithm(AlgorithmBuilderInterface abi);

@@ -99,8 +99,7 @@ public class Drawer extends Canvas {
 
         //
         for (AbstractLayer layer : ds.getLayerManager()) {
-            if (layer.isActive())
-                layer.accept(gp);
+            layer.accept(gp);
 
             /*
              * layer. AbstractShape shape = layer.getShape();

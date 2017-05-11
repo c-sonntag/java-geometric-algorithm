@@ -21,6 +21,7 @@ import at.u4a.geometric_algorithms.algorithm.AlgorithmBuilderInterface;
 import at.u4a.geometric_algorithms.gui.layer.AbstractLayer;
 import at.u4a.geometric_algorithms.gui.layer.LayerCategory;
 import at.u4a.geometric_algorithms.gui.layer.LayerManager;
+import at.u4a.geometric_algorithms.gui.layer.AbstractLayer.AuthorizedAction;
 import at.u4a.geometric_algorithms.gui.element.DrawerScene;
 import at.u4a.geometric_algorithms.gui.element.InterfaceDrawerAction;
 import at.u4a.geometric_algorithms.gui.element.InterfaceLayerAction;
@@ -339,8 +340,8 @@ public class PrincipalGui extends JFrame {
             menuBar.add(mnAlgorithmMenu);
 
             algorithms = new ArrayList<AlgorithmEntry>();
-            
-            for (Algorithm a : Algorithm.values() ) {
+
+            for (Algorithm a : Algorithm.values()) {
                 AlgorithmEntry ae = new AlgorithmEntry(a);
                 algorithms.add(ae);
                 mnAlgorithmMenu.add(ae.jmi);
@@ -369,13 +370,16 @@ public class PrincipalGui extends JFrame {
         }
 
         @Override
-        public void activeDeleteBtn(boolean b) {
-            btnLayerDelete.setEnabled(b);
-        }
-
-        @Override
         public void setActiveLayer(AbstractLayer l) {
             if (l == null) {
+                mnAlgorithmMenu.setEnabled(false);
+                btnLayerDelete.setEnabled(false);
+                return;
+            }
+
+            btnLayerDelete.setEnabled(l.isAuthorized(AuthorizedAction.Delete));
+
+            if (!l.isAuthorized(AuthorizedAction.ApplyAlgorithm)) {
                 mnAlgorithmMenu.setEnabled(false);
                 return;
             }
@@ -409,7 +413,11 @@ public class PrincipalGui extends JFrame {
         @Override
         public void applyAlgorithm(AlgorithmBuilderInterface abi) {
             LayerManager lm = ds.getLayerManager();
-            AbstractLayer algorithmLayer = abi.builder(lm.getSelectedLayer());
+            AbstractLayer selectedLayer = lm.getSelectedLayer();
+            AbstractLayer algorithmLayer = abi.builder(selectedLayer);
+            //
+            selectedLayer.getAuthorized().clear();
+            //
             lm.remplaceLayer(lm.getSelectedLayer(), algorithmLayer);
         }
 

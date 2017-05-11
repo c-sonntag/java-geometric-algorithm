@@ -9,6 +9,7 @@ import at.u4a.geometric_algorithms.geometric.Point;
 import at.u4a.geometric_algorithms.gui.element.DrawerScene;
 import at.u4a.geometric_algorithms.gui.element.InterfaceLayerAction;
 import at.u4a.geometric_algorithms.gui.element.LayerTree;
+import at.u4a.geometric_algorithms.gui.layer.AbstractLayer.AuthorizedAction;
 
 public class LayerManager implements Iterable<AbstractLayer> {
 
@@ -80,7 +81,6 @@ public class LayerManager implements Iterable<AbstractLayer> {
         if (controllerTree != null)
             controllerTree.selectNode(l);
         //
-        la.activeDeleteBtn(selectedLayer != null);
         la.setActiveLayer(selectedLayer);
 
     }
@@ -88,16 +88,16 @@ public class LayerManager implements Iterable<AbstractLayer> {
     public void deleteLayer(AbstractLayer l) {
         if (selectedLayer == l)
             setSelectedLayer(null);
-        
+
         int findLayerIndex = layers.indexOf(l);
         layers.remove(l);
-        
+
         // Keep emplacement
-        if(findLayerIndex < layers.size())
+        if ((findLayerIndex < layers.size()) && (findLayerIndex >= 0))
             selectedLayer = layers.get(findLayerIndex);
-        else if( !layers.isEmpty() )
+        else if (!layers.isEmpty())
             selectedLayer = layers.lastElement();
-        
+
         refresh();
         ds.refresh();
     }

@@ -41,7 +41,10 @@ public class AlgorithmLayer<TAlgorithm extends AbstractAlgorithm> extends Abstra
     }
 
     public String toString() {
-        return "[" + getLayerName() + "]";
+        String subLayerChain = "";
+        for (AbstractLayer al : subLayer)
+            subLayerChain += (subLayerChain.isEmpty() ? "" : ",") + al.getLayerName();
+        return getLayerName() + "[" + subLayerChain + "]";
     }
 
     @Override
@@ -66,24 +69,27 @@ public class AlgorithmLayer<TAlgorithm extends AbstractAlgorithm> extends Abstra
 
     @Override
     public void accept(InterfaceShapePainterVisitor visitor) {
-        for (AbstractLayer al : subLayer)
-            al.accept(visitor);
-        //
-        algorithm.accept(subLayer, visitor);
+        if (isActive()) {
+            for (AbstractLayer al : subLayer)
+                al.accept(visitor);
+            //
+            algorithm.accept(subLayer, visitor);
+        }
     }
 
     @Override
     public boolean contains(Point p) {
-        for (AbstractLayer al : subLayer)
-            if (al.contains(p))
-                return true;
+        if (isActive())
+            for (AbstractLayer al : subLayer)
+                if (al.contains(p))
+                    return true;
         return false;
     }
 
     @Override
     public InterfaceMapper getTopContainMappedComposition(Point p) {
-        for (AbstractLayer al : subLayer)
-            if (al.isActive()) {
+        if (isActive())
+            for (AbstractLayer al : subLayer) {
                 InterfaceMapper im = al.getTopContainMappedComposition(p);
                 if (im != null)
                     return im;

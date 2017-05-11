@@ -149,6 +149,15 @@ public class LayerTree extends JTree {
         // model.reload( root );
     }
 
+    private void insertLayer(DefaultMutableTreeNode node, Vector<AbstractLayer> layers) {
+        for (AbstractLayer layer : layers) {
+            DefaultMutableTreeNode dmtn = new DefaultMutableTreeNode(layer);
+            if (layer.isContener())
+                insertLayer(dmtn, layer.getSubLayer());
+            node.add(dmtn);
+        }
+    }
+
     public void reload() {
         DefaultMutableTreeNode rootNode = (DefaultMutableTreeNode) treeModel.getRoot();
 
@@ -160,9 +169,13 @@ public class LayerTree extends JTree {
 
         // rootNode.setUserObject(lm.getLayers());
 
-        for (AbstractLayer l : lm.getLayers()) {
-            rootNode.add(new DefaultMutableTreeNode(l));
-        }
+        // for (AbstractLayer l : lm.getLayers()) {
+        // DefaultMutableTreeNode yop = new DefaultMutableTreeNode(l);
+        // rootNode.add(yop);
+        // }
+
+        insertLayer(rootNode, lm.getLayers());
+
         // The method below rebuit the JTree in my app - you should do the same
         // here
         // this.createFileTree(rootNode, rootFile); // rescan the file structure
@@ -174,7 +187,7 @@ public class LayerTree extends JTree {
         @SuppressWarnings("unchecked")
         Enumeration<DefaultMutableTreeNode> e = root.depthFirstEnumeration();
         while (e.hasMoreElements()) {
-            
+
             DefaultMutableTreeNode mutableNode = e.nextElement();
             Object userObject = mutableNode.getUserObject();
 
@@ -202,7 +215,7 @@ public class LayerTree extends JTree {
     // !!!!!!!!!!!! //
     // !!!!!!!!!!!! //
     // !!!!!!!!!!!! //
-    
+
     static private final ImageIcon noLayerImageIcon = new ImageIcon("icons/layer/no_layer.png");
 
     class LayerNodeRenderer implements TreeCellRenderer {
@@ -260,7 +273,7 @@ public class LayerTree extends JTree {
             // toolBar.add(rigidArea);
             // toolBar.add(Box.createRigidArea(rigidAreaSize));
 
-            //lblLayerType = new JLabel("_LayerType_");
+            // lblLayerType = new JLabel("_LayerType_");
             lblLayerType = new JLabel("");
             lblLayerType.setIcon(noLayerImageIcon);
             toolBar.add(lblLayerType);
@@ -308,7 +321,7 @@ public class LayerTree extends JTree {
 
         public void update(AbstractLayer node) {
             lblCategoryGen.set(node.getCategory());
-            //lblLayerType.setText(node.getLayerType());
+            // lblLayerType.setText(node.getLayerType());
             lblLayerType.setIcon(node.getLayerTypeIcon());
             lblLayerName.setText(node.getLayerName());
             chckbxActive.setSelected(node.isActive());
@@ -345,11 +358,13 @@ public class LayerTree extends JTree {
         }
 
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+            
             Component returnValue = null;
+            
             if ((value != null) && (value instanceof DefaultMutableTreeNode)) {
 
                 Object userObject = ((DefaultMutableTreeNode) value).getUserObject();
-
+                
                 // if (userObject instanceof Employee) {
                 // Employee e = (Employee) userObject;
                 // firstNameLabel.setText(e.firstName);
@@ -372,14 +387,16 @@ public class LayerTree extends JTree {
 
                     if (selected) {
                         lm.setSelectedLayer(node);
-
                         renderer.setBackground(backgroundSelectionColor);
                     } else {
                         renderer.setBackground(backgroundNonSelectionColor);
                     }
+                    
+                    //renderer.setEnabled(selected);
 
                     /** @todo voir plutot avec le parent */
-                    renderer.setEnabled(tree.isEnabled());
+                    //renderer.setEnabled(tree.isEnabled());
+                    
                     returnValue = renderer;
 
                 }
@@ -421,6 +438,7 @@ public class LayerTree extends JTree {
     }
 
     class LayerNodeEditor extends AbstractCellEditor implements TreeCellEditor {
+        
         LayerNodeRenderer renderer = new LayerNodeRenderer();
 
         ChangeEvent changeEvent = null;
@@ -439,24 +457,28 @@ public class LayerTree extends JTree {
             // AbstractLayer node = renderer.getNode();
             // ds.repaint();
 
-            // return null;
+            // return null
             return renderer.getNode();
         }
 
         public boolean isCellEditable(EventObject event) {
             boolean returnValue = false;
             if (event instanceof MouseEvent) {
+                
                 MouseEvent mouseEvent = (MouseEvent) event;
                 TreePath path = tree.getPathForLocation(mouseEvent.getX(), mouseEvent.getY());
+
                 if (path != null) {
                     Object node = path.getLastPathComponent();
                     if ((node != null) && (node instanceof DefaultMutableTreeNode)) {
                         DefaultMutableTreeNode treeNode = (DefaultMutableTreeNode) node;
                         Object userObject = treeNode.getUserObject();
-                        returnValue = ((treeNode.isLeaf()) && (userObject instanceof AbstractLayer));
+                        //returnValue = ((treeNode.isLeaf()) && (userObject instanceof AbstractLayer));
+                        returnValue = (userObject instanceof AbstractLayer);
                     }
                 }
             }
+            
             return returnValue;
         }
 

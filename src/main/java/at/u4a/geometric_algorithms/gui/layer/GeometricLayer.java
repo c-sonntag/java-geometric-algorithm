@@ -57,17 +57,18 @@ public class GeometricLayer<TShape extends AbstractShape> extends AbstractLayer 
 
     @Override
     public void accept(InterfaceShapePainterVisitor visitor) {
-        shape.accept(visitor);
+        if (isActive())
+            shape.accept(visitor);
     }
 
     @Override
     public boolean contains(Point p) {
-        return shape.contains(p);
+        return (isActive()) ? shape.contains(p) : false;
     }
 
     @Override
     public InterfaceMapper getTopContainMappedComposition(Point p) {
-        return shape.getContainMappedComposition(p);
+        return (isActive()) ? shape.getContainMappedComposition(p) : null;
     }
 
     @Override
