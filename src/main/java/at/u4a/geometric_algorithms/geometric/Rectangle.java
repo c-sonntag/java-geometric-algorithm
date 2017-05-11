@@ -59,7 +59,6 @@ public class Rectangle extends AbstractShape {
 
     private List<InterfaceMapper> mappedComposition = null;
 
-    @Override
     public List<InterfaceMapper> getMappedComposition() {
         //
         if (mappedComposition != null)
@@ -106,13 +105,22 @@ public class Rectangle extends AbstractShape {
         // Lines
 
         /** @tofo faire les lignes */
-        //mappedComposition.add(new MappedLine(topLeftPoint, topRightPoint));
-        //mappedComposition.add(new MappedLine(topRightPoint, bottomRightPoint));
-        //mappedComposition.add(new MappedLine(bottomRightPoint, bottomLeftPoint));
-        //mappedComposition.add(new MappedLine(bottomLeftPoint, topLeftPoint));
+        // mappedComposition.add(new MappedLine(topLeftPoint, topRightPoint));
+        // mappedComposition.add(new MappedLine(topRightPoint,
+        // bottomRightPoint));
+        // mappedComposition.add(new MappedLine(bottomRightPoint,
+        // bottomLeftPoint));
+        // mappedComposition.add(new MappedLine(bottomLeftPoint, topLeftPoint));
 
         //
         return mappedComposition;
+    }
+
+    public InterfaceMapper getContainMappedComposition(Point pc) {
+        for (InterfaceMapper im : getMappedComposition())
+            if (im.contains(pc))
+                return im;
+        return null;
     }
 
 }

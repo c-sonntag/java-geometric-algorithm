@@ -32,7 +32,7 @@ public class SelectionToolState extends ToolState {
 
     public void init(Drawer drawer) {
         d = drawer;
-        lm = drawer.getDS().getLayerMannager();
+        lm = drawer.getDS().getLayerManager();
     }
 
     /* TOOLBAR */
@@ -56,7 +56,6 @@ public class SelectionToolState extends ToolState {
 
     protected Point lastCurrentPoint = new Point();
     protected Point translatePoint = new Point();
-    protected InterfaceGeometric ig = null;
 
     protected boolean inMove = false;
 
@@ -65,7 +64,7 @@ public class SelectionToolState extends ToolState {
     /* */
 
     protected boolean isMove() {
-        return ig != null;
+        return inMove;
     }
 
     protected boolean isHave() {
@@ -92,11 +91,6 @@ public class SelectionToolState extends ToolState {
 
     /* */
 
-    protected void setMoveComponent() {
-        if (overlay != null)
-            ig = overlay.getShape();
-    }
-    
     protected void setSelected() {
         if (overlay != null)
             lm.setSelectedLayer(overlay);
@@ -106,11 +100,6 @@ public class SelectionToolState extends ToolState {
     public void mousePressed(DrawerContext context, MouseEvent event) {
         if (isHave()) {
             if (!inMove) {
-
-                //
-                setMoveComponent();
-                if (ig == null)
-                    return;
 
                 //
                 lastCurrentPoint.set(currentPoint);
@@ -127,27 +116,21 @@ public class SelectionToolState extends ToolState {
     public void mouseReleased(DrawerContext context, MouseEvent event) {
 
         if (inMove) {
-            ig = null;
             inMove = false;
 
             //
             setCursor(d);
         }
-
-        // inMove = false;
-
-        /*
-         * if (!isLeftClick(event)) return; // if (currentState ==
-         * State.Waiting) { currentState = State.Started;
-         * poly.origin.set(event.getX(), event.getY()); addPlace(context,
-         * event.getX(), event.getY()); } inPlace = false;
-         */
     }
 
     private long moveScanChrono = 0;
 
     protected void findOverlay(Point p) {
         overlay = lm.getTopContainedShape(p);
+    }
+
+    protected void translate(Point p) {
+        overlay.translate(p);
     }
 
     @Override
@@ -171,9 +154,9 @@ public class SelectionToolState extends ToolState {
             //
             setCursor(d);
 
-        } else if (ig != null) {
+        } else if (isHave()) {
             translatePoint.set(currentPoint.x - lastCurrentPoint.x, currentPoint.y - lastCurrentPoint.y);
-            ig.translate(translatePoint);
+            translate(translatePoint);
             lastCurrentPoint.set(currentPoint);
             context.repaint();
         }

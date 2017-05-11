@@ -80,35 +80,68 @@ public class CloudOfSegments extends AbstractShape implements InterfaceContainer
 
     /* */
 
-    @Override
-    public List<InterfaceMapper> getMappedComposition() {
-        List<InterfaceMapper> mappedComposition = new ArrayList<InterfaceMapper>();
-        
+    // @Override
+    // public List<InterfaceMapper> getMappedComposition() {
+    // List<InterfaceMapper> mappedComposition = new
+    // ArrayList<InterfaceMapper>();
+    //
+    // // Points on the top
+    // for (Segment s : cloud) {
+    // mappedComposition.add(new MappedPoint((o) -> {
+    // o.set(origin.x + s.a.x, origin.y + s.a.y);
+    // }, (o) -> {
+    // s.a.set(o.x - origin.x, o.y - origin.y);
+    // }));
+    // mappedComposition.add(new MappedPoint((o) -> {
+    // o.set(origin.x + s.b.x, origin.y + s.b.y);
+    // }, (o) -> {
+    // s.b.set(o.x - origin.x, o.y - origin.y);
+    // }));
+    // }
+    //
+    // // Lines at second on the top
+    // int listPointSize = mappedComposition.size();
+    // for (int i = 0; i < listPointSize; i += 2) {
+    // mappedComposition.add(new MappedSegment(//
+    // (MappedPoint) mappedComposition.get(i), //
+    // (MappedPoint) mappedComposition.get(i + 1) //
+    // ));
+    // }
+    //
+    // //
+    // return mappedComposition;
+    // }
+
+    public InterfaceMapper getContainMappedComposition(Point pc) {
+
         // Points on the top
         for (Segment s : cloud) {
-            mappedComposition.add(new MappedPoint((o) -> {
+            MappedPoint im_p1 = new MappedPoint((o) -> {
                 o.set(origin.x + s.a.x, origin.y + s.a.y);
             }, (o) -> {
                 s.a.set(o.x - origin.x, o.y - origin.y);
-            }));
-            mappedComposition.add(new MappedPoint((o) -> {
+            });
+            MappedPoint im_p2 = new MappedPoint((o) -> {
                 o.set(origin.x + s.b.x, origin.y + s.b.y);
             }, (o) -> {
                 s.b.set(o.x - origin.x, o.y - origin.y);
-            }));
+            });
+            
+            //
+            
+            if(im_p1.contains(pc))
+                return im_p1;
+            else if (im_p2.contains(pc))
+                return im_p2;
+            
+            InterfaceMapper im_line = new MappedSegment(im_p1, im_p2);
+            
+            if(im_line.contains(pc))
+                return im_line;
         }
-        
-        // Lines at second on the top
-        int listPointSize = mappedComposition.size();
-        for (int i = 0; i < listPointSize; i += 2) {
-            mappedComposition.add(new MappedSegment(//
-                    (MappedPoint) mappedComposition.get(i), //
-                    (MappedPoint) mappedComposition.get(i + 1) //
-            ));
-        }
-        
+
         //
-        return mappedComposition;
+        return null;
     }
 
 }

@@ -2,14 +2,8 @@ package at.u4a.geometric_algorithms.gui.tools.state;
 
 import java.io.File;
 
-import javax.swing.ImageIcon;
-
 import at.u4a.geometric_algorithms.geometric.CloudOfPoints;
-import at.u4a.geometric_algorithms.geometric.InterfaceGeometric;
 import at.u4a.geometric_algorithms.geometric.Point;
-import at.u4a.geometric_algorithms.geometric.Polygon;
-import at.u4a.geometric_algorithms.geometric.Segment;
-import at.u4a.geometric_algorithms.geometric.mapper.InterfaceMapper;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGraphicVisitor;
 import at.u4a.geometric_algorithms.gui.element.Drawer;
 import at.u4a.geometric_algorithms.gui.element.DrawerContext;
@@ -26,13 +20,7 @@ public class CloudOfPointsToolState extends ToolState {
     class DirectSelectionPolygonTool extends DirectSelectionToolState {
 
         protected void findOverlay(Point p) {
-            for (InterfaceMapper c : cop.getMappedComposition()) {
-                if (c.contains(p)) {
-                    overlayComposant = c;
-                    return;
-                }
-            }
-            overlayComposant = null;
+            overlayComposant = cop.getContainMappedComposition(p);
         }
 
         protected void setSelected() {
@@ -78,11 +66,11 @@ public class CloudOfPointsToolState extends ToolState {
     }
 
     public void valid(Drawer drawer) {
-        GeometricLayer<CloudOfPoints> copLayer = new GeometricLayer<CloudOfPoints>(cop,Tool.CloudOfPoint);
+        GeometricLayer<CloudOfPoints> copLayer = new GeometricLayer<CloudOfPoints>(cop, Tool.CloudOfPoint);
         copLayer.setLayerName("cop" + String.valueOf(ColoudOfSegmentsCount));
         ColoudOfSegmentsCount++;
 
-        drawer.getDS().getLayerMannager().addLayer(copLayer);
+        drawer.getDS().getLayerManager().addLayer(copLayer);
 
         //
         cop = new CloudOfPoints();

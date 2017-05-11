@@ -1,5 +1,6 @@
 package at.u4a.geometric_algorithms.gui.layer;
 
+import java.util.Arrays;
 import java.util.Vector;
 
 import javax.swing.ImageIcon;
@@ -8,24 +9,27 @@ import at.u4a.geometric_algorithms.algorithm.AbstractAlgorithm;
 import at.u4a.geometric_algorithms.algorithm.Algorithm;
 import at.u4a.geometric_algorithms.geometric.AbstractShape;
 import at.u4a.geometric_algorithms.geometric.Point;
+import at.u4a.geometric_algorithms.geometric.mapper.InterfaceMapper;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceShapePainterVisitor;
-import at.u4a.geometric_algorithms.gui.tools.Tool;
 
 public class AlgorithmLayer<TAlgorithm extends AbstractAlgorithm> extends AbstractLayer {
 
     private final TAlgorithm algorithm;
     private final Algorithm algorithmType;
 
-    public AlgorithmLayer(TAlgorithm algorithm, Algorithm algorithmType) {
+    private final Vector<AbstractLayer> subLayer;
+
+    public AlgorithmLayer(TAlgorithm algorithm, Algorithm algorithmType, AbstractLayer... subLayer) {
         this.algorithm = algorithm;
         this.algorithmType = algorithmType;
+        this.subLayer = new Vector<AbstractLayer>(Arrays.asList(subLayer));
     }
-    
+
     @Override
     public AbstractShape getShape() {
         return null;
     }
-    
+
     @Override
     public LayerCategory getCategory() {
         return LayerCategory.Algorithm;
@@ -35,7 +39,7 @@ public class AlgorithmLayer<TAlgorithm extends AbstractAlgorithm> extends Abstra
     public boolean isContener() {
         return true;
     }
-    
+
     public String toString() {
         return "[" + getLayerName() + "]";
     }
@@ -57,21 +61,34 @@ public class AlgorithmLayer<TAlgorithm extends AbstractAlgorithm> extends Abstra
 
     @Override
     public Vector<AbstractLayer> getSubLayer() {
-        // TODO Auto-generated method stub
-        return null;
+        return subLayer;
     }
 
     @Override
     public void accept(InterfaceShapePainterVisitor visitor) {
-        // TODO Auto-generated method stub
-        
+        for (AbstractLayer al : subLayer)
+            al.accept(visitor);
+        //
+        algorithm.accept(subLayer, visitor);
     }
 
     @Override
     public boolean contains(Point p) {
-        // TODO Auto-generated method stub
+        for (AbstractLayer al : subLayer)
+            if (al.contains(p))
+                return true;
         return false;
     }
 
+    @Override
+    public InterfaceMapper getTopContainMappedComposition(Point p) {
+        for (AbstractLayer al : subLayer)
+            if (al.isActive()) {
+                InterfaceMapper im = al.getTopContainMappedComposition(p);
+                if (im != null)
+                    return im;
+            }
+        return null;
+    }
 
 }

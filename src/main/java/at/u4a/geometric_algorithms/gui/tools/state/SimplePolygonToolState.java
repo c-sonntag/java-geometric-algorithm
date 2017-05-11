@@ -19,13 +19,7 @@ public class SimplePolygonToolState extends ToolState {
     class DirectSelectionPolygonTool extends DirectSelectionToolState {
 
         protected void findOverlay(Point p) {
-            for (InterfaceMapper c : poly.getMappedComposition()) {
-                if (c.contains(p)) {
-                    overlayComposant = c;
-                    return;
-                }
-            }
-            overlayComposant = null;
+            overlayComposant = poly.getContainMappedComposition(p);
         }
         
         protected void setSelected() {
@@ -79,7 +73,7 @@ public class SimplePolygonToolState extends ToolState {
         polygonLayer.setLayerName("p" + String.valueOf(PolygonCount));
         PolygonCount++;
 
-        drawer.getDS().getLayerMannager().addLayer(polygonLayer);
+        drawer.getDS().getLayerManager().addLayer(polygonLayer);
 
         //
         poly = new Polygon();

@@ -69,10 +69,7 @@ public class Polygon extends AbstractShape implements InterfaceContainer<Segment
     }
 
     public Type getType() {
-        
-        
-        
-        
+
         return Type.Simple; /** < @TODO */
     }
 
@@ -149,37 +146,80 @@ public class Polygon extends AbstractShape implements InterfaceContainer<Segment
 
     /* */
 
+    // @Override
+    // public List<InterfaceMapper> getMappedComposition() {
+    // ArrayList<InterfaceMapper> mappedComposition = new
+    // ArrayList<InterfaceMapper>();
+    //
+    // // Points
+    // for (Point q : perimeter)
+    // mappedComposition.add(new MappedPoint((o) -> {
+    // o.set(origin.x + q.x, origin.y + q.y);
+    // }, (o) -> {
+    // q.set(o.x - origin.x, o.y - origin.y);
+    // }));
+    //
+    // // Segments
+    // int listPointSize = mappedComposition.size();
+    // int count = 0;
+    //
+    // //
+    // MappedPoint lastPoint = null;
+    // for (int i = 0; i < listPointSize; i++) {
+    //
+    // MappedPoint qm = (MappedPoint) mappedComposition.get(i);
+    // if (lastPoint != null)
+    // mappedComposition.add(new MappedSegment(lastPoint, qm));
+    // //
+    // lastPoint = qm;
+    // }
+    // if (listPointSize > 1)
+    // mappedComposition.add(new MappedSegment((MappedPoint)
+    // mappedComposition.get(0), (MappedPoint)
+    // mappedComposition.get(listPointSize - 1)));
+    //
+    // //
+    // return mappedComposition;
+    // }
+
     @Override
-    public List<InterfaceMapper> getMappedComposition() {
-        ArrayList<InterfaceMapper> mappedComposition = new ArrayList<InterfaceMapper>();
+    public InterfaceMapper getContainMappedComposition(Point pc) {
 
         // Points
-        for (Point q : perimeter)
-            mappedComposition.add(new MappedPoint((o) -> {
+        MappedPoint mp_first = null;
+        MappedPoint mp_last = null;
+        for (Point q : perimeter) {
+            MappedPoint mp = new MappedPoint((o) -> {
                 o.set(origin.x + q.x, origin.y + q.y);
             }, (o) -> {
                 q.set(o.x - origin.x, o.y - origin.y);
-            }));
+            });
 
-        // Segments
-        int listPointSize = mappedComposition.size();
-        int count = 0;
+            if (mp.contains(pc))
+                return mp;
 
-        //
-        MappedPoint lastPoint = null;
-        for (int i = 0; i < listPointSize; i++) {
-
-            MappedPoint qm = (MappedPoint) mappedComposition.get(i);
-            if (lastPoint != null)
-                mappedComposition.add(new MappedSegment(lastPoint, qm));
             //
-            lastPoint = qm;
-        }
-        if (listPointSize > 1)
-            mappedComposition.add(new MappedSegment((MappedPoint) mappedComposition.get(0), (MappedPoint) mappedComposition.get(listPointSize - 1)));
 
-        //
-        return mappedComposition;
+            if (mp_last != null) {
+                MappedSegment ms = new MappedSegment(mp_last, mp);
+                if (ms.contains(pc))
+                    return ms;
+            }
+
+            //
+
+            if (mp_first == null)
+                mp_first = mp;
+            mp_last = mp;
+        }
+
+        if ((mp_last != null) && (mp_first != null)) {
+            MappedSegment ms = new MappedSegment(mp_last, mp_first);
+            if (ms.contains(pc))
+                return ms;
+        }
+
+        return null;
     }
 
 }

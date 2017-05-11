@@ -7,6 +7,7 @@ import javax.swing.ImageIcon;
 
 import at.u4a.geometric_algorithms.geometric.AbstractShape;
 import at.u4a.geometric_algorithms.geometric.Point;
+import at.u4a.geometric_algorithms.geometric.mapper.InterfaceMapper;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceShapePainterVisitor;
 
 public abstract class AbstractLayer {
@@ -50,7 +51,11 @@ public abstract class AbstractLayer {
 
     /* ABSTRACT PUBLIC FUNCTION - SHAPES */
     
+    abstract public void translate(Point p);
+    
     abstract public boolean contains(Point p);
+    
+    abstract public InterfaceMapper getTopContainMappedComposition(Point p);
     
     /** @todo InterfaceGeometric getContains(Point p); */
     
@@ -92,5 +97,7 @@ public abstract class AbstractLayer {
     public String toString() {
         return getLayerName();
     }
+
+    
 
 }

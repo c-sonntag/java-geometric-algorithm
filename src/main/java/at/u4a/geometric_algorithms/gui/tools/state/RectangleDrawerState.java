@@ -45,7 +45,7 @@ public class RectangleDrawerState extends ToolState {
         rectangleLayer.setLayerName("r" + String.valueOf(RectangleCount));
         RectangleCount++;
 
-        drawer.getDS().getLayerMannager().addLayer(rectangleLayer);
+        drawer.getDS().getLayerManager().addLayer(rectangleLayer);
         currentState = State.Finish;
 
         //

@@ -16,10 +16,11 @@ import java.awt.Dimension;
 import javax.swing.JButton;
 import javax.swing.SwingConstants;
 
-import at.u4a.geometric_algorithms.algorithm.AlgorithmManager;
-import at.u4a.geometric_algorithms.algorithm.AlgorithmManager.AlgorithmBuilderInterface;
+import at.u4a.geometric_algorithms.algorithm.Algorithm;
+import at.u4a.geometric_algorithms.algorithm.AlgorithmBuilderInterface;
 import at.u4a.geometric_algorithms.gui.layer.AbstractLayer;
 import at.u4a.geometric_algorithms.gui.layer.LayerCategory;
+import at.u4a.geometric_algorithms.gui.layer.LayerManager;
 import at.u4a.geometric_algorithms.gui.element.DrawerScene;
 import at.u4a.geometric_algorithms.gui.element.InterfaceDrawerAction;
 import at.u4a.geometric_algorithms.gui.element.InterfaceLayerAction;
@@ -91,9 +92,6 @@ public class PrincipalGui extends JFrame {
         initializeToolBarLeft();
         initializeStatusBar();
 
-        // Actionner
-        la.load(ds.getAlgorithmManager());
-
         // Third
         initializeContent();
 
@@ -140,7 +138,7 @@ public class PrincipalGui extends JFrame {
         JMenuItem mntmNew = new JMenuItem("New");
         mntmNew.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
-                ds.getLayerMannager().clear();
+                ds.getLayerManager().clear();
             }
         });
         mntmNew.setIcon(new ImageIcon("icons/action/page_add.png"));
@@ -289,18 +287,20 @@ public class PrincipalGui extends JFrame {
 
         private class AlgorithmEntry {
 
+            public final Algorithm a;
             public final AlgorithmBuilderInterface abi;
             public final String name;
             public final JMenuItem jmi;
 
-            public AlgorithmEntry(AlgorithmBuilderInterface _abi) {
-                this.abi = _abi;
+            public AlgorithmEntry(Algorithm a) {
+                this.a = a;
+                this.abi = a.supplier.get();
                 this.name = abi.getName();
                 this.jmi = new JMenuItem(this.name);
 
                 this.jmi.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent arg0) {
-                        abi.acceptBuilder(am, ds.getLayerMannager().getSelectedLayer());
+                        applyAlgorithm(abi);
                     }
                 });
 
@@ -313,8 +313,6 @@ public class PrincipalGui extends JFrame {
         private final JToolBar toolbar;
 
         private final List<AlgorithmEntry> algorithms;
-
-        private AlgorithmManager am;
 
         public LayerAction() {
 
@@ -341,6 +339,14 @@ public class PrincipalGui extends JFrame {
             menuBar.add(mnAlgorithmMenu);
 
             algorithms = new ArrayList<AlgorithmEntry>();
+            
+            for (Algorithm a : Algorithm.values() ) {
+                AlgorithmEntry ae = new AlgorithmEntry(a);
+                algorithms.add(ae);
+                mnAlgorithmMenu.add(ae.jmi);
+            }
+
+            setMenuToBottomLeftAlignement(mnAlgorithmMenu);
 
             /* TOOLBAR - BUTTON */
 
@@ -350,23 +356,6 @@ public class PrincipalGui extends JFrame {
             btnLayerDelete.setIcon(new ImageIcon("icons/action/cancel.png"));
 
             toolbar.add(btnLayerDelete);
-
-        }
-
-        public void load(AlgorithmManager am) {
-
-            this.am = am;
-
-            mnAlgorithmMenu.removeAll();
-            algorithms.clear();
-
-            for (AlgorithmBuilderInterface abi : am.getAlgorithms()) {
-                AlgorithmEntry ae = new AlgorithmEntry(abi);
-                algorithms.add(ae);
-                mnAlgorithmMenu.add(ae.jmi);
-            }
-
-            setMenuToBottomLeftAlignement(mnAlgorithmMenu);
 
         }
 
@@ -415,6 +404,13 @@ public class PrincipalGui extends JFrame {
          */
         private void setMenuToBottomLeftAlignement(JMenu m) {
             m.setMenuLocation((int) -(m.getPopupMenu().getPreferredSize().getWidth() - m.getPreferredSize().getWidth()), (int) -m.getPopupMenu().getPreferredSize().getHeight());
+        }
+
+        @Override
+        public void applyAlgorithm(AlgorithmBuilderInterface abi) {
+            LayerManager lm = ds.getLayerManager();
+            AbstractLayer algorithmLayer = abi.builder(lm.getSelectedLayer());
+            lm.remplaceLayer(lm.getSelectedLayer(), algorithmLayer);
         }
 
     }

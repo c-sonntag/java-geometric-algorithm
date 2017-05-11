@@ -6,6 +6,7 @@ import javax.swing.ImageIcon;
 
 import at.u4a.geometric_algorithms.geometric.AbstractShape;
 import at.u4a.geometric_algorithms.geometric.Point;
+import at.u4a.geometric_algorithms.geometric.mapper.InterfaceMapper;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceShapePainterVisitor;
 import at.u4a.geometric_algorithms.gui.tools.Tool;
 
@@ -62,6 +63,17 @@ public class GeometricLayer<TShape extends AbstractShape> extends AbstractLayer 
     @Override
     public boolean contains(Point p) {
         return shape.contains(p);
+    }
+
+    @Override
+    public InterfaceMapper getTopContainMappedComposition(Point p) {
+        return shape.getContainMappedComposition(p);
+        //for (InterfaceMapper c : shape.getMappedComposition()) {
+        //    if (c.contains(p)) {
+        //        return c;
+        //    }
+        //}
+        //return null;
     }
 
 }

@@ -15,7 +15,7 @@ public abstract class LayerContainer extends AbstractLayer {
     }
 
     @Override
-    public Boolean isContener() {
+    public boolean isContener() {
         return true;
     }
 

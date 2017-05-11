@@ -78,17 +78,32 @@ public class CloudOfPoints extends AbstractShape implements InterfaceContainer<P
 
     /* */
 
+    //@Override
+    //public List<InterfaceMapper> getMappedComposition() {
+    //    List<InterfaceMapper> mappedComposition = new ArrayList<InterfaceMapper>();
+    //    for (Point p : cloud) {
+    //        mappedComposition.add(new MappedPoint((o) -> {
+    //            o.set(origin.x + p.x, origin.y + p.y);
+    //        }, (o) -> {
+    //            p.set(o.x - origin.x, o.y - origin.y);
+    //        }));
+    //    }
+    //    return mappedComposition;
+    //}
+    
     @Override
-    public List<InterfaceMapper> getMappedComposition() {
-        List<InterfaceMapper> mappedComposition = new ArrayList<InterfaceMapper>();
+    public InterfaceMapper getContainMappedComposition(Point pc) {
+        //List<InterfaceMapper> mappedComposition = new ArrayList<InterfaceMapper>();
         for (Point p : cloud) {
-            mappedComposition.add(new MappedPoint((o) -> {
+            InterfaceMapper im = new MappedPoint((o) -> {
                 o.set(origin.x + p.x, origin.y + p.y);
             }, (o) -> {
                 p.set(o.x - origin.x, o.y - origin.y);
-            }));
+            });
+            if(im.contains(pc))
+                return im;
         }
-        return mappedComposition;
+        return null;
     }
 
 }

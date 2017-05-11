@@ -62,7 +62,7 @@ public class Drawer extends Canvas {
         ds.getDrawerAction().addDrawerActionListenerOfValid(context::valid);
         ds.getDrawerAction().addDrawerActionListenerOfCancel(context::cancel);
 
-        ds.getLayerMannager().addLayer(new GeometricLayer<Rectangle>(new Rectangle(new Point(10, 10), new Point(100, 100)), Tool.ShapeRectangle));
+        ds.getLayerManager().addLayer(new GeometricLayer<Rectangle>(new Rectangle(new Point(10, 10), new Point(100, 100)), Tool.ShapeRectangle));
 
         //
         repaint();
@@ -98,7 +98,7 @@ public class Drawer extends Canvas {
         gc.clearRect(0, 0, width, height);
 
         //
-        for (AbstractLayer layer : ds.getLayerMannager()) {
+        for (AbstractLayer layer : ds.getLayerManager()) {
             if (layer.isActive())
                 layer.accept(gp);
 

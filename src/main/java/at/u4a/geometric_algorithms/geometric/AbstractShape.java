@@ -50,6 +50,8 @@ public abstract class AbstractShape implements InterfaceGeometric {
     
     /* MAPPED */
     
-    public abstract List<InterfaceMapper> getMappedComposition();
+    //public abstract List<InterfaceMapper> getMappedComposition();
+    
+    public abstract InterfaceMapper getContainMappedComposition(Point p);
 
 }

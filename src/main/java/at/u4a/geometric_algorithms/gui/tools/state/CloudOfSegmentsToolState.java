@@ -3,7 +3,6 @@ package at.u4a.geometric_algorithms.gui.tools.state;
 import at.u4a.geometric_algorithms.geometric.CloudOfSegments;
 import at.u4a.geometric_algorithms.geometric.Point;
 import at.u4a.geometric_algorithms.geometric.Segment;
-import at.u4a.geometric_algorithms.geometric.mapper.InterfaceMapper;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGraphicVisitor;
 import at.u4a.geometric_algorithms.gui.element.Drawer;
 import at.u4a.geometric_algorithms.gui.element.DrawerContext;
@@ -22,13 +21,7 @@ public class CloudOfSegmentsToolState extends ToolState {
     class DirectSelectionPolygonTool extends DirectSelectionToolState {
 
         protected void findOverlay(Point p) {
-            for (InterfaceMapper c : cof.getMappedComposition()) {
-                if (c.contains(p)) {
-                    overlayComposant = c;
-                    return;
-                }
-            }
-            overlayComposant = null;
+            overlayComposant = cof.getContainMappedComposition(p);
         }
 
         protected void setSelected() {
@@ -79,7 +72,7 @@ public class CloudOfSegmentsToolState extends ToolState {
         cofLayer.setLayerName("cof" + String.valueOf(ColoudOfSegmentsCount));
         ColoudOfSegmentsCount++;
 
-        drawer.getDS().getLayerMannager().addLayer(cofLayer);
+        drawer.getDS().getLayerManager().addLayer(cofLayer);
 
         //
         cof = new CloudOfSegments();

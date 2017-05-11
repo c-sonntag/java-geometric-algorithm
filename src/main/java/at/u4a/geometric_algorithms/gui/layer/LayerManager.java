@@ -94,7 +94,7 @@ public class LayerManager implements Iterable<AbstractLayer> {
     }
 
     public void remplaceLayer(AbstractLayer findLayer, AbstractLayer newLayer) {
-        
+
         //
         int findLayerIndex = layers.indexOf(findLayer);
         if (findLayerIndex >= 0)
@@ -103,7 +103,7 @@ public class LayerManager implements Iterable<AbstractLayer> {
         //
         if (selectedLayer == findLayer)
             selectedLayer = newLayer;
-        
+
         //
         refresh();
         ds.refresh();
@@ -132,13 +132,15 @@ public class LayerManager implements Iterable<AbstractLayer> {
 
         // Always Selected Layer(s if container) are at the top
         if (selectedLayer != null)
-            if (selectedLayer.contains(p))
-                contains.add(selectedLayer);
+            if (selectedLayer.isActive())
+                if (selectedLayer.contains(p))
+                    contains.add(selectedLayer);
 
         //
         for (AbstractLayer layer : layers) {
-            if (layer.contains(p))
-                contains.add(layer);
+            if (layer.isActive())
+                if (layer.contains(p))
+                    contains.add(layer);
         }
 
         //

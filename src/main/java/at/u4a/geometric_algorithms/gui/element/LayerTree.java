@@ -109,7 +109,7 @@ public class LayerTree extends JTree {
         /// ///
 
         this.ds = ds;
-        this.lm = ds.getLayerMannager();
+        this.lm = ds.getLayerManager();
         lm.setControllerTree(this);
 
         //
