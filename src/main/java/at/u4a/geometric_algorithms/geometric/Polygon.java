@@ -3,6 +3,7 @@ package at.u4a.geometric_algorithms.geometric;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Vector;
 
 import at.u4a.geometric_algorithms.geometric.mapper.InterfaceMapper;
 import at.u4a.geometric_algorithms.geometric.mapper.MappedPoint;
@@ -56,7 +57,7 @@ public class Polygon extends AbstractShape implements InterfaceContainer<Segment
 
     /* PUBLIC VARIABLES */
 
-    final public ArrayList<Point> perimeter = new ArrayList<Point>();
+    final public Vector<Point> perimeter = new Vector<Point>();
 
     /* FUNCTION */
 
