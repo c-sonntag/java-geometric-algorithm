@@ -88,7 +88,16 @@ public class LayerManager implements Iterable<AbstractLayer> {
     public void deleteLayer(AbstractLayer l) {
         if (selectedLayer == l)
             setSelectedLayer(null);
+        
+        int findLayerIndex = layers.indexOf(l);
         layers.remove(l);
+        
+        // Keep emplacement
+        if(findLayerIndex < layers.size())
+            selectedLayer = layers.get(findLayerIndex);
+        else if( !layers.isEmpty() )
+            selectedLayer = layers.lastElement();
+        
         refresh();
         ds.refresh();
     }

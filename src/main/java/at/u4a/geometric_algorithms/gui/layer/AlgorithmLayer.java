@@ -91,4 +91,10 @@ public class AlgorithmLayer<TAlgorithm extends AbstractAlgorithm> extends Abstra
         return null;
     }
 
+    @Override
+    public void translate(Point p) {
+        for (AbstractLayer al : subLayer)
+            al.translate(p);
+    }
+
 }

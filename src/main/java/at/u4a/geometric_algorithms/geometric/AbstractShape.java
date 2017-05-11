@@ -1,8 +1,5 @@
 package at.u4a.geometric_algorithms.geometric;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import at.u4a.geometric_algorithms.geometric.mapper.InterfaceMapper;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGeometricPainterVisitor;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceShapePainterVisitor;

@@ -68,12 +68,11 @@ public class GeometricLayer<TShape extends AbstractShape> extends AbstractLayer 
     @Override
     public InterfaceMapper getTopContainMappedComposition(Point p) {
         return shape.getContainMappedComposition(p);
-        //for (InterfaceMapper c : shape.getMappedComposition()) {
-        //    if (c.contains(p)) {
-        //        return c;
-        //    }
-        //}
-        //return null;
+    }
+
+    @Override
+    public void translate(Point p) {
+        shape.translate(p);
     }
 
 }
