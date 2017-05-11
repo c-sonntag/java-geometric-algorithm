@@ -1,14 +1,15 @@
 package at.u4a.geometric_algorithms.algorithm;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
 import at.u4a.geometric_algorithms.algorithm.AlgorithmBuilderInterface;
+import at.u4a.geometric_algorithms.algorithm.Triangulation.PointTipped.Tip;
 import at.u4a.geometric_algorithms.geometric.Point;
 import at.u4a.geometric_algorithms.geometric.Polygon;
 import at.u4a.geometric_algorithms.geometric.Rectangle;
 import at.u4a.geometric_algorithms.geometric.Segment;
+import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGraphicVisitor;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceShapePainterVisitor;
 import at.u4a.geometric_algorithms.gui.layer.AbstractLayer;
 import at.u4a.geometric_algorithms.gui.layer.AlgorithmLayer;
@@ -37,7 +38,7 @@ class Triangulation extends AbstractAlgorithm {
 
         @Override
         public AbstractLayer builder(AbstractLayer l) {
-            AbstractLayer al = new AlgorithmLayer<Triangulation>(new Triangulation(), Algorithm.Triangulation, l);
+            AbstractLayer al = new AlgorithmLayer<Triangulation>(new Triangulation((Polygon) l.getShape()), Algorithm.Triangulation, l);
             al.setLayerName("r" + String.valueOf(TriangulationCount));
             TriangulationCount++;
             return al;
@@ -46,14 +47,11 @@ class Triangulation extends AbstractAlgorithm {
     };
 
     private final Polygon poly;
-    
+
     public Triangulation(Polygon poly) {
-        //points = new Vector<Point>();
         this.poly = poly;
-        points = poly.perimeter;
-        pointsTip = new Vector<Tip>(points.size());
-        //
-        fusionPoints = new Vector<Point>();
+        pointsTip = new Vector<PointTipped>(poly.perimeter.size());
+        fusionPoints = new Vector<PointTipped>();
         triangulationFusion = new Vector<Segment>();
         //
         type = Polygon.Type.Simple;
@@ -64,37 +62,47 @@ class Triangulation extends AbstractAlgorithm {
     // private final Polygon triangulation = new
 
     @Override
-    public void accept(Vector<AbstractLayer> v, InterfaceShapePainterVisitor visitor) {
-        Polygon p = (Polygon) v.firstElement().getShape();
+    public void accept(Vector<AbstractLayer> v, InterfaceGraphicVisitor visitor) {
+
+        //
+        buildFusion();
+        buildTriangulation();
+
+        //
+        if (type != Polygon.Type.Monotone)
+            return;
+
+        //
+        final Segment sToOrigin = new Segment();
+        for (Segment tf : triangulationFusion) {
+            sToOrigin.set(tf);
+            poly.convertToStandard(sToOrigin.a);
+            poly.convertToStandard(sToOrigin.b);
+            visitor.visit_unit(sToOrigin);
+        }
 
         // Rectangle r =
 
-        visitor.visit(new Rectangle(new Point(20, 20), new Point(40, 50)));
+        // visitor.visit(new Rectangle(new Point(20, 20), new Point(40, 50)));
 
     }
-    
-    
+
     /* ************** */
 
     /**
      * Index du point le plus haut et le plus bas dans la listes des points
      */
     int topPointIndex, bottomPointIndex;
-    
+
     /**
      * La liste des points ajouté.
      */
-    private Vector<Point> points;
-    
-    /**
-     * Position des points ajouté.
-     */
-    private Vector<Tip> pointsTip;
+    private Vector<PointTipped> pointsTip;
 
     /**
      * La liste des points affiché.
      */
-    private Vector<Point> fusionPoints;
+    private Vector<PointTipped> fusionPoints;
 
     /**
      * Le tableau des triangulation affiché en fonction de fusion.
@@ -106,24 +114,36 @@ class Triangulation extends AbstractAlgorithm {
      */
     public Polygon.Type type;
 
-    
     /* ************** */
 
-    static enum Tip {
-        NONE("?"), LEFT("L"), RIGHT("R"), TOP("T"), BOTTOM("B");
+    static class PointTipped extends Point {
 
-        private final String str;
+        static enum Tip {
+            NONE("?"), LEFT("L"), RIGHT("R"), TOP("T"), BOTTOM("B");
 
-        private Tip(String value) {
-            this.str = value;
+            private final String str;
+
+            private Tip(String value) {
+                this.str = value;
+            }
+
+            public String toString() {
+                return this.str;
+            }
         }
 
-        public String toString() {
-            return this.str;
+        public PointTipped(Point p) {
+            set(p);
+            tip = Tip.NONE;
         }
-    }
-    
-    
+
+        /**
+         * Position dans la le polygone monotone
+         */
+        public Tip tip;
+
+    };
+
     /**
      * Algorithme qui recherche le coté des points
      *
@@ -132,19 +152,21 @@ class Triangulation extends AbstractAlgorithm {
      */
     void searchTipSimple() {
         type = Polygon.Type.Simple;
-        if (points.size() < 3)
+        if (poly.perimeter.size() < 3)
             return;
         //
+        pointsTip.clear();
         Tip actualTip = Tip.RIGHT;
         //
-        Point firstPoint = points.firstElement();
-        Point prevPoint = null;
-        
+        // Point firstPoint = poly.perimeter.firstElement();
+        PointTipped prevPoint = null;
+
         //
-        Iterator<Point> currentPoint_it = points.iterator();
-        Iterator<Tip> currentPointTip_it = pointsTip.iterator();
-        
-        for (Point currentPoint : points) {
+        for (Point currentPoint : poly.perimeter) {
+
+            PointTipped currentPointTip = new PointTipped(currentPoint);
+            pointsTip.add(currentPointTip);
+
             if (prevPoint != null) {
                 if (prevPoint.y >= currentPoint.y) {
                     if (actualTip == Tip.RIGHT)
@@ -154,25 +176,26 @@ class Triangulation extends AbstractAlgorithm {
                         return;
                 }
             }
-            currentPoint.tip = actualTip;
-            prevPoint = currentPoint;
+
+            currentPointTip.tip = actualTip;
+            prevPoint = currentPointTip;
         }
-        type = Type.MONOTONE;
+        type = Polygon.Type.Monotone;
     }
 
     /**
      * Algorithme qui fusionne les cotés des points
      */
-    Vector<Point> makeSide(Polygon poly, Tip choice, boolean Unordered) {
-        Vector<Point> side = new Vector<Point>();
+    Vector<PointTipped> makeSide(Tip choice, boolean Unordered) {
+        Vector<PointTipped> side = new Vector<PointTipped>();
         //
-        int i = Unordered ? points.size() - 1 : 0;
-        int end = Unordered ? -1 : points.size();
+        int i = Unordered ? pointsTip.size() - 1 : 0;
+        int end = Unordered ? -1 : pointsTip.size();
         //
         while (i != end) {
-            Point p = points.get(i);
-            if (p.tip == choice)
-                side.add(p);
+            PointTipped pt = pointsTip.get(i);
+            if (pt.tip == choice)
+                side.add(pt);
             //
             if (Unordered)
                 i--;
@@ -185,19 +208,19 @@ class Triangulation extends AbstractAlgorithm {
     /**
      * Algorithme qui fusionne les cotés des points
      */
-    void buildFusion(Polygon poly) {
+    void buildFusion() {
         searchTipSimple();
         if (type != Polygon.Type.Monotone)
             return;
         //
         fusionPoints.clear();
-        Vector<Point> sideRight = makeSide(poly, Tip.RIGHT, false);
-        Vector<Point> sideLeft = makeSide(poly, Tip.LEFT, true);
+        Vector<PointTipped> sideRight = makeSide(Tip.RIGHT, false);
+        Vector<PointTipped> sideLeft = makeSide(Tip.LEFT, true);
         //
         int idRight = 0, idLeft = 0;
         int sideRightSize = sideRight.size(), sideLeftSize = sideLeft.size();
         //
-        Point leftPoint, rightPoint;
+        PointTipped leftPoint, rightPoint;
         //
         while (true) {
             if ((idRight < sideRightSize) && (idLeft < sideLeftSize)) {
@@ -220,13 +243,10 @@ class Triangulation extends AbstractAlgorithm {
                 break;
         }
     }
-    
-    
+
     /**
-     * Produit vectoriel
-     * x = a.y*0 - 0*b.y* = 0
-     * y = 0*b.x - a.x*0 = 0
-     * z = a.x*b.y - a.y*b.x
+     * Produit vectoriel x = a.y*0 - 0*b.y* = 0 y = 0*b.x - a.x*0 = 0 z =
+     * a.x*b.y - a.y*b.x
      */
     static double getProduitVectorielZ(Point pA, Point pB) {
         return pA.x * pB.y - pA.y * pB.x;
@@ -244,20 +264,20 @@ class Triangulation extends AbstractAlgorithm {
     /**
      * Algorithme qui Créer les segments de la triangulation
      */
-    static void buildTriangulation(Polygon poly) {
+    void buildTriangulation() {
         triangulationFusion.clear();
-        if (type == Type.UNKNOWN)
+        if (type != Polygon.Type.Monotone)
             return;
         //
-        Vector<Point> pile = new Vector<Point>();
+        Vector<PointTipped> pile = new Vector<PointTipped>();
         boolean havePop;
         //
         for (int idCurrent = 0; idCurrent < fusionPoints.size() - 1; idCurrent++) {
-            Point current = fusionPoints.get(idCurrent);
+            PointTipped current = fusionPoints.get(idCurrent);
             do {
                 havePop = false;
                 if (pile.size() >= 2) {
-                    Point pLast = pile.get(pile.size() - 1), pLastLast = pile.get(pile.size() - 2);
+                    PointTipped pLast = pile.get(pile.size() - 1), pLastLast = pile.get(pile.size() - 2);
                     double produit = resumeProduitVectorielZ(current, pLast, pLastLast);
                     //
                     if (((produit > 0) && (current.tip == Tip.RIGHT)) || ((produit < 0) && (current.tip == Tip.LEFT))) {
@@ -266,7 +286,7 @@ class Triangulation extends AbstractAlgorithm {
                         havePop = true;
                     } else if (current.tip != pLast.tip) {
                         triangulationFusion.add(new Segment(current, pLast));
-                        pile.remove(pLastLast);
+                        pile.remove(pLastLast);;
                         havePop = true;
                     }
                 }
@@ -274,89 +294,5 @@ class Triangulation extends AbstractAlgorithm {
             pile.add(current);
         }
     }
-
-    /**
-     * Algorithme qui recherche le coté des points
-     */
-    static void buildSide(Polygon poly) {
-        topPointIndex = -1;
-        bottomPointIndex = -1;
-        type = Type.UNKNOWN;
-        type = Type.MONOTONE;
-        //
-        if (points.size() < 3)
-            return;
-        //
-        Point currentPoint = null, prevPoint = null;
-        Point.Tip actualTip = Point.Tip.RIGHT;
-        boolean topChanged = false;
-        //
-        int pointSize = points.size();
-        //
-        // sens horaire
-        boolean clockwise =
-                (points.elementAt(0).y < points.elementAt(1).y) && (points.elementAt(0).x < points.elementAt(1).x) ||
-                        (points.elementAt(0).y > points.elementAt(1).y) && (points.elementAt(0).x > points.elementAt(1).x);
-        //
-        for (int i = 0; ; i = (i + 1) % pointSize) {
-            if ((i >= pointSize) && !topChanged) // || ( !topChanged) )
-                break;
-            //
-            currentPoint = points.elementAt(clockwise ? i : (pointSize - (1 + i)));
-            //
-            if (prevPoint != null) {
-                if (prevPoint.y >= currentPoint.y) {
-                    if (actualTip == Point.Tip.RIGHT)
-                        actualTip = Point.Tip.LEFT;
-                } else {
-                    if (actualTip == Point.Tip.LEFT)
-                        return;
-                }
-            }
-            currentPoint.tip = actualTip;
-            prevPoint = currentPoint;
-        }
-
-            /*if (topChanged && !currentPointIt.hasNext())
-                currentPointIt = points.iterator(); // looping if top point changed
-            if (!currentPointIt.hasNext())
-                break;
-            //
-            Point currentPoint = currentPointIt.next();
-            //
-            if (topPoint == currentPoint) {
-                break;
-            } else if ((topPoint == null)) {
-                topPoint = currentPoint;
-                topPoint.tip = Point.Tip.TOP;
-                topChanged = true;
-            }
-
-
-            //
-            prevPoint = currentPoint;
-        }
-
-/*
-        if (topPoint != null) {
-            if ()
-        }
-        if (prevPoint != null) {
-            if (prevPoint.y >= currentPoint.y) {
-                if (actualTip == Point.Tip.RIGHT)
-                    actualTip = Point.Tip.LEFT;
-            } else {
-                if (actualTip == Point.Tip.LEFT)
-                    return;
-            }
-        }
-        currentPoint.tip = actualTip;
-        prevPoint = currentPoint;
-    }*/
-
-        type = Type.MONOTONE;
-    }
-
-
 
 };

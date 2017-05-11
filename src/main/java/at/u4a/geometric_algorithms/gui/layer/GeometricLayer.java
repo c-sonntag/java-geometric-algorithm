@@ -7,6 +7,7 @@ import javax.swing.ImageIcon;
 import at.u4a.geometric_algorithms.geometric.AbstractShape;
 import at.u4a.geometric_algorithms.geometric.Point;
 import at.u4a.geometric_algorithms.geometric.mapper.InterfaceMapper;
+import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGraphicVisitor;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceShapePainterVisitor;
 import at.u4a.geometric_algorithms.gui.tools.Tool;
 
@@ -56,9 +57,9 @@ public class GeometricLayer<TShape extends AbstractShape> extends AbstractLayer 
     }
 
     @Override
-    public void accept(InterfaceShapePainterVisitor visitor) {
+    public void accept(InterfaceGraphicVisitor visitor) {
         if (isActive())
-            shape.accept(visitor);
+            shape.accept((InterfaceShapePainterVisitor) visitor);
     }
 
     @Override

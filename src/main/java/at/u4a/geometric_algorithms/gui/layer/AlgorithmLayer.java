@@ -10,7 +10,7 @@ import at.u4a.geometric_algorithms.algorithm.Algorithm;
 import at.u4a.geometric_algorithms.geometric.AbstractShape;
 import at.u4a.geometric_algorithms.geometric.Point;
 import at.u4a.geometric_algorithms.geometric.mapper.InterfaceMapper;
-import at.u4a.geometric_algorithms.graphic_visitor.InterfaceShapePainterVisitor;
+import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGraphicVisitor;
 
 public class AlgorithmLayer<TAlgorithm extends AbstractAlgorithm> extends AbstractLayer {
 
@@ -68,7 +68,7 @@ public class AlgorithmLayer<TAlgorithm extends AbstractAlgorithm> extends Abstra
     }
 
     @Override
-    public void accept(InterfaceShapePainterVisitor visitor) {
+    public void accept(InterfaceGraphicVisitor visitor) {
         if (isActive()) {
             for (AbstractLayer al : subLayer)
                 al.accept(visitor);

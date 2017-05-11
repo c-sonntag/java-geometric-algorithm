@@ -9,7 +9,7 @@ import javax.swing.ImageIcon;
 import at.u4a.geometric_algorithms.geometric.AbstractShape;
 import at.u4a.geometric_algorithms.geometric.Point;
 import at.u4a.geometric_algorithms.geometric.mapper.InterfaceMapper;
-import at.u4a.geometric_algorithms.graphic_visitor.InterfaceShapePainterVisitor;
+import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGraphicVisitor;
 
 public abstract class AbstractLayer {
 
@@ -54,7 +54,7 @@ public abstract class AbstractLayer {
 
     abstract public Vector<AbstractLayer> getSubLayer();
 
-    abstract public void accept(InterfaceShapePainterVisitor visitor);
+    abstract public void accept(InterfaceGraphicVisitor visitor);
 
     /* ABSTRACT PUBLIC FUNCTION - SHAPES */
 
