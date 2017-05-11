@@ -16,6 +16,9 @@ import java.awt.Dimension;
 import javax.swing.JButton;
 import javax.swing.SwingConstants;
 
+import at.u4a.geometric_algorithms.algorithm.AlgorithmManager;
+import at.u4a.geometric_algorithms.gui.layer.AbstractLayer;
+import at.u4a.geometric_algorithms.gui.layer.LayerCategory;
 import at.u4a.geometric_algorithms.gui.element.DrawerScene;
 import at.u4a.geometric_algorithms.gui.element.InterfaceDrawerAction;
 import at.u4a.geometric_algorithms.gui.element.InterfaceLayerAction;
@@ -47,13 +50,13 @@ public class PrincipalGui extends JFrame {
 
     /* Initialize Final Variable */
 
+    private final AlgorithmManager am = new AlgorithmManager();
+
     private final DrawerAction da = new DrawerAction();
     private final LayerAction la = new LayerAction();
-    
-    private final DrawerScene ds = new DrawerScene(da,la);
+
+    private final DrawerScene ds = new DrawerScene(da, la);
     private final LayerTree treeLayer = new LayerTree(ds);
-    
-    
 
     /**
      * Launch the application.
@@ -278,17 +281,18 @@ public class PrincipalGui extends JFrame {
         return panelLayer;
     }
 
-   
-
+    
+    
     private class LayerAction implements InterfaceLayerAction {
 
+        private final JMenu mnAlgorithmMenu;
         private final JButton btnLayerDelete;
         private final JToolBar toolbar;
 
         public LayerAction() {
 
             toolbar = new JToolBar();
-            
+
             /* TOOLBAR - MENUBAR */
 
             JPanel panelMenuBar = new JPanel();
@@ -303,15 +307,18 @@ public class PrincipalGui extends JFrame {
             // menuBar.setOpaque(false);
             // mnNewMenu.setVerticalAlignment(SwingConstants.BOTTOM);
 
-            JMenu mnNewMenu = new JMenu("F");
+            mnAlgorithmMenu = new JMenu(LayerCategory.Algorithm.symbol);
+            
+            mnAlgorithmMenu.setToolTipText(LayerCategory.Algorithm.name);
+            mnAlgorithmMenu.setFont(LayerCategoryLabel.font);
+            menuBar.add(mnAlgorithmMenu);
 
-            mnNewMenu.setFont(LayerCategoryLabel.font);
-            menuBar.add(mnNewMenu);
+            for (String name : am.getAlgorithms()) {
+                JMenuItem mntmNewMenuItem = new JMenuItem(name);
+                mnAlgorithmMenu.add(mntmNewMenuItem);
+            }
 
-            JMenuItem mntmNewMenuItem = new JMenuItem("Triangul");
-            mnNewMenu.add(mntmNewMenuItem);
-
-            setMenuToBottomLeftAlignement(mnNewMenu);
+            setMenuToBottomLeftAlignement(mnAlgorithmMenu);
 
             /* TOOLBAR - BUTTON */
 
@@ -319,7 +326,6 @@ public class PrincipalGui extends JFrame {
             btnLayerDelete.setEnabled(false);
             btnLayerDelete.setToolTipText("Delete layer");
             btnLayerDelete.setIcon(new ImageIcon("icons/action/cancel.png"));
-           
 
             toolbar.add(btnLayerDelete);
 
@@ -335,21 +341,33 @@ public class PrincipalGui extends JFrame {
         }
 
         @Override
-        public void setDelete(boolean b) {
+        public void activeDeleteBtn(boolean b) {
             btnLayerDelete.setEnabled(b);
         }
-        
+
+        @Override
+        public void setActiveLayer(AbstractLayer l) {
+            if (l == null) {
+                mnAlgorithmMenu.setEnabled(false);
+                return;
+            }
+            
+            boolean atLeastOnAlgorithm = false;
+               
+        }
+
         @Override
         public JToolBar getToolBar() {
             return toolbar;
         }
-        
+
         /**
          * This function need to have a content in Menu for change alignement
          */
         private void setMenuToBottomLeftAlignement(JMenu m) {
             m.setMenuLocation((int) -(m.getPopupMenu().getPreferredSize().getWidth() - m.getPreferredSize().getWidth()), (int) -m.getPopupMenu().getPreferredSize().getHeight());
         }
+
 
     }
 

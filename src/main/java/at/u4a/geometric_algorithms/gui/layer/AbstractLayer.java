@@ -6,7 +6,6 @@ import java.util.Vector;
 import javax.swing.ImageIcon;
 
 import at.u4a.geometric_algorithms.geometric.AbstractShape;
-import at.u4a.geometric_algorithms.geometric.InterfaceGeometric;
 import at.u4a.geometric_algorithms.geometric.Point;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceShapePainterVisitor;
 

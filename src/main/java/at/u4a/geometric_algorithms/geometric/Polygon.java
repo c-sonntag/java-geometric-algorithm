@@ -69,6 +69,10 @@ public class Polygon extends AbstractShape implements InterfaceContainer<Segment
     }
 
     public Type getType() {
+        
+        
+        
+        
         return Type.Simple; /** < @TODO */
     }
 

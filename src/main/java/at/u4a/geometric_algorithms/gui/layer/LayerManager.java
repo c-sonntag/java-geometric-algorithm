@@ -80,7 +80,8 @@ public class LayerManager implements Iterable<AbstractLayer> {
         if (controllerTree != null)
             controllerTree.selectNode(l);
         //
-        la.setDelete(selectedLayer != null);
+        la.activeDeleteBtn(selectedLayer != null);
+        la.setActiveLayer(selectedLayer);
 
     }
 

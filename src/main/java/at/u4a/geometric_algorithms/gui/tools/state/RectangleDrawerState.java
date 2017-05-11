@@ -34,8 +34,10 @@ public class RectangleDrawerState extends ToolState {
     public void valid(Drawer drawer) {
 
         //
-        if (((Math.abs(rectangle.size.x) < MIN_SIZE.x) && (Math.abs(rectangle.size.y) < MIN_SIZE.y)))
+        if (((Math.abs(rectangle.size.x) < MIN_SIZE.x) || (Math.abs(rectangle.size.y) < MIN_SIZE.y))) {
             init(drawer);
+            return;
+        }
 
         //
         GeometricLayer<Rectangle> rectangleLayer = new GeometricLayer<Rectangle>(rectangle);
@@ -95,9 +97,8 @@ public class RectangleDrawerState extends ToolState {
         if (currentState != State.Started) {
             if (currentPointToPlace == null)
                 currentPointToPlace = new Point();
-            currentPointToPlace.set(event.getX(), event.getY());  
-        }
-        else {
+            currentPointToPlace.set(event.getX(), event.getY());
+        } else {
             setSize(event.getX(), event.getY());
         }
         context.repaint();
@@ -109,7 +110,7 @@ public class RectangleDrawerState extends ToolState {
 
     @Override
     public void paint(InterfaceGraphicVisitor painter) {
-        
+
         if (currentState != State.Waiting)
             painter.visit(rectangle);
         else if (currentPointToPlace != null)
