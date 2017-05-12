@@ -54,7 +54,7 @@ public class DrawerScene {
 
             scene.getRoot().setCursor(CURSOR_NO_TOOLS);
             root.setCursor(CURSOR_NO_TOOLS);
-
+            
             //
             fxPanel.setScene(scene);
         }
@@ -86,8 +86,9 @@ public class DrawerScene {
         Platform.runLater(new Runnable() {
             public void run() {
                 fx = new DrawerScene.FX();
-                setTool(null);
-                // setTool(Tool.Selection);
+                
+                //setTool(null);
+                setTool(Tool.DirectSelection);
             }
         });
 
@@ -139,18 +140,7 @@ public class DrawerScene {
         for (Entry<Tool, ToolButton> toolControlEntry : toolsItems.entrySet()) {
             toolControlEntry.getValue().setActive((tool == null) ? false : tool.equals(toolControlEntry.getKey()));
         }
-
-        //
-        /*
-         * for (Entry<Tool, ToolControl> toolControlEntry :
-         * toolsControl.entrySet()) {
-         * toolControlEntry.getValue().setActive(tool.equals(toolControlEntry.
-         * getKey()));
-         * 
-         * if (tool.equals(toolControlEntry.getKey())) {
-         * toolControlEntry.getValue().data.btn.setSelected(true); } else {
-         * toolControlEntry.getValue().data.btn.setSelected(false); } }
-         */
+        
 
         //
         if (tool == null) {

@@ -28,7 +28,8 @@ public class GraphToTests {
         Random rnd = new Random();
 
         Polygon poly = new Polygon();
-        poly.origin.set(300 + rnd.nextInt(400), 50 + rnd.nextInt(100));
+        //poly.origin.set(300 + rnd.nextInt(400), 50 + rnd.nextInt(100));
+        poly.origin.set(300, 50);
 
         poly.addPoint(new Point(0, 0));
 

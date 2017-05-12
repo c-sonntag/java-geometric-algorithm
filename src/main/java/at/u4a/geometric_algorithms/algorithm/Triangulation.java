@@ -368,8 +368,8 @@ public class Triangulation extends AbstractAlgorithm {
 
     static boolean inP(Point pA, PointTipped pOrigine, Point pB) {
         double produit = resumeProduitVectorielZ(pA, pOrigine, pB);
-        System.out.print("inP(" + pA + " * " + pOrigine + " * " + pB + ")="+produit+" \t");
-        return (((produit > 0) && (pOrigine.tip == Tip.Right)) || ((produit < 0) && (pOrigine.tip == Tip.Left)));
+        System.out.print("inP(" + pA + " * " + pOrigine + " * " + pB + ")=" + produit + " \t");
+        return (((produit > 0) && (pOrigine.tip == Tip.Right)) || ((produit < 0) && (pOrigine.tip == Tip.Left)) || (pOrigine.tip == Tip.Up) || (pOrigine.tip == Tip.Down));
     }
 
     /**
@@ -405,15 +405,18 @@ public class Triangulation extends AbstractAlgorithm {
                 PointTipped firstStackPop = stack.pop();
 
                 //
+                
                 PointTipped stackPoppedBack = null;
                 while (!stack.isEmpty()) {
                     stackPoppedBack = stack.pop();
-                    if (inP(firstStackPop, current, stackPoppedBack)) {
-                        System.out.print("s(" + current + " * " + stackPoppedBack + ") \t");
-                        triangulationFusion.add(new Segment(firstStackPop, stackPoppedBack));
+                    //if (inP(stackPoppedBack, current, firstStackPop) || inP(firstStackPop, current, stackPoppedBack) ) {
+                    if (inP(firstStackPop, current, stackPoppedBack) ) {
+                        System.out.print("s(" + current + " * " + stackPoppedBack + ") \n");
+                        triangulationFusion.add(new Segment(current, stackPoppedBack));
                     } else
                         break;
                 }
+                
 
                 //
                 if (stackPoppedBack != null)
@@ -424,6 +427,7 @@ public class Triangulation extends AbstractAlgorithm {
             } else {
 
                 //
+                System.out.print("ADD:");
                 Iterator<PointTipped> stack_it = stack.iterator();
                 while (stack_it.hasNext()) {
                     PointTipped stackPoint = stack_it.next();
@@ -433,6 +437,7 @@ public class Triangulation extends AbstractAlgorithm {
                     }
                 }
                 stack.clear();
+                System.out.print(" |\n  ");
 
                 //
                 stack.push(fusionPoints.get(i - 1));
