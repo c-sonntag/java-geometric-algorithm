@@ -126,7 +126,7 @@ public class Triangulation extends AbstractAlgorithm {
     static class PointTipped extends Point {
 
         static enum Tip {
-            NONE("?"), LEFT("L"), RIGHT("R"), TOP("T"), BOTTOM("B");
+            None("?"), Left("U"), Right("C");
 
             private final String str;
 
@@ -141,7 +141,7 @@ public class Triangulation extends AbstractAlgorithm {
 
         public PointTipped(Point p) {
             set(p);
-            tip = Tip.NONE;
+            tip = Tip.None;
         }
 
         public PointTipped(Point p, Tip t) {
@@ -222,28 +222,45 @@ public class Triangulation extends AbstractAlgorithm {
         return true;
     }
 
+    class SideTuple {
+        Vector<Point> side = new Vector<Point>();
+        double minX, maxX;
+    }
+
     /**
      * Algorithme qui fusionne les cotés des points
      * 
      * @param clockwise
-     *            : sens horaire, donc coté droit
+     *            sens horaire
      */
-    Vector<Point> makeSide(boolean clockwise) {
+    SideTuple makeSide(boolean clockwise) {
 
         final Vector<Point> points = poly.perimeter;
         final int size = poly.perimeter.size();
 
-        Vector<Point> side = new Vector<Point>();
+        SideTuple st = new SideTuple();
 
         int start = Math.floorMod(topPointIndex + (clockwise ? 0 : -1), size);
         int end = Math.floorMod(bottomPointIndex + (clockwise ? 0 : -1), size);
         int add = clockwise ? 1 : -1;
 
+        // Add first
+        Point p = points.get(start);
+        st.side.addElement(p);
+        st.maxX = st.minX = p.x;
+        start = Math.floorMod(start + add, size);
+
+        //
         for (int i = start; i != end; i = Math.floorMod(i + add, size)) {
-            side.addElement(points.get(i));
+            p = points.get(i);
+            st.side.addElement(p);
+            if (p.x > st.maxX)
+                st.maxX = p.x;
+            else if (p.x < st.minX)
+                st.minX = p.x;
         }
 
-        return side;
+        return st;
     }
 
     /**
@@ -255,13 +272,21 @@ public class Triangulation extends AbstractAlgorithm {
         //
         fusionPoints.clear();
 
-        Vector<Point> sideClockwise = makeSide(true);
-        Vector<Point> sideUnClockwise = makeSide(false);
+        SideTuple sideClockwise = makeSide(true);
+        SideTuple sideUnclockwise = makeSide(false);
 
-        boolean normalSens = sideClockwise.firstElement().x > sideUnClockwise.firstElement().x;
+        boolean normalSens = sideUnclockwise.minX < sideUnclockwise.maxX;
 
-        Vector<Point> sideRight = normalSens ? sideClockwise : sideUnClockwise;
-        Vector<Point> sideLeft = normalSens ? sideUnClockwise : sideClockwise;
+        if (normalSens) {
+            if ((sideClockwise.maxX <= sideUnclockwise.maxX) || (sideClockwise.minX <= sideUnclockwise.minX))
+                return false;
+        } else {
+            if ((sideUnclockwise.maxX <= sideClockwise.maxX) || (sideUnclockwise.minX <= sideClockwise.minX))
+                return false;
+        }
+
+        Vector<Point> sideRight = normalSens ? sideClockwise.side : sideUnclockwise.side;
+        Vector<Point> sideLeft = normalSens ? sideUnclockwise.side : sideClockwise.side;
 
         System.out.println("");
         System.out.println("topPointIndex(" + topPointIndex + ") bottomPointIndex(" + bottomPointIndex + ")");
@@ -282,21 +307,21 @@ public class Triangulation extends AbstractAlgorithm {
                     rightPoint = rightPoint_it.next();
 
                 if (leftPoint.y <= rightPoint.y) {
-                    fusionPoints.add(new PointTipped(leftPoint, Tip.LEFT));
+                    fusionPoints.add(new PointTipped(leftPoint, Tip.Left));
                     leftPoint = null;
                 } else {
-                    fusionPoints.add(new PointTipped(rightPoint, Tip.RIGHT));
+                    fusionPoints.add(new PointTipped(rightPoint, Tip.Right));
                     rightPoint = null;
                 }
             } else if (rightPoint_it.hasNext() || (rightPoint != null)) {
                 if (rightPoint == null)
                     rightPoint = rightPoint_it.next();
-                fusionPoints.add(new PointTipped(rightPoint, Tip.RIGHT));
+                fusionPoints.add(new PointTipped(rightPoint, Tip.Right));
                 rightPoint = null;
             } else if (leftPoint_it.hasNext() || (leftPoint != null)) {
                 if (leftPoint == null)
                     leftPoint = leftPoint_it.next();
-                fusionPoints.add(new PointTipped(leftPoint, Tip.LEFT));
+                fusionPoints.add(new PointTipped(leftPoint, Tip.Left));
                 leftPoint = null;
 
             } else
@@ -342,22 +367,26 @@ public class Triangulation extends AbstractAlgorithm {
             do {
                 havePop = false;
                 if (pile.size() >= 2) {
+
                     PointTipped pLast = pile.get(pile.size() - 1), pLastLast = pile.get(pile.size() - 2);
+
                     double produit = resumeProduitVectorielZ(current, pLast, pLastLast);
-                    
+
                     System.out.print("PV(" + current + " * " + pLast + " * " + pLastLast + ")=" + produit + "\t ");
                     if (((idCurrent % 4) == 0) && (idCurrent != 0)) {
                         System.out.println();
                     }
 
                     //
-                    if ((current.tip == pLastLast.tip) && (pLastLast.tip != pLast.tip)) {
-                        if (((pLast.tip == Tip.RIGHT) && (produit < 0)) || (pLast.tip == Tip.LEFT) && (produit > 0))
-                            return false;
-                    }
+                    // if ((current.tip == pLastLast.tip) && (pLastLast.tip !=
+                    // pLast.tip)) {
+                    // if (((pLast.tip == Tip.Right) && (produit < 0)) ||
+                    // (pLast.tip == Tip.Left) && (produit > 0))
+                    // return false;
+                    // }
 
                     //
-                    if (((produit > 0) && (current.tip == Tip.RIGHT)) || ((produit < 0) && (current.tip == Tip.LEFT))) {
+                    if (((produit > 0) && (current.tip == Tip.Right)) || ((produit < 0) && (current.tip == Tip.Left))) {
                         triangulationFusion.add(new Segment(current, pLastLast));
                         add += "SL" + triangulationFusion.lastElement() + "\t ";
                         pile.remove(pLast);

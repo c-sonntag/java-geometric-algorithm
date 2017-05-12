@@ -11,8 +11,9 @@ public class GraphToTests {
 
     public static void addGraph(LayerManager layerManager) {
         layerManager.addLayer(rectangle());
-        //layerManager.addLayer(polygon());
-        layerManager.addLayer(triangulation(polygon()));
+        // layerManager.addLayer(polygon());
+        layerManager.addLayer(triangulation(polygon(false)));
+        layerManager.addLayer(triangulation(polygon(true)));
     }
 
     static AbstractLayer rectangle() {
@@ -22,22 +23,30 @@ public class GraphToTests {
     static int POLYGON_SIDE_NB = 3;
     static double POLYGON_FACTOR = 3;
 
-    static AbstractLayer polygon() {
+    static AbstractLayer polygon(boolean reverse) {
 
         Random rnd = new Random();
 
         Polygon poly = new Polygon();
-        poly.origin.set(300, 100);
+        poly.origin.set(100 + rnd.nextInt(200), 50 + rnd.nextInt(100));
 
         poly.addPoint(new Point(0, 0));
 
-        for (int i = 1; i <= POLYGON_SIDE_NB; i++)
-            poly.addPoint(new Point(rnd.nextInt(80) * POLYGON_FACTOR, 20 * i * POLYGON_FACTOR));
+        if (reverse)
+            for (int i = 1; i <= POLYGON_SIDE_NB; i++)
+                poly.addPoint(new Point(-rnd.nextInt(80) * POLYGON_FACTOR, 20 * i * POLYGON_FACTOR));
+        else
+            for (int i = 1; i <= POLYGON_SIDE_NB; i++)
+                poly.addPoint(new Point(rnd.nextInt(80) * POLYGON_FACTOR, 20 * i * POLYGON_FACTOR));
 
         poly.addPoint(new Point(0, (POLYGON_SIDE_NB + 1) * 20 * POLYGON_FACTOR));
 
-        for (int i = POLYGON_SIDE_NB; i > 0; i--)
-            poly.addPoint(new Point(-rnd.nextInt(80) * POLYGON_FACTOR, 20 * i  * POLYGON_FACTOR));
+        if (reverse)
+            for (int i = POLYGON_SIDE_NB; i > 0; i--)
+                poly.addPoint(new Point(rnd.nextInt(80) * POLYGON_FACTOR, 20 * i * POLYGON_FACTOR));
+        else
+            for (int i = POLYGON_SIDE_NB; i > 0; i--)
+                poly.addPoint(new Point(-rnd.nextInt(80) * POLYGON_FACTOR, 20 * i * POLYGON_FACTOR));
 
         return new GeometricLayer<Polygon>(poly, Tool.ShapeSimplePoligon);
     }
