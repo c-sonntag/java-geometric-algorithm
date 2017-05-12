@@ -1,5 +1,6 @@
 package at.u4a.geometric_algorithms.algorithm;
 
+import java.util.Iterator;
 import java.util.Vector;
 
 import at.u4a.geometric_algorithms.algorithm.AlgorithmBuilderInterface;
@@ -51,24 +52,10 @@ class Triangulation extends AbstractAlgorithm {
 
     /* ************** */
 
-    // private final Polygon triangulation = new
-
-    private int mutablePreviousPolyHash = 0;
-
     @Override
     public void accept(Vector<AbstractLayer> v, InterfaceGraphicVisitor visitor) {
 
-        int currentPolyHash = poly.hashCode();
-        if (currentPolyHash != mutablePreviousPolyHash) {
-
-            //
-            System.out.println("gen triangulation...");
-            buildFusion();
-            buildTriangulation();
-
-            //
-            mutablePreviousPolyHash = currentPolyHash;
-        }
+        triangulation();
 
         //
         if (type != Polygon.Type.Monotone)
@@ -86,6 +73,25 @@ class Triangulation extends AbstractAlgorithm {
         // Rectangle r =
 
         // visitor.visit(new Rectangle(new Point(20, 20), new Point(40, 50)));
+    }
+
+    /* ************** */
+
+    private int mutablePreviousPolyHash = 0;
+
+    protected void triangulation() {
+
+        int currentPolyHash = poly.hashCode();
+        if (currentPolyHash != mutablePreviousPolyHash) {
+
+            //
+            type = Polygon.Type.Simple;
+            if (buildFusion())
+                if (buildTriangulation())
+                    type = Polygon.Type.Monotone;
+            //
+            mutablePreviousPolyHash = currentPolyHash;
+        }
 
     }
 
@@ -95,6 +101,7 @@ class Triangulation extends AbstractAlgorithm {
      * Index du point le plus haut et le plus bas dans la listes des points
      */
     int topPointIndex, bottomPointIndex;
+    Point topPoint, bottomPoint;
 
     /**
      * La liste des points affiché.
@@ -153,7 +160,7 @@ class Triangulation extends AbstractAlgorithm {
     /**
      * Algorithme qui recherche l'index du point en haut et en bas
      */
-    private void searchUpDonwSide() {
+    private boolean searchUpDonwSide() {
 
         topPointIndex = -1;
         bottomPointIndex = -1;
@@ -162,7 +169,7 @@ class Triangulation extends AbstractAlgorithm {
         final int size = poly.perimeter.size();
 
         if (size < 3)
-            return;
+            return false;
 
         double topY = 0, bottomY = 0;
         final Vector<Point> points = poly.perimeter;
@@ -191,7 +198,7 @@ class Triangulation extends AbstractAlgorithm {
                         countAngle++;
 
                         if (countAngle > 2)
-                            return;
+                            return false;
                     }
                 }
 
@@ -206,7 +213,10 @@ class Triangulation extends AbstractAlgorithm {
             precPoint = currentPoint;
         }
 
-        type = Polygon.Type.Monotone;
+        topPoint = points.get(topPointIndex);
+        bottomPoint = points.get(bottomPointIndex);
+
+        return true;
     }
 
     /**
@@ -236,47 +246,62 @@ class Triangulation extends AbstractAlgorithm {
     /**
      * Algorithme qui fusionne les cotés des points
      */
-    void buildFusion() {
-        searchUpDonwSide();
-        if (type != Polygon.Type.Monotone)
-            return;
+    private boolean buildFusion() {
+        if (!searchUpDonwSide())
+            return false;
         //
         fusionPoints.clear();
-        
-        Vector<Point> sideRight = makeSide(true);
-        Vector<Point> sideLeft = makeSide(false);
-        
-        System.out.println( "" );
-        System.out.println( "topPointIndex("+topPointIndex+") bottomPointIndex("+bottomPointIndex+")");
-        System.out.println( "sideRight("+sideRight.size()+") : " + sideRight );
-        System.out.println( "sideLeft("+sideLeft.size()+") : " + sideLeft );
-        
+
+        Vector<Point> sideClockwise = makeSide(true);
+        Vector<Point> sideUnClockwise = makeSide(false);
+
+        boolean normalSens = sideClockwise.firstElement().x > sideUnClockwise.firstElement().x;
+
+        Vector<Point> sideRight = normalSens ? sideClockwise : sideUnClockwise;
+        Vector<Point> sideLeft = normalSens ? sideUnClockwise : sideClockwise;
+
+        System.out.println("");
+        System.out.println("topPointIndex(" + topPointIndex + ") bottomPointIndex(" + bottomPointIndex + ")");
+        System.out.println("sideRight(" + sideRight.size() + ") : " + sideRight);
+        System.out.println("sideLeft(" + sideLeft.size() + ") : " + sideLeft);
+
         //
-        int idRight = 0, idLeft = 0;
-        int sideRightSize = sideRight.size(), sideLeftSize = sideLeft.size();
-        //
-        Point leftPoint, rightPoint;
+        Point leftPoint = null, rightPoint = null;
+        Iterator<Point> leftPoint_it = sideLeft.iterator();
+        Iterator<Point> rightPoint_it = sideRight.iterator();
         //
         while (true) {
-            if ((idRight < sideRightSize) && (idLeft < sideLeftSize)) {
-                leftPoint = sideLeft.get(idLeft);
-                rightPoint = sideRight.get(idRight);
+            if (leftPoint_it.hasNext() && rightPoint_it.hasNext()) {
+
+                if (leftPoint == null)
+                    leftPoint = leftPoint_it.next();
+                if (rightPoint == null)
+                    rightPoint = rightPoint_it.next();
+
                 if (leftPoint.y <= rightPoint.y) {
                     fusionPoints.add(new PointTipped(leftPoint, Tip.LEFT));
-                    idLeft++;
+                    leftPoint = null;
                 } else {
                     fusionPoints.add(new PointTipped(rightPoint, Tip.RIGHT));
-                    idRight++;
+                    rightPoint = null;
                 }
-            } else if (idRight < sideRightSize) {
-                fusionPoints.add(new PointTipped(sideRight.get(idRight), Tip.RIGHT));
-                idRight++;
-            } else if (idLeft < sideLeftSize) {
-                fusionPoints.add(new PointTipped(sideLeft.get(idLeft), Tip.LEFT));
-                idLeft++;
+            } else if (rightPoint_it.hasNext() || (rightPoint != null)) {
+                if (rightPoint == null)
+                    rightPoint = rightPoint_it.next();
+                fusionPoints.add(new PointTipped(rightPoint, Tip.RIGHT));
+                rightPoint = null;
+            } else if (leftPoint_it.hasNext() || (leftPoint != null)) {
+                if (leftPoint == null)
+                    leftPoint = leftPoint_it.next();
+                fusionPoints.add(new PointTipped(leftPoint, Tip.LEFT));
+                leftPoint = null;
+
             } else
                 break;
         }
+
+        System.out.println("fusionPoints(" + fusionPoints.size() + ") : " + fusionPoints);
+        return true;
     }
 
     /**
@@ -299,10 +324,10 @@ class Triangulation extends AbstractAlgorithm {
     /**
      * Algorithme qui Créer les segments de la triangulation
      */
-    void buildTriangulation() {
+    private boolean buildTriangulation() {
         triangulationFusion.clear();
-        if (type != Polygon.Type.Monotone)
-            return;
+
+        String add = "";
 
         //
         Vector<PointTipped> pile = new Vector<PointTipped>();
@@ -315,13 +340,23 @@ class Triangulation extends AbstractAlgorithm {
                 if (pile.size() >= 2) {
                     PointTipped pLast = pile.get(pile.size() - 1), pLastLast = pile.get(pile.size() - 2);
                     double produit = resumeProduitVectorielZ(current, pLast, pLastLast);
+                    System.out.print("PV(" + current +" * "+ pLast +" * "+ pLastLast + ")="+produit+"  ");
+                    
+                    //
+                    if( (current.tip == pLastLast.tip) && (pLastLast.tip != pLast.tip)){
+                        if(((pLast.tip == Tip.RIGHT) && (produit<0)) || (pLast.tip == Tip.LEFT) && (produit>0))
+                            return false;
+                    }
+                    
                     //
                     if (((produit > 0) && (current.tip == Tip.RIGHT)) || ((produit < 0) && (current.tip == Tip.LEFT))) {
                         triangulationFusion.add(new Segment(current, pLastLast));
+                        add += "SL" + triangulationFusion.lastElement() + " ";
                         pile.remove(pLast);
                         havePop = true;
                     } else if (current.tip != pLast.tip) {
                         triangulationFusion.add(new Segment(current, pLast));
+                        add += "SR" + triangulationFusion.lastElement() + " ";
                         pile.remove(pLastLast);
                         havePop = true;
                     }
@@ -329,6 +364,9 @@ class Triangulation extends AbstractAlgorithm {
             } while (havePop);
             pile.add(current);
         }
+        System.out.println();
+        System.out.println(add);
+        return true;
     }
 
 };
