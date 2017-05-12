@@ -18,7 +18,7 @@ import at.u4a.geometric_algorithms.gui.layer.AlgorithmLayer;
  * @author Hip
  *
  */
-class Triangulation extends AbstractAlgorithm {
+public class Triangulation extends AbstractAlgorithm {
 
     public static class Builder implements AlgorithmBuilderInterface {
 
@@ -36,6 +36,9 @@ class Triangulation extends AbstractAlgorithm {
 
         @Override
         public AbstractLayer builder(AbstractLayer l) {
+            if (!canApply(l))
+                throw new RuntimeException("Triangulation need a Polygon !");
+            //
             AbstractLayer al = new AlgorithmLayer<Triangulation>(new Triangulation((Polygon) l.getShape()), Algorithm.Triangulation, l);
             al.setLayerName("r" + String.valueOf(TriangulationCount));
             TriangulationCount++;
@@ -332,31 +335,36 @@ class Triangulation extends AbstractAlgorithm {
         //
         Vector<PointTipped> pile = new Vector<PointTipped>();
         boolean havePop;
+        int fusionPointsSize = fusionPoints.size();
         //
-        for (int idCurrent = 0; idCurrent < fusionPoints.size() - 1; idCurrent++) {
-            PointTipped current = fusionPoints.get(idCurrent);
+        for (int idCurrent = 0; idCurrent < fusionPointsSize - 1; idCurrent++) {
+            PointTipped current = fusionPoints.get(Math.floorMod(idCurrent, fusionPointsSize));
             do {
                 havePop = false;
                 if (pile.size() >= 2) {
                     PointTipped pLast = pile.get(pile.size() - 1), pLastLast = pile.get(pile.size() - 2);
                     double produit = resumeProduitVectorielZ(current, pLast, pLastLast);
-                    System.out.print("PV(" + current +" * "+ pLast +" * "+ pLastLast + ")="+produit+"  ");
                     
+                    System.out.print("PV(" + current + " * " + pLast + " * " + pLastLast + ")=" + produit + "\t ");
+                    if (((idCurrent % 4) == 0) && (idCurrent != 0)) {
+                        System.out.println();
+                    }
+
                     //
-                    if( (current.tip == pLastLast.tip) && (pLastLast.tip != pLast.tip)){
-                        if(((pLast.tip == Tip.RIGHT) && (produit<0)) || (pLast.tip == Tip.LEFT) && (produit>0))
+                    if ((current.tip == pLastLast.tip) && (pLastLast.tip != pLast.tip)) {
+                        if (((pLast.tip == Tip.RIGHT) && (produit < 0)) || (pLast.tip == Tip.LEFT) && (produit > 0))
                             return false;
                     }
-                    
+
                     //
                     if (((produit > 0) && (current.tip == Tip.RIGHT)) || ((produit < 0) && (current.tip == Tip.LEFT))) {
                         triangulationFusion.add(new Segment(current, pLastLast));
-                        add += "SL" + triangulationFusion.lastElement() + " ";
+                        add += "SL" + triangulationFusion.lastElement() + "\t ";
                         pile.remove(pLast);
                         havePop = true;
                     } else if (current.tip != pLast.tip) {
                         triangulationFusion.add(new Segment(current, pLast));
-                        add += "SR" + triangulationFusion.lastElement() + " ";
+                        add += "SR" + triangulationFusion.lastElement() + "\t ";
                         pile.remove(pLastLast);
                         havePop = true;
                     }

@@ -13,6 +13,7 @@ import at.u4a.geometric_algorithms.graphic_visitor.GraphicPainter;
 import at.u4a.geometric_algorithms.gui.layer.AbstractLayer;
 import at.u4a.geometric_algorithms.gui.layer.GeometricLayer;
 import at.u4a.geometric_algorithms.gui.tools.Tool;
+import at.u4a.geometric_algorithms.utils.GraphToTests;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 
@@ -62,7 +63,7 @@ public class Drawer extends Canvas {
         ds.getDrawerAction().addDrawerActionListenerOfValid(context::valid);
         ds.getDrawerAction().addDrawerActionListenerOfCancel(context::cancel);
 
-        ds.getLayerManager().addLayer(new GeometricLayer<Rectangle>(new Rectangle(new Point(10, 10), new Point(100, 100)), Tool.ShapeRectangle));
+        ds.getLayerManager().clear();
 
         //
         repaint();
@@ -107,8 +108,7 @@ public class Drawer extends Canvas {
              * if( shape.contains(p) ) .accept(sp);
              */
         }
-            
-        
+
         this.context.paint(gp);
     }
 
