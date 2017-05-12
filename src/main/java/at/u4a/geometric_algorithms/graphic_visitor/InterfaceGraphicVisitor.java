@@ -14,7 +14,7 @@ public interface InterfaceGraphicVisitor extends InterfaceShapePainterVisitor, I
     public void setDotted(boolean b);
     public boolean getDotted();
     
-    //public GraphicsContext getGraphicsContext();*
+    public GraphicsContext getGraphicsContext();
     //public void setGraphicsContext(GraphicsContext gc);
     
 }

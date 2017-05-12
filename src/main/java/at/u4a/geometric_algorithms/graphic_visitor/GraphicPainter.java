@@ -86,6 +86,10 @@ public class GraphicPainter implements InterfaceGraphicVisitor {
     public boolean getDotted() {
         return this.isDotted;
     }
+    
+    public GraphicsContext getGraphicsContext() {
+        return gc;
+        }
 
     // public void setGraphicsContext(GraphicsContext gc) {
     // this.gc = gc;
