@@ -441,12 +441,22 @@ public class Triangulation extends AbstractAlgorithm {
 
                 if (true) {
 
-                    Iterator<PointTipped> stack_it = stack.iterator();
-                    while (stack_it.hasNext()) {
-                        PointTipped stackPoint = stack_it.next();
-                        if (stack_it.hasNext()) {
-                            System.out.print("s(" + currentPoint + " * " + stackPoint + ") \t");
+                    Iterator<PointTipped> stack_it = stack.descendingIterator();
+                    if (stack_it.hasNext()) { // last item
+                        PointTipped stackPoint, endStackPoint = stack_it.next();
+                        System.out.print("pop(" + endStackPoint + ") \t");
+
+                        while (stack_it.hasNext()) {
+                            stackPoint = stack_it.next();
+                            System.out.print("s(" + currentPoint + " * " + stackPoint + ") ");
+                            //
+                            if (endStackPoint != null)
+                                if (inP(endStackPoint, stackPoint, currentPoint))
+                                    return false;
+
+                            System.out.print(" +++ \t ");
                             triangulationFusion.add(new Segment(currentPoint, stackPoint));
+                            endStackPoint = null;
                         }
                     }
 
