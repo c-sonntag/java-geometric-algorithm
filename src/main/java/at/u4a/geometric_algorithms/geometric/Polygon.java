@@ -9,6 +9,7 @@ import at.u4a.geometric_algorithms.geometric.mapper.InterfaceMapper;
 import at.u4a.geometric_algorithms.geometric.mapper.MappedPoint;
 import at.u4a.geometric_algorithms.geometric.mapper.MappedSegment;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceShapePainterVisitor;
+import at.u4a.geometric_algorithms.utils.Mutable;
 
 public class Polygon extends AbstractShape implements InterfaceContainer<Segment> {
 
@@ -67,6 +68,10 @@ public class Polygon extends AbstractShape implements InterfaceContainer<Segment
 
     public Polygon(Point origin) {
         super(origin);
+    }
+    
+    public int hashCode() {
+        return Mutable.getHashCode(perimeter);
     }
 
     public Type getType() {

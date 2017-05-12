@@ -24,6 +24,14 @@ public class Point implements InterfaceGeometric {
         this.y = 0;
     }
 
+    public String toString() {
+        return x + "," + y;
+    }
+
+    public int hashCode() {
+        return Double.hashCode(x) * 31 + Double.hashCode(y);
+    }
+
     public void set(Point other) {
         this.x = other.x;
         this.y = other.y;

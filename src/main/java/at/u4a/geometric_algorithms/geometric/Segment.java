@@ -11,6 +11,10 @@ public class Segment extends Line {
     public Segment() {
         super();
     }
+    
+    public String toString() {
+        return "["+a.toString()+";"+b.toString()+"]";
+    }
 
     public boolean contains(Point p) {
         return

@@ -18,6 +18,14 @@ public class Line implements InterfaceGeometric {
         b = new Point();
     }
 
+    public String toString() {
+        return "(" + a.toString() + ";" + b.toString() + ")";
+    }
+
+    public int hashCode() {
+        return a.hashCode() * 31 + b.hashCode();
+    }
+
     public void set(Line other) {
         this.a.set(other.a);
         this.b.set(other.b);
