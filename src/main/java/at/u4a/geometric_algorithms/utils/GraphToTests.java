@@ -20,8 +20,8 @@ public class GraphToTests {
         return new GeometricLayer<Rectangle>(new Rectangle(new Point(10, 10), new Point(100, 100)), Tool.ShapeRectangle);
     }
 
-    static int POLYGON_SIDE_NB = 3;
-    static double POLYGON_FACTOR = 4;
+    static int POLYGON_SIDE_NB = 8;
+    static double POLYGON_FACTOR = 5;
 
     static AbstractLayer polygon(boolean reverse) {
 
@@ -29,7 +29,7 @@ public class GraphToTests {
 
         Polygon poly = new Polygon();
         //poly.origin.set(300 + rnd.nextInt(400), 50 + rnd.nextInt(100));
-        poly.origin.set(300, 50);
+        poly.origin.set(100*POLYGON_FACTOR, 50);
 
         poly.addPoint(new Point(0, 0));
 

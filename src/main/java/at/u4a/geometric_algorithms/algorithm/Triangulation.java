@@ -346,7 +346,7 @@ public class Triangulation extends AbstractAlgorithm {
         }
 
         // Add Bottom
-        fusionPoints.add(new PointTipped(bottomPoint, Tip.Down));
+        // fusionPoints.add(new PointTipped(bottomPoint, Tip.Down));
 
         System.out.println("fusionPoints(" + fusionPoints.size() + ") : " + fusionPoints);
         return true;
@@ -399,152 +399,84 @@ public class Triangulation extends AbstractAlgorithm {
         //
         for (int i = 2; i < fusionPointsSize - 1; i++) {
 
-            PointTipped current = fusionPoints.get(i);
+            // PointTipped lastPoint = fusionPoints.get(i - 1);
+            PointTipped currentPoint = fusionPoints.get(i);
+            // PointTipped nextPoint = fusionPoints.get(i + 1);
+
+            // Intersection between points with different side
+            /*
+             * if (lastPoint.tip == nextPoint.tip) if (lastPoint.tip !=
+             * currentPoint.tip) if (inP(lastPoint, currentPoint, nextPoint))
+             * return false;
+             */
+
             PointTipped stackFirst = stack.getFirst();
-            // PointTipped stackPop = stack.pop();
 
-            if ((current.tip.code & stackFirst.tip.code) != 0) { // same chain
-
+            if ((currentPoint.tip.code & stackFirst.tip.code) != 0) { // same
+                                                                      // chain
                 //
-                // PointTipped firstStackPop = stack.pop();
+                PointTipped stackPop = stack.pop();
 
-                //
-                PointTipped stackPop = null;
-                // PointTipped stackPoppedBack = null;
                 while (!stack.isEmpty()) {
-                    // stackPoppedBack = stack.pop();
-                    // if (inP(stackPoppedBack, current, firstStackPop) ||
-                    // inP(firstStackPop, current, stackPoppedBack) ) {
-
-                    stackPop = stack.pop();
-
                     stackFirst = stack.peekFirst();
 
-                    // if (inP(current, stackPop, stackFirst) && inP(stackPop,
-                    // stackFirst, current)) {
-                    if (inP(current, stackPop, stackFirst)) {
+                    if (inP(currentPoint, stackPop, stackFirst)) {
 
-                        System.out.print("s(" + current + " * " + stackFirst + ") \n");
+                        System.out.print("s(" + currentPoint + " * " + stackFirst + ") \n");
                         stackPop = stack.pop();
 
-                        triangulationFusion.add(new Segment(current, stackPop));
+                        triangulationFusion.add(new Segment(currentPoint, stackPop));
                     } else
                         break;
                 }
 
                 //
-
-                // if (stackPoppedBack != null)
-                // stack.push(stackPoppedBack);
-                // stack.push(firstStackPop);
-                if (stackPop != null)
-                    stack.push(stackPop);
-                stack.push(current);
+                stack.push(stackPop);
+                stack.push(currentPoint);
 
             } else {
 
                 //
                 System.out.print("ADD:");
-                Iterator<PointTipped> stack_it = stack.iterator();
-                // Iterator<PointTipped> stack_it = stack.descendingIterator();
 
-                while (stack_it.hasNext()) {
-                    PointTipped stackPoint = stack_it.next();
-                    if (stack_it.hasNext()) {
-                        System.out.print("s(" + current + " * " + stackPoint + ") \t");
-                        triangulationFusion.add(new Segment(current, stackPoint));
+                if (true) {
+
+                    Iterator<PointTipped> stack_it = stack.iterator();
+                    while (stack_it.hasNext()) {
+                        PointTipped stackPoint = stack_it.next();
+                        if (stack_it.hasNext()) {
+                            System.out.print("s(" + currentPoint + " * " + stackPoint + ") \t");
+                            triangulationFusion.add(new Segment(currentPoint, stackPoint));
+                        }
                     }
+
+                } else {
+
+                    Iterator<PointTipped> stack_it = stack.iterator();
+                    while (stack_it.hasNext()) {
+                        PointTipped stackPoint = stack_it.next();
+                        if (stack_it.hasNext()) {
+                            System.out.print("s(" + currentPoint + " * " + stackPoint + ") \t");
+                            triangulationFusion.add(new Segment(currentPoint, stackPoint));
+                        }
+                    }
+
                 }
+
                 stack.clear();
                 System.out.print(" |\n  ");
 
                 //
                 stack.push(fusionPoints.get(i - 1));
-                stack.push(current);
+                stack.push(currentPoint);
 
             }
         }
 
-        /*
-         * PointTipped rightMost = fusionPoints.get(fusionPointsSize - 1); while
-         * (stack.size() > 1) { PointTipped lastPopped = stack.pop();
-         * triangulationFusion.add(new Segment(rightMost, stack.peek())); //
-         * triangulationFusion.add(rightMost, lastPopped, stack.peek()); }
-         */
-        // if (((current.tip.code & Tip.OnlyUpDown.code) | (stackPop.tip.code &
-        // Tip.OnlyUpDown.code)) == 0)
-
+        // except the first and the last one diagonals
         triangulationFusion.remove(0);
-        triangulationFusion.remove(triangulationFusion.size() - 1);
+        // triangulationFusion.remove(triangulationFusion.size() - 1);
 
         return true;
     }
-
-    /**
-     * Algorithme qui Créer les segments de la triangulation
-     */
-    private boolean buildTriangulation_old() {
-        triangulationFusion.clear();
-        //
-        Vector<PointTipped> pile = new Vector<PointTipped>();
-        boolean havePop;
-        int fusionPointsSize = fusionPoints.size();
-        //
-        for (int idCurrent = 0; idCurrent < fusionPointsSize; idCurrent++) {
-            PointTipped current = fusionPoints.get(idCurrent);
-            do {
-                havePop = false;
-                if (pile.size() >= 2) {
-
-                    PointTipped pLast = pile.get(pile.size() - 1), pLastLast = pile.get(pile.size() - 2);
-
-                    double produit = resumeProduitVectorielZ(current, pLast, pLastLast);
-
-                    System.out.print("PV(" + current + " * " + pLast + " * " + pLastLast + ")=" + produit + "\t ");
-
-                    //
-                    // if ((current.tip == pLastLast.tip) && (pLastLast.tip !=
-                    // pLast.tip)) {
-                    // if (((pLast.tip == Tip.Right) && (produit < 0)) ||
-                    // (pLast.tip == Tip.Left) && (produit > 0))
-                    // return false;
-                    // }
-
-                    //
-                    if (((produit > 0) && (current.tip == Tip.Right)) || ((produit < 0) && (current.tip == Tip.Left))) {
-                        triangulationFusion.add(new Segment(current, pLastLast));
-                        pile.remove(pLast);
-                        havePop = true;
-                    } else if ((current.tip.code & pLast.tip.code) == 0) {
-                        if ((current.tip.code & pLastLast.tip.code) == 0) {
-                            triangulationFusion.add(new Segment(current, pLastLast));
-                            pile.remove(pLast);
-                        } else {
-                            triangulationFusion.add(new Segment(current, pLast));
-                            pile.remove(pLastLast);
-                        }
-                        havePop = true;
-                    } else if (current.tip == Tip.UpDown) {
-                        triangulationFusion.add(new Segment(current, pLastLast));
-                        pile.remove(pLast);
-                        havePop = true;
-                    }
-
-                    if (havePop)
-                        System.out.print(" POP(" + triangulationFusion.lastElement() + ")\t ");
-
-                    if (((idCurrent % 2) == 0) && (idCurrent != 0)) {
-                        System.out.println();
-                    }
-
-                }
-            } while (havePop);
-
-            pile.add(current);
-
-        }
-        System.out.println();
-        return true;
-    }
-
 };
