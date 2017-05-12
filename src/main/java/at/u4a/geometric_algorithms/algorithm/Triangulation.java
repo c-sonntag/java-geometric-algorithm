@@ -18,7 +18,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 
 /**
- * TriangulationOfDelaunay
+ * Triangulation
  * 
  * @author Hip
  *
@@ -144,7 +144,10 @@ public class Triangulation extends AbstractAlgorithm {
     static class PointTipped extends Point {
 
         static enum Tip {
-            None("?", 0b000), Left("L", 0b001), Right("R", 0b010), Up("U", 0b111), Down("D", 0b011);
+            None("?", 0b000), Left("L", 0b001), Right("R", 0b010), Up("U", 0b0111), Down("D", 0b1011), OnlyUpDown("UD", 0b1100);
+
+            // UpDown("UD",
+            // 0b1111);
 
             public final String str;
             public final int code;
@@ -290,8 +293,8 @@ public class Triangulation extends AbstractAlgorithm {
         //
         fusionPoints.clear();
 
-        SideTuple sideClockwise = makeSide(true, false);
-        SideTuple sideUnclockwise = makeSide(false, false);
+        SideTuple sideClockwise = makeSide(true, true);
+        SideTuple sideUnclockwise = makeSide(false, true);
 
         boolean normalSens = sideUnclockwise.minX < sideClockwise.maxX;
 
@@ -390,38 +393,52 @@ public class Triangulation extends AbstractAlgorithm {
         int fusionPointsSize = fusionPoints.size();
 
         //
-        stack.push(fusionPoints.get(0));
-        stack.push(fusionPoints.get(1));
+        stack.add(fusionPoints.get(0));
+        stack.add(fusionPoints.get(1));
 
         //
         for (int i = 2; i < fusionPointsSize - 1; i++) {
 
             PointTipped current = fusionPoints.get(i);
             PointTipped stackFirst = stack.getFirst();
+            // PointTipped stackPop = stack.pop();
 
             if ((current.tip.code & stackFirst.tip.code) != 0) { // same chain
 
                 //
-                PointTipped firstStackPop = stack.pop();
+                // PointTipped firstStackPop = stack.pop();
 
                 //
-                
-                PointTipped stackPoppedBack = null;
+                PointTipped stackPop = null;
+                // PointTipped stackPoppedBack = null;
                 while (!stack.isEmpty()) {
-                    stackPoppedBack = stack.pop();
-                    //if (inP(stackPoppedBack, current, firstStackPop) || inP(firstStackPop, current, stackPoppedBack) ) {
-                    if (inP(firstStackPop, current, stackPoppedBack) ) {
-                        System.out.print("s(" + current + " * " + stackPoppedBack + ") \n");
-                        triangulationFusion.add(new Segment(current, stackPoppedBack));
+                    // stackPoppedBack = stack.pop();
+                    // if (inP(stackPoppedBack, current, firstStackPop) ||
+                    // inP(firstStackPop, current, stackPoppedBack) ) {
+
+                    stackPop = stack.pop();
+
+                    stackFirst = stack.peekFirst();
+
+                    // if (inP(current, stackPop, stackFirst) && inP(stackPop,
+                    // stackFirst, current)) {
+                    if (inP(current, stackPop, stackFirst)) {
+
+                        System.out.print("s(" + current + " * " + stackFirst + ") \n");
+                        stackPop = stack.pop();
+
+                        triangulationFusion.add(new Segment(current, stackPop));
                     } else
                         break;
                 }
-                
 
                 //
-                if (stackPoppedBack != null)
-                    stack.push(stackPoppedBack);
+
+                // if (stackPoppedBack != null)
+                // stack.push(stackPoppedBack);
                 // stack.push(firstStackPop);
+                if (stackPop != null)
+                    stack.push(stackPop);
                 stack.push(current);
 
             } else {
@@ -429,6 +446,8 @@ public class Triangulation extends AbstractAlgorithm {
                 //
                 System.out.print("ADD:");
                 Iterator<PointTipped> stack_it = stack.iterator();
+                // Iterator<PointTipped> stack_it = stack.descendingIterator();
+
                 while (stack_it.hasNext()) {
                     PointTipped stackPoint = stack_it.next();
                     if (stack_it.hasNext()) {
@@ -445,6 +464,18 @@ public class Triangulation extends AbstractAlgorithm {
 
             }
         }
+
+        /*
+         * PointTipped rightMost = fusionPoints.get(fusionPointsSize - 1); while
+         * (stack.size() > 1) { PointTipped lastPopped = stack.pop();
+         * triangulationFusion.add(new Segment(rightMost, stack.peek())); //
+         * triangulationFusion.add(rightMost, lastPopped, stack.peek()); }
+         */
+        // if (((current.tip.code & Tip.OnlyUpDown.code) | (stackPop.tip.code &
+        // Tip.OnlyUpDown.code)) == 0)
+
+        triangulationFusion.remove(0);
+        triangulationFusion.remove(triangulationFusion.size() - 1);
 
         return true;
     }
