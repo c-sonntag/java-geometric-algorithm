@@ -1,5 +1,7 @@
 package at.u4a.geometric_algorithms.algorithm;
 
+import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -106,9 +108,8 @@ public class Triangulation extends AbstractAlgorithm {
 
             //
             type = Polygon.Type.Simple;
-            if (buildFusion())
-                if (buildTriangulation())
-                    type = Polygon.Type.Monotone;
+            if (buildTriangulation())
+                type = Polygon.Type.Monotone;
             //
             mutablePreviousPolyHash = currentPolyHash;
         }
@@ -143,7 +144,7 @@ public class Triangulation extends AbstractAlgorithm {
     static class PointTipped extends Point {
 
         static enum Tip {
-            None("?", 0b00), Left("L", 0b01), Right("R", 0b10), UpDown("UD", 0b11);
+            None("?", 0b000), Left("L", 0b001), Right("R", 0b010), Up("U", 0b111), Down("D", 0b011);
 
             public final String str;
             public final int code;
@@ -183,7 +184,6 @@ public class Triangulation extends AbstractAlgorithm {
      * Algorithme qui recherche l'index du point en haut et en bas
      */
     private boolean searchUpDonwSide() {
-
         topPointIndex = -1;
         bottomPointIndex = -1;
         type = Polygon.Type.Simple;
@@ -305,7 +305,7 @@ public class Triangulation extends AbstractAlgorithm {
         System.out.println("sideLeft(" + sideLeft.size() + ") : " + sideLeft);
 
         // Add Top
-        fusionPoints.add(new PointTipped(topPoint, Tip.UpDown));
+        fusionPoints.add(new PointTipped(topPoint, Tip.Up));
 
         //
         Point leftPoint = null, rightPoint = null;
@@ -343,7 +343,7 @@ public class Triangulation extends AbstractAlgorithm {
         }
 
         // Add Bottom
-        fusionPoints.add(new PointTipped(bottomPoint, Tip.UpDown));
+        fusionPoints.add(new PointTipped(bottomPoint, Tip.Down));
 
         System.out.println("fusionPoints(" + fusionPoints.size() + ") : " + fusionPoints);
         return true;
@@ -366,47 +366,83 @@ public class Triangulation extends AbstractAlgorithm {
         return getProduitVectorielZ(pAdecal, pBdecal);
     }
 
+    static boolean inP(Point pA, PointTipped pOrigine, Point pB) {
+        double produit = resumeProduitVectorielZ(pA, pOrigine, pB);
+        System.out.print("inP(" + pA + " * " + pOrigine + " * " + pB + ")="+produit+" \t");
+        return (((produit > 0) && (pOrigine.tip == Tip.Right)) || ((produit < 0) && (pOrigine.tip == Tip.Left)));
+    }
+
     /**
      * Algorithme qui Créer les segments de la triangulation
-     * @see Computational Geometry - Algorithms and Applications - TRIANGULATEMONOTONEPOLYGON
+     * 
+     * @see Computational Geometry - Algorithms and Applications -
+     *      TRIANGULATEMONOTONEPOLYGON
      */
     private boolean buildTriangulation() {
+        if (!buildFusion())
+            return false;
+
+        //
         triangulationFusion.clear();
-        
+
         //
-        Vector<PointTipped> stack = new Vector<PointTipped>();
+        ArrayDeque<PointTipped> stack = new ArrayDeque<PointTipped>();
         int fusionPointsSize = fusionPoints.size();
-        
+
         //
-        stack.add(fusionPoints.get(0));
-        stack.add(fusionPoints.get(1));
-        
+        stack.push(fusionPoints.get(0));
+        stack.push(fusionPoints.get(1));
+
         //
-        for(int i=2; i < fusionPointsSize-1; i++) {
-            
+        for (int i = 2; i < fusionPointsSize - 1; i++) {
+
             PointTipped current = fusionPoints.get(i);
-            
-            PointTipped stackFirst = stack.firstElement();
-            
-            if()
-            
+            PointTipped stackFirst = stack.getFirst();
+
+            if ((current.tip.code & stackFirst.tip.code) != 0) { // same chain
+
+                //
+                PointTipped firstStackPop = stack.pop();
+
+                //
+                PointTipped stackPoppedBack = null;
+                while (!stack.isEmpty()) {
+                    stackPoppedBack = stack.pop();
+                    if (inP(firstStackPop, current, stackPoppedBack)) {
+                        System.out.print("s(" + current + " * " + stackPoppedBack + ") \t");
+                        triangulationFusion.add(new Segment(firstStackPop, stackPoppedBack));
+                    } else
+                        break;
+                }
+
+                //
+                if (stackPoppedBack != null)
+                    stack.push(stackPoppedBack);
+                // stack.push(firstStackPop);
+                stack.push(current);
+
+            } else {
+
+                //
+                Iterator<PointTipped> stack_it = stack.iterator();
+                while (stack_it.hasNext()) {
+                    PointTipped stackPoint = stack_it.next();
+                    if (stack_it.hasNext()) {
+                        System.out.print("s(" + current + " * " + stackPoint + ") \t");
+                        triangulationFusion.add(new Segment(current, stackPoint));
+                    }
+                }
+                stack.clear();
+
+                //
+                stack.push(fusionPoints.get(i - 1));
+                stack.push(current);
+
+            }
         }
-        
-        
-        
-        
-        
-        
-        boolean havePop;
-        int fusionPointsSize = fusionPoints.size();
-        //
-        for (int idCurrent = 0; idCurrent < fusionPointsSize; idCurrent++) {
-            PointTipped current = fusionPoints.get(idCurrent);
-            do {
-                havePop = false;
-                
-                
-            }}}
+
+        return true;
+    }
 
     /**
      * Algorithme qui Créer les segments de la triangulation

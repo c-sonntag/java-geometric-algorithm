@@ -13,7 +13,7 @@ public class GraphToTests {
         layerManager.addLayer(rectangle());
         // layerManager.addLayer(polygon());
         layerManager.addLayer(triangulation(polygon(false)));
-        layerManager.addLayer(triangulation(polygon(true)));
+        //layerManager.addLayer(triangulation(polygon(true)));
     }
 
     static AbstractLayer rectangle() {
@@ -21,14 +21,14 @@ public class GraphToTests {
     }
 
     static int POLYGON_SIDE_NB = 3;
-    static double POLYGON_FACTOR = 3;
+    static double POLYGON_FACTOR = 4;
 
     static AbstractLayer polygon(boolean reverse) {
 
         Random rnd = new Random();
 
         Polygon poly = new Polygon();
-        poly.origin.set(100 + rnd.nextInt(200), 50 + rnd.nextInt(100));
+        poly.origin.set(300 + rnd.nextInt(400), 50 + rnd.nextInt(100));
 
         poly.addPoint(new Point(0, 0));
 
