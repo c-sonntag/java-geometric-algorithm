@@ -143,7 +143,7 @@ public class Triangulation extends AbstractAlgorithm {
     static class PointTipped extends Point {
 
         static enum Tip {
-            None("?", 0b00), Left("L", 0b01), Right("R", 0b01), UpDown("UD", 0b11);
+            None("?", 0b00), Left("L", 0b01), Right("R", 0b10), UpDown("UD", 0b11);
 
             public final String str;
             public final int code;
@@ -368,15 +368,57 @@ public class Triangulation extends AbstractAlgorithm {
 
     /**
      * Algorithme qui Créer les segments de la triangulation
+     * @see Computational Geometry - Algorithms and Applications - TRIANGULATEMONOTONEPOLYGON
      */
     private boolean buildTriangulation() {
+        triangulationFusion.clear();
+        
+        //
+        Vector<PointTipped> stack = new Vector<PointTipped>();
+        int fusionPointsSize = fusionPoints.size();
+        
+        //
+        stack.add(fusionPoints.get(0));
+        stack.add(fusionPoints.get(1));
+        
+        //
+        for(int i=2; i < fusionPointsSize-1; i++) {
+            
+            PointTipped current = fusionPoints.get(i);
+            
+            PointTipped stackFirst = stack.firstElement();
+            
+            if()
+            
+        }
+        
+        
+        
+        
+        
+        
+        boolean havePop;
+        int fusionPointsSize = fusionPoints.size();
+        //
+        for (int idCurrent = 0; idCurrent < fusionPointsSize; idCurrent++) {
+            PointTipped current = fusionPoints.get(idCurrent);
+            do {
+                havePop = false;
+                
+                
+            }}}
+
+    /**
+     * Algorithme qui Créer les segments de la triangulation
+     */
+    private boolean buildTriangulation_old() {
         triangulationFusion.clear();
         //
         Vector<PointTipped> pile = new Vector<PointTipped>();
         boolean havePop;
         int fusionPointsSize = fusionPoints.size();
         //
-        for (int idCurrent = 0; idCurrent < fusionPointsSize - 1; idCurrent++) {
+        for (int idCurrent = 0; idCurrent < fusionPointsSize; idCurrent++) {
             PointTipped current = fusionPoints.get(idCurrent);
             do {
                 havePop = false;
@@ -397,18 +439,22 @@ public class Triangulation extends AbstractAlgorithm {
                     // }
 
                     //
-                    if (((produit > 0) && (current.tip == Tip.Right)) || ((produit < 0) && (current.tip == Tip.Left)) || (current.tip == Tip.UpDown)) {
+                    if (((produit > 0) && (current.tip == Tip.Right)) || ((produit < 0) && (current.tip == Tip.Left))) {
                         triangulationFusion.add(new Segment(current, pLastLast));
                         pile.remove(pLast);
                         havePop = true;
-                    } else if ((current.tip != pLast.tip) && (current.tip != Tip.UpDown) && (pLast.tip != Tip.UpDown)) {
-                        if (current.tip != pLastLast.tip) {
+                    } else if ((current.tip.code & pLast.tip.code) == 0) {
+                        if ((current.tip.code & pLastLast.tip.code) == 0) {
                             triangulationFusion.add(new Segment(current, pLastLast));
                             pile.remove(pLast);
                         } else {
                             triangulationFusion.add(new Segment(current, pLast));
                             pile.remove(pLastLast);
                         }
+                        havePop = true;
+                    } else if (current.tip == Tip.UpDown) {
+                        triangulationFusion.add(new Segment(current, pLastLast));
+                        pile.remove(pLast);
                         havePop = true;
                     }
 
