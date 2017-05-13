@@ -12,6 +12,7 @@ import at.u4a.geometric_algorithms.geometric.Polygon.*;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGraphicVisitor;
 import at.u4a.geometric_algorithms.gui.layer.AbstractLayer;
 import at.u4a.geometric_algorithms.gui.layer.AlgorithmLayer;
+import javafx.scene.paint.Color;
 
 /**
  * Triangulation
@@ -116,11 +117,13 @@ public class ConvexEnvelope extends AbstractAlgorithm {
         convexPoly.clear();
 
         //
+        System.out.println(); /** @todo */
+        System.out.println(); /** @todo */
         AbstractList<Point> convexPoints = devideToRing(points);
         if (convexPoints == null) {
             System.out.println("ConvexEnvelope not compute"); /** @todo */
             return false;
-            
+
         }
 
         //
@@ -226,8 +229,15 @@ public class ConvexEnvelope extends AbstractAlgorithm {
     };
 
     /** @see https://math.stackexchange.com/questions/274712/calculate-on-which-side-of-a-straight-line-is-a-given-point-located */
-    private static double crossCompareSide(Point current, Point linePointLeft, Point linePointRight) {
-        return (current.x - linePointLeft.x) * (linePointRight.y - linePointLeft.y) - (current.y - linePointLeft.y) * (linePointRight.x - linePointLeft.x);
+    private double crossCompareSide(Point current, Point linePointLeft, Point linePointRight) {
+
+        double v = (current.x - linePointLeft.x) * (linePointRight.y - linePointLeft.y) - (current.y - linePointLeft.y) * (linePointRight.x - linePointLeft.x);
+        
+        drawLine(new Line(linePointLeft,linePointRight));
+        
+        System.out.println("current(" + current + ") * linePointLeft(" + current + ") * linePointRight(" + current + ") = " + v);
+        return v;
+
     }
 
     private Vector<Point> envelopeUnion(AbstractList<Point> polyLeft, AbstractList<Point> polyRight) {
@@ -241,6 +251,7 @@ public class ConvexEnvelope extends AbstractAlgorithm {
         final SideSearchHorizontalId sideSearchHozIdRight = new SideSearchHorizontalId(polyRight);
 
         //
+        System.out.println();
         drawTip(sideSearchHozIdLeft.top);
         drawTip(sideSearchHozIdLeft.bottom);
         drawTip(sideSearchHozIdRight.top);
@@ -281,8 +292,8 @@ public class ConvexEnvelope extends AbstractAlgorithm {
             }
 
             //
-            boolean uTop_IsOnTop_OfThePolyRight_TopLine = crossCompareSide(uTopPoint, vTopPointPrec, vTopPoint) > 0;
-            boolean vTop_IsOnTop_OfThePolyLeft_TopLine = crossCompareSide(vTopPoint, uTopPoint, uTopPointSuiv) > 0;
+            final boolean uTop_IsOnTop_OfThePolyRight_TopLine = crossCompareSide(uTopPoint, vTopPointPrec, vTopPoint) > 0;
+            final boolean vTop_IsOnTop_OfThePolyLeft_TopLine = crossCompareSide(vTopPoint, uTopPoint, uTopPointSuiv) > 0;
 
             //
             if (uTop_IsOnTop_OfThePolyRight_TopLine) {
@@ -317,8 +328,8 @@ public class ConvexEnvelope extends AbstractAlgorithm {
             }
 
             //
-            boolean uBottom_IsOnBottom_OfThePolyRight_BottomLine = crossCompareSide(uBottomPoint, vBottomPoint, vBottomPointSuiv) > 0;
-            boolean vBottom_IsOnBottom_OfThePolyLeft_BottomLine = crossCompareSide(vBottomPoint, uBottomPointPrec, uBottomPoint) > 0;
+            final boolean uBottom_IsOnBottom_OfThePolyRight_BottomLine = crossCompareSide(uBottomPoint, vBottomPoint, vBottomPointSuiv) > 0;
+            final boolean vBottom_IsOnBottom_OfThePolyLeft_BottomLine = crossCompareSide(vBottomPoint, uBottomPointPrec, uBottomPoint) > 0;
 
             //
             if (uBottom_IsOnBottom_OfThePolyRight_BottomLine) {
@@ -376,8 +387,8 @@ public class ConvexEnvelope extends AbstractAlgorithm {
         AbstractList<Point> polyRight = devideToRing(sides.pointsRight);
 
         //
-        //visitPolygon(polyLeft);
-        //visitPolygon(polyRight);
+        visitPolygon(polyLeft);
+        visitPolygon(polyRight);
 
         //
         return envelopeUnion(polyLeft, polyRight);
@@ -386,7 +397,10 @@ public class ConvexEnvelope extends AbstractAlgorithm {
     public void visitPolygon(AbstractList<Point> p) {
         if (p == null || mutableVisitor == null)
             return;
+        mutableVisitor.getGraphicsContext().save();
+        mutableVisitor.getGraphicsContext().setStroke(Color.RED);
         mutableVisitor.visit(new MonotonePolygon(as.origin, p));
+        mutableVisitor.getGraphicsContext().restore();
     }
 
     public void visitPolygon(Polygon poly) {
@@ -404,4 +418,18 @@ public class ConvexEnvelope extends AbstractAlgorithm {
         mutableVisitor.drawTip(p.toString(), pToOrigin);
     }
 
+    
+    public void drawLine(Line s) {
+        if (mutableVisitor == null)
+            return;
+        mutableVisitor.getGraphicsContext().save();
+        mutableVisitor.getGraphicsContext().setStroke(Color.CHOCOLATE);
+        mutableVisitor.getGraphicsContext().setLineWidth(2);
+        final Line lToOrigin = new Line();
+        lToOrigin.set(s);
+        as.convertToStandard(lToOrigin.a);
+        as.convertToStandard(lToOrigin.b);
+        mutableVisitor.visit_unit(lToOrigin);
+        mutableVisitor.getGraphicsContext().restore();
+    }
 };

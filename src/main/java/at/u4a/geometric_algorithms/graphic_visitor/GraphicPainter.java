@@ -65,7 +65,6 @@ public class GraphicPainter implements InterfaceGraphicVisitor {
         //
         gc.setTextAlign(TextAlignment.CENTER);
         gc.setTextBaseline(VPos.BOTTOM);
-        ;
     }
 
     /* SETTING */
@@ -124,7 +123,7 @@ public class GraphicPainter implements InterfaceGraphicVisitor {
     public void drawTip(String t, Point p) {
         gc.save();
         setTipTextPaint();
-        gc.strokeText(p.toString(), p.x, p.y);
+        gc.strokeText(t, p.x, p.y);
         gc.restore();
     }
 
