@@ -12,8 +12,8 @@ public class GraphToTests {
     public static void addGraph(LayerManager layerManager) {
         layerManager.addLayer(rectangle());
         // layerManager.addLayer(polygon());
-        // layerManager.addLayer(triangulation(polygon(false)));
-        // layerManager.addLayer(triangulation(polygon(true)));
+         //layerManager.addLayer(triangulation(polygon(false)));
+         //layerManager.addLayer(triangulation(polygon(true)));
 
         //layerManager.addLayer(cloud_of_points());
         layerManager.addLayer(convex_envelope(cloud_of_points()));
@@ -69,12 +69,11 @@ public class GraphToTests {
         return new GeometricLayer<Polygon>(poly, Tool.ShapeSimplePoligon);
     }
 
-    static double Cloud_of_Points_NB = 10;
+    static double Cloud_of_Points_NB = 6;
     static double Cloud_of_Points_FACTOR = 2;
 
     private static AbstractLayer cloud_of_points() {
-        //Random rnd = new Random(11111);
-        Random rnd = new Random(123);
+        Random rnd = new Random(3333);
 
         CloudOfPoints cloudOfPoint = new CloudOfPoints();
         cloudOfPoint.origin.set(200 + rnd.nextInt(100), 200 + rnd.nextInt(100));

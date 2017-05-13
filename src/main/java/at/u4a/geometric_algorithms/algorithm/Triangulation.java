@@ -16,6 +16,7 @@ import at.u4a.geometric_algorithms.geometric.Segment;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGraphicVisitor;
 import at.u4a.geometric_algorithms.gui.layer.AbstractLayer;
 import at.u4a.geometric_algorithms.gui.layer.AlgorithmLayer;
+import at.u4a.geometric_algorithms.utils.Calc;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
@@ -368,25 +369,8 @@ public class Triangulation extends AbstractAlgorithm {
         return true;
     }
 
-    /**
-     * Produit vectoriel x = a.y*0 - 0*b.y* = 0 y = 0*b.x - a.x*0 = 0 z =
-     * a.x*b.y - a.y*b.x
-     */
-    static double getProduitVectorielZ(Point pA, Point pB) {
-        return pA.x * pB.y - pA.y * pB.x;
-    }
-
-    /**
-     * Fait le calcul necessaire au decalage de A et B en fonction de O
-     */
-    static double resumeProduitVectorielZ(Point pA, Point pOrigine, Point pB) {
-        Point pAdecal = new Point(pA.x - pOrigine.x, pA.y - pOrigine.y);
-        Point pBdecal = new Point(pB.x - pOrigine.x, pB.y - pOrigine.y);
-        return getProduitVectorielZ(pAdecal, pBdecal);
-    }
-
     static boolean inP(Point pA, PointTipped pOrigine, Point pB) {
-        double produit = resumeProduitVectorielZ(pA, pOrigine, pB);
+        double produit = Calc.resumeProduitVectorielZ(pA, pOrigine, pB);
         return (((produit > 0) && (pOrigine.tip == Tip.Right)) || ((produit < 0) && (pOrigine.tip == Tip.Left)) || (pOrigine.tip == Tip.Up) || (pOrigine.tip == Tip.Down));
     }
 
