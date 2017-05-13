@@ -69,6 +69,7 @@ public class ConvexEnvelope extends AbstractAlgorithm {
     public ConvexEnvelope(AbstractList<Point> points, AbstractShape as) {
         this.points = points;
         this.as = as;
+        this.convexPoly = new ConvexPolygon(as.origin);
     }
 
     /* ************** */
@@ -89,7 +90,7 @@ public class ConvexEnvelope extends AbstractAlgorithm {
     protected void makeConvexEnveloppe() {
 
         int currentShapeHash = as.hashCode();
-        if (currentShapeHash != mutablePreviousShapeHash || true) { /** @todo debug */
+        if (currentShapeHash != mutablePreviousShapeHash || true) {
 
             //
             buildConvexPolygon();
@@ -101,7 +102,7 @@ public class ConvexEnvelope extends AbstractAlgorithm {
 
     /* ************** */
 
-    private final ConvexPolygon convexPoly = new ConvexPolygon();
+    private final ConvexPolygon convexPoly;
 
     public Polygon getPolygon() {
         return convexPoly;
@@ -116,11 +117,14 @@ public class ConvexEnvelope extends AbstractAlgorithm {
 
         //
         AbstractList<Point> convexPoints = devideToRing(points);
-        if (convexPoints == null)
+        if (convexPoints == null) {
+            System.out.println("ConvexEnvelope not compute"); /** @todo */
             return false;
+            
+        }
 
         //
-        convexPoly.perimeter = convexPoints;
+        convexPoly.swapPerimeter(convexPoints);
 
         //
         return true;
@@ -134,14 +138,12 @@ public class ConvexEnvelope extends AbstractAlgorithm {
         Point left = null, right = null;
 
         final Point center = new Point();
-        boolean initFirst = false;
 
         void initFirst(Point first) {
             this.top = first;
             this.bottom = first;
             this.left = first;
             this.right = first;
-            this.initFirst = true;
         }
 
         SideSearch(AbstractList<Point> points) {
@@ -175,19 +177,18 @@ public class ConvexEnvelope extends AbstractAlgorithm {
 
         Point top = null, bottom = null;
 
-        boolean initFirst = false;
-
-        void initFirst(Point first) {
-            this.top = first;
-            this.bottom = first;
-            this.initFirst = true;
+        public SideSearchHorizontalId(AbstractList<Point> points) {
+            Iterator<Point> points_it = points.iterator();
+            if (points_it.hasNext()) {
+                initFirst(points_it.next());
+                while (points_it.hasNext())
+                    updateSide(points_it.next());
+            }
         }
 
-        void updateSideOrInitFirst(Point p) {
-            if (initFirst)
-                updateSide(p);
-            else
-                initFirst(p);
+        private void initFirst(Point first) {
+            this.top = first;
+            this.bottom = first;
         }
 
         private void updateSide(Point p) {
@@ -206,9 +207,6 @@ public class ConvexEnvelope extends AbstractAlgorithm {
         final AbstractList<Point> pointsLeft = new Vector<Point>();
         final AbstractList<Point> pointsRight = new Vector<Point>();
 
-        final SideSearchHorizontalId sideSearchHozIdLeft = new SideSearchHorizontalId();
-        final SideSearchHorizontalId sideSearchHozIdRight = new SideSearchHorizontalId();
-
         SideTuple(AbstractList<Point> points) {
             sideSearch = new SideSearch(points);
             fillSide(points);
@@ -218,14 +216,10 @@ public class ConvexEnvelope extends AbstractAlgorithm {
             sideSearch.updateCenter();
             Point center = sideSearch.center;
             for (Point p : points) {
-                if (p.x <= center.x) {
+                if (p.x <= center.x)
                     pointsLeft.add(p);
-                    sideSearchHozIdLeft.updateSideOrInitFirst(p);
-                } else {
+                else
                     pointsRight.add(p);
-                    sideSearchHozIdRight.updateSideOrInitFirst(p);
-                }
-
             }
         }
 
@@ -236,21 +230,31 @@ public class ConvexEnvelope extends AbstractAlgorithm {
         return (current.x - linePointLeft.x) * (linePointRight.y - linePointLeft.y) - (current.y - linePointLeft.y) * (linePointRight.x - linePointLeft.x);
     }
 
-    private Vector<Point> envelopeUnion(AbstractList<Point> polyLeft, AbstractList<Point> polyRight, SideTuple sides) {
+    private Vector<Point> envelopeUnion(AbstractList<Point> polyLeft, AbstractList<Point> polyRight) {
 
         //
         if ((polyLeft == null) || (polyRight == null))
             return null;
 
         //
-        int uTop = polyLeft.indexOf(sides.sideSearchHozIdLeft.top);
-        int vTop = polyRight.indexOf(sides.sideSearchHozIdRight.top);
-        int uBottom = polyLeft.indexOf(sides.sideSearchHozIdLeft.bottom);
-        int vBottom = polyRight.indexOf(sides.sideSearchHozIdRight.bottom);
+        final SideSearchHorizontalId sideSearchHozIdLeft = new SideSearchHorizontalId(polyLeft);
+        final SideSearchHorizontalId sideSearchHozIdRight = new SideSearchHorizontalId(polyRight);
+
+        //
+        drawTip(sideSearchHozIdLeft.top);
+        drawTip(sideSearchHozIdLeft.bottom);
+        drawTip(sideSearchHozIdRight.top);
+        drawTip(sideSearchHozIdRight.bottom);
+
+        //
+        int uTop = polyLeft.indexOf(sideSearchHozIdLeft.top);
+        int vTop = polyRight.indexOf(sideSearchHozIdRight.top);
+        int uBottom = polyLeft.indexOf(sideSearchHozIdLeft.bottom);
+        int vBottom = polyRight.indexOf(sideSearchHozIdRight.bottom);
 
         if ((uTop < 0) || (vTop < 0) || (uBottom < 0) || (vBottom < 0)) {
-            // throw new RuntimeException("Internal error from script");
-            return null;
+            throw new RuntimeException("Internal error from script");
+            // return null;
         }
 
         //
@@ -277,8 +281,8 @@ public class ConvexEnvelope extends AbstractAlgorithm {
             }
 
             //
-            boolean uTop_IsOnTop_OfThePolyRight_TopLine = crossCompareSide(uTopPoint, vTopPointPrec, vTopPoint) < 0;
-            boolean vTop_IsOnTop_OfThePolyLeft_TopLine = crossCompareSide(vTopPoint, uTopPoint, uTopPointSuiv) < 0;
+            boolean uTop_IsOnTop_OfThePolyRight_TopLine = crossCompareSide(uTopPoint, vTopPointPrec, vTopPoint) > 0;
+            boolean vTop_IsOnTop_OfThePolyLeft_TopLine = crossCompareSide(vTopPoint, uTopPoint, uTopPointSuiv) > 0;
 
             //
             if (uTop_IsOnTop_OfThePolyRight_TopLine) {
@@ -328,18 +332,30 @@ public class ConvexEnvelope extends AbstractAlgorithm {
 
         }
 
-        //
         Vector<Point> convexPoints = new Vector<Point>();
+
+        /*
+         * Vector<Point> convexPoints = new Vector<Point>(); for (Point p :
+         * polyLeft) convexPoints.add(p); for (Point p : polyRight)
+         * convexPoints.add(p); if (!convexPoints.isEmpty()) return
+         * convexPoints;
+         */
 
         //
         convexPoints.add(polyLeft.get(uBottom));
-        convexPoints.add(polyLeft.get(uTop));
-        for (int i = Math.floorMod(uBottom + 1, polyLeftSize); i != uTop; i = Math.floorMod(i + 1, polyLeftSize))
+
+        final int uStart = Math.floorMod(uBottom + 1, polyLeftSize);
+        final int uEnd = Math.floorMod(uTop + 1, polyLeftSize);
+
+        for (int i = uStart; i != uEnd; i = Math.floorMod(i + 1, polyLeftSize))
             convexPoints.add(polyLeft.get(i));
 
         convexPoints.add(polyRight.get(vTop));
-        convexPoints.add(polyRight.get(vBottom));
-        for (int i = Math.floorMod(vTop + 1, polyRightSize); i != vBottom; i = Math.floorMod(i + 1, polyRightSize))
+
+        final int vStart = Math.floorMod(vTop + 1, polyRightSize);
+        final int vEnd = Math.floorMod(vBottom + 1, polyRightSize);
+
+        for (int i = vStart; i != vEnd; i = Math.floorMod(i + 1, polyRightSize))
             convexPoints.add(polyRight.get(i));
 
         //
@@ -357,19 +373,14 @@ public class ConvexEnvelope extends AbstractAlgorithm {
 
         //
         AbstractList<Point> polyLeft = devideToRing(sides.pointsLeft);
-        visitPolygon(polyLeft);
-
         AbstractList<Point> polyRight = devideToRing(sides.pointsRight);
-        visitPolygon(polyRight);
-        
-        //
-        drawTip(sides.sideSearchHozIdLeft.top);
-        drawTip(sides.sideSearchHozIdLeft.bottom);
-        drawTip(sides.sideSearchHozIdRight.top);
-        drawTip(sides.sideSearchHozIdRight.bottom);
 
         //
-        return envelopeUnion(polyLeft, polyRight, sides);
+        //visitPolygon(polyLeft);
+        //visitPolygon(polyRight);
+
+        //
+        return envelopeUnion(polyLeft, polyRight);
     }
 
     public void visitPolygon(AbstractList<Point> p) {
@@ -377,7 +388,13 @@ public class ConvexEnvelope extends AbstractAlgorithm {
             return;
         mutableVisitor.visit(new MonotonePolygon(as.origin, p));
     }
-    
+
+    public void visitPolygon(Polygon poly) {
+        if (poly == null || mutableVisitor == null)
+            return;
+        mutableVisitor.visit(poly);
+    }
+
     public void drawTip(Point p) {
         if (mutableVisitor == null)
             return;

@@ -15,26 +15,28 @@ import at.u4a.geometric_algorithms.utils.Mutable;
 public class Polygon extends AbstractShape implements InterfaceContainer<Segment> {
 
     /* TYPE CLASS */
-    
+
     public static class ConvexPolygon extends Polygon {
-        
-        public AbstractList<Point> perimeter = new Vector<Point>();
-        
+
+        public ConvexPolygon(Point origin) {
+            super(origin);
+        }
+
         public Type getType() {
             return Type.Convex;
         }
     }
-    
+
     public static class MonotonePolygon extends Polygon {
-        public MonotonePolygon(Point origin,AbstractList<Point> perimeter) {
-            super(origin,perimeter);
+        public MonotonePolygon(Point origin, AbstractList<Point> perimeter) {
+            super(origin, perimeter);
         }
+
         public Type getType() {
             return Type.Monotone;
         }
     }
-    
-    
+
     /* INTERNAL CLASS */
 
     private class SegmentIterator implements Iterator<Segment> {
@@ -80,7 +82,8 @@ public class Polygon extends AbstractShape implements InterfaceContainer<Segment
 
     /* PUBLIC VARIABLES */
 
-    final public AbstractList<Point> perimeter;
+    /** @todo find to set final */
+    public AbstractList<Point> perimeter;
 
     /* FUNCTION */
 
@@ -93,12 +96,12 @@ public class Polygon extends AbstractShape implements InterfaceContainer<Segment
         super(origin);
         this.perimeter = new Vector<Point>();
     }
-    
-    public Polygon(Point origin,AbstractList<Point> perimeter) {
+
+    public Polygon(Point origin, AbstractList<Point> perimeter) {
         super(origin);
         this.perimeter = perimeter;
     }
-    
+
     public int hashCode() {
         return Mutable.getHashCode(perimeter);
     }
@@ -109,6 +112,14 @@ public class Polygon extends AbstractShape implements InterfaceContainer<Segment
 
     public void addPoint(Point p) {
         perimeter.add(p);
+    }
+
+    public AbstractList<Point> swapPerimeter(AbstractList<Point> other) {
+        if (other == null)
+            throw new RuntimeException("Polygon need a perimeter");
+        AbstractList<Point> old = this.perimeter;
+        this.perimeter = other;
+        return old;
     }
 
     public Iterator<Segment> iterator() {
