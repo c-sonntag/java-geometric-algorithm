@@ -28,7 +28,7 @@ public class Polygon extends AbstractShape implements InterfaceContainer<Segment
     }
 
     public static class MonotonePolygon extends Polygon {
-        public MonotonePolygon(Point origin, AbstractList<Point> perimeter) {
+        public MonotonePolygon(Point origin, Vector<Point> perimeter) {
             super(origin, perimeter);
         }
 
@@ -82,8 +82,7 @@ public class Polygon extends AbstractShape implements InterfaceContainer<Segment
 
     /* PUBLIC VARIABLES */
 
-    /** @todo find to set final */
-    public AbstractList<Point> perimeter;
+    final public Vector<Point> perimeter;
 
     /* FUNCTION */
 
@@ -97,7 +96,7 @@ public class Polygon extends AbstractShape implements InterfaceContainer<Segment
         this.perimeter = new Vector<Point>();
     }
 
-    public Polygon(Point origin, AbstractList<Point> perimeter) {
+    public Polygon(Point origin, Vector<Point> perimeter) {
         super(origin);
         this.perimeter = perimeter;
     }
@@ -114,13 +113,13 @@ public class Polygon extends AbstractShape implements InterfaceContainer<Segment
         perimeter.add(p);
     }
 
-    public AbstractList<Point> swapPerimeter(AbstractList<Point> other) {
+    /*public AbstractList<Point> swapPerimeter(AbstractList<Point> other) {
         if (other == null)
             throw new RuntimeException("Polygon need a perimeter");
         AbstractList<Point> old = this.perimeter;
         this.perimeter = other;
         return old;
-    }
+    }*/
 
     public Iterator<Segment> iterator() {
         return new Polygon.SegmentIterator();

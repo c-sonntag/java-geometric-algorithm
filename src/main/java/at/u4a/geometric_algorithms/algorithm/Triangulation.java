@@ -71,7 +71,7 @@ public class Triangulation extends AbstractAlgorithm {
 
     private final MonotonePolygon mp;
 
-    public Triangulation(AbstractList<Point> points, AbstractShape as) {
+    public Triangulation(Vector<Point> points, AbstractShape as) {
         this.points = points;
         this.as = as;
 

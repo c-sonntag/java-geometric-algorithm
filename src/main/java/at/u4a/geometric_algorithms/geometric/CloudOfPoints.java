@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Vector;
 
 import at.u4a.geometric_algorithms.geometric.mapper.InterfaceMapper;
 import at.u4a.geometric_algorithms.geometric.mapper.MappedPoint;
@@ -12,7 +13,7 @@ import at.u4a.geometric_algorithms.utils.Mutable;
 
 public class CloudOfPoints extends AbstractShape implements InterfaceContainer<Point> {
 
-    final public ArrayList<Point> cloud = new ArrayList<Point>();
+    final public Vector<Point> cloud = new Vector<Point>();
 
     public ArrayList<Point> getOnPosition(Point p) {
         ArrayList<Point> points = null;
