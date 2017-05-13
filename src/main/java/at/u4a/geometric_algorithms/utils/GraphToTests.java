@@ -12,9 +12,26 @@ public class GraphToTests {
     public static void addGraph(LayerManager layerManager) {
         layerManager.addLayer(rectangle());
         // layerManager.addLayer(polygon());
-        layerManager.addLayer(triangulation(polygon(false)));
-        //layerManager.addLayer(triangulation(polygon(true)));
+        // layerManager.addLayer(triangulation(polygon(false)));
+        // layerManager.addLayer(triangulation(polygon(true)));
+
+        //layerManager.addLayer(cloud_of_points());
+        layerManager.addLayer(convex_envelope(cloud_of_points()));
     }
+
+    /* ****** ALGORITHM LAYER ****** */
+
+    private static AbstractLayer convex_envelope(AbstractLayer layer) {
+        ConvexEnvelope.Builder ceb = new ConvexEnvelope.Builder();
+        return ceb.builder(layer);
+    }
+
+    static AbstractLayer triangulation(AbstractLayer layer) {
+        Triangulation.Builder tb = new Triangulation.Builder();
+        return tb.builder(layer);
+    }
+
+    /* ****** SHAPE LAYER ****** */
 
     static AbstractLayer rectangle() {
         return new GeometricLayer<Rectangle>(new Rectangle(new Point(10, 10), new Point(100, 100)), Tool.ShapeRectangle);
@@ -28,8 +45,8 @@ public class GraphToTests {
         Random rnd = new Random();
 
         Polygon poly = new Polygon();
-        //poly.origin.set(300 + rnd.nextInt(400), 50 + rnd.nextInt(100));
-        poly.origin.set(100*POLYGON_FACTOR, 50);
+        // poly.origin.set(300 + rnd.nextInt(400), 50 + rnd.nextInt(100));
+        poly.origin.set(100 * POLYGON_FACTOR, 50);
 
         poly.addPoint(new Point(0, 0));
 
@@ -52,9 +69,20 @@ public class GraphToTests {
         return new GeometricLayer<Polygon>(poly, Tool.ShapeSimplePoligon);
     }
 
-    static AbstractLayer triangulation(AbstractLayer layer) {
-        Triangulation.Builder tb = new Triangulation.Builder();
-        return tb.builder(layer);
+    static double Cloud_of_Points_NB = 10;
+    static double Cloud_of_Points_FACTOR = 2;
+
+    private static AbstractLayer cloud_of_points() {
+        Random rnd = new Random(11111);
+
+        CloudOfPoints cloudOfPoint = new CloudOfPoints();
+        cloudOfPoint.origin.set(200 + rnd.nextInt(100), 200 + rnd.nextInt(100));
+
+        for (int i = 0; i < Cloud_of_Points_NB; i++) {
+            cloudOfPoint.addPoint(new Point(200 - rnd.nextInt(400) * Cloud_of_Points_FACTOR, 200 - rnd.nextInt(200) * Cloud_of_Points_FACTOR));
+        }
+
+        return new GeometricLayer<CloudOfPoints>(cloudOfPoint, Tool.CloudOfPoint);
     }
 
 }

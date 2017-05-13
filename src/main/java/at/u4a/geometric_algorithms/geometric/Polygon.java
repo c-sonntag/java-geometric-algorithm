@@ -17,6 +17,9 @@ public class Polygon extends AbstractShape implements InterfaceContainer<Segment
     /* TYPE CLASS */
     
     public static class ConvexPolygon extends Polygon {
+        
+        public AbstractList<Point> perimeter = new Vector<Point>();
+        
         public Type getType() {
             return Type.Convex;
         }

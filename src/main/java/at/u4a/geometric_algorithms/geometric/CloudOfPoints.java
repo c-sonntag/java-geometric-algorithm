@@ -28,6 +28,10 @@ public class CloudOfPoints extends AbstractShape implements InterfaceContainer<P
         return points;
     }
 
+    public void addPoint(Point p) {
+        cloud.add(p);
+    }
+    
     @Override
     public boolean contains(Point p) {
         return (getContains(p) != null);
@@ -77,6 +81,7 @@ public class CloudOfPoints extends AbstractShape implements InterfaceContainer<P
         return cloud.iterator();
     }
 
+    
     @Override
     public void clear() {
         cloud.clear();
