@@ -143,8 +143,12 @@ public class GraphicPainter implements InterfaceGraphicVisitor {
     /* GEOMETRIC */
 
     public void visit(Point p) {
+        Paint stroke = gc.getStroke();
         gc.save();
-        setPointPaint();
+        //
+        gc.setFill(stroke);
+        gc.setStroke(Color.BLACK);
+        //
         gc.fillOval((int) (p.x - 2 * Point.POINT_RAYON), (int) (p.y - 2 * Point.POINT_RAYON), 2 * 2 * Point.POINT_RAYON, 2 * 2 * Point.POINT_RAYON);
         gc.strokeOval((int) (p.x - 2 * Point.POINT_RAYON), (int) (p.y - 2 * Point.POINT_RAYON), 2 * 2 * Point.POINT_RAYON, 2 * 2 * Point.POINT_RAYON);
         gc.restore();
