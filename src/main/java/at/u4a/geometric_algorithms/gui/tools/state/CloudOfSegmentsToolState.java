@@ -72,7 +72,7 @@ public class CloudOfSegmentsToolState extends ToolState {
         cofLayer.setLayerName("cof" + String.valueOf(ColoudOfSegmentsCount));
         ColoudOfSegmentsCount++;
 
-        drawer.getDS().getLayerManager().addLayer(cofLayer);
+        drawer.getDS().getLayerManager().addLayerAndSelectIt(cofLayer);
 
         //
         cof = new CloudOfSegments();

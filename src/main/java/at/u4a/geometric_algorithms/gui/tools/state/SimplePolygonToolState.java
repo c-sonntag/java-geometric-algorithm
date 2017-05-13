@@ -73,7 +73,7 @@ public class SimplePolygonToolState extends ToolState {
         polygonLayer.setLayerName("p" + String.valueOf(PolygonCount));
         PolygonCount++;
 
-        drawer.getDS().getLayerManager().addLayer(polygonLayer);
+        drawer.getDS().getLayerManager().addLayerAndSelectIt(polygonLayer);
 
         //
         poly = new Polygon();

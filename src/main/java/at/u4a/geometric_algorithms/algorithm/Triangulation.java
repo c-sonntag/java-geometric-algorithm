@@ -318,12 +318,6 @@ public class Triangulation extends AbstractAlgorithm {
         Vector<Point> sideRight = normalSens ? sideClockwise.side : sideUnclockwise.side;
         Vector<Point> sideLeft = normalSens ? sideUnclockwise.side : sideClockwise.side;
 
-        System.out.println("");
-        System.out.println(normalSens ? "Clockwise" : "Unclockwise");
-        System.out.println("topPointIndex(" + topPointIndex + ") bottomPointIndex(" + bottomPointIndex + ")");
-        System.out.println("sideRight(" + sideRight.size() + ") : " + sideRight);
-        System.out.println("sideLeft(" + sideLeft.size() + ") : " + sideLeft);
-
         // Add Top
         fusionPoints.add(new PointTipped(topPoint, Tip.Up));
 
@@ -365,7 +359,6 @@ public class Triangulation extends AbstractAlgorithm {
         // Add Bottom
         // fusionPoints.add(new PointTipped(bottomPoint, Tip.Down));
 
-        System.out.println("fusionPoints(" + fusionPoints.size() + ") : " + fusionPoints);
         return true;
     }
 
@@ -411,10 +404,7 @@ public class Triangulation extends AbstractAlgorithm {
                     stackFirst = stack.peekFirst();
 
                     if (inP(currentPoint, stackPop, stackFirst)) {
-
-                        System.out.print("s(" + currentPoint + " * " + stackFirst + ") \n");
                         stackPop = stack.pop();
-
                         triangulationFusion.add(new Segment(currentPoint, stackPop));
                     } else
                         break;

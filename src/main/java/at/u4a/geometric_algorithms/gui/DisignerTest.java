@@ -47,10 +47,14 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.CardLayout;
+import javax.swing.JTextField;
 
 public class DisignerTest {
 
     private JFrame frame;
+    private JTextField textField;
+    private JTextField txtDfg;
+    private JTextField txtDfg_1;
 
     /**
      * Launch the application.
@@ -84,7 +88,26 @@ public class DisignerTest {
         frame.setBounds(100, 100, 450, 107);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
-        testLayerTreeLayerInfoWithPanel();
+        JPanel panel = new JPanel();
+        frame.getContentPane().add(panel, BorderLayout.NORTH);
+        
+        JLabel lblDfg = new JLabel("dfg");
+        frame.getContentPane().add(lblDfg, BorderLayout.SOUTH);
+        
+        txtDfg = new JTextField();
+        txtDfg.setText("dfg");
+        frame.getContentPane().add(txtDfg, BorderLayout.WEST);
+        txtDfg.setColumns(10);
+        
+        JLabel lblDfg_1 = new JLabel("dfg");
+        frame.getContentPane().add(lblDfg_1, BorderLayout.EAST);
+        
+        txtDfg_1 = new JTextField();
+        txtDfg_1.setText("dfg");
+        frame.getContentPane().add(txtDfg_1, BorderLayout.CENTER);
+        txtDfg_1.setColumns(10);
+        
+        //testLayerTreeLayerInfoWithPanel();
         
     }
     
@@ -197,6 +220,13 @@ private void testLayerTreeLayerInfoWithPanel() {
         panel.setAlignmentX(Component.LEFT_ALIGNMENT);
         toolBar.add(panel);
         panel.setLayout(new GridLayout(1, 0, 0, 0));
+        
+        textField = new JTextField();
+        toolBar.add(textField);
+        textField.setColumns(10);
+        
+        JCheckBox chckbxNewCheckBox = new JCheckBox("New check box");
+        toolBar.add(chckbxNewCheckBox);
 
         //setMenuToBottomLeftAlignement(mnNewMenu);
         

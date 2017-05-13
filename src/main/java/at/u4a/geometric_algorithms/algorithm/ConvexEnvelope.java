@@ -103,7 +103,7 @@ public class ConvexEnvelope extends AbstractAlgorithm {
     protected void makeConvexEnveloppe() {
 
         int currentShapeHash = as.hashCode();
-        if (currentShapeHash != mutablePreviousShapeHash || true) {
+        if (currentShapeHash != mutablePreviousShapeHash) {
 
             //
             buildConvexPolygon();
@@ -129,17 +129,10 @@ public class ConvexEnvelope extends AbstractAlgorithm {
         convexPoly.clear();
 
         //
-
-        for (int i = 0; i < 50; ++i)
-            System.out.println();
-
         Vector<Point> convexPoints = devideToRing(points, 0);
         if (convexPoints == null) {
-            throw new RuntimeException("ConvexEnvelope not compute"); /** @todo */
+            return false;
         }
-
-        //
-        // convexPoly.swapPerimeter(convexPoints);
 
         //
         return true;
@@ -273,7 +266,6 @@ public class ConvexEnvelope extends AbstractAlgorithm {
         final SideSearchCorner sideSearchHozIdRight = new SideSearchCorner(polyRight);
 
         //
-        System.out.println();
         int uTop = polyLeft.indexOf(sideSearchHozIdLeft.top);
         int vTop = polyRight.indexOf(sideSearchHozIdRight.top);
         int uBottom = polyLeft.indexOf(sideSearchHozIdLeft.bottom);
@@ -412,7 +404,9 @@ public class ConvexEnvelope extends AbstractAlgorithm {
 
         //
         int polySize = poly.size();
-        if (polySize <= 3) {
+        if (polySize == 0)
+            return null;
+        else if (polySize <= 3) {
             if (polySize >= 2) {
                 Point p0 = poly.get(0);
                 Point p1 = poly.get(1);

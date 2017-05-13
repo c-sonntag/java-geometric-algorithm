@@ -70,7 +70,7 @@ public class CloudOfPointsToolState extends ToolState {
         copLayer.setLayerName("cop" + String.valueOf(ColoudOfSegmentsCount));
         ColoudOfSegmentsCount++;
 
-        drawer.getDS().getLayerManager().addLayer(copLayer);
+        drawer.getDS().getLayerManager().addLayerAndSelectIt(copLayer);
 
         //
         cop = new CloudOfPoints();

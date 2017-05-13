@@ -43,6 +43,13 @@ public class LayerManager implements Iterable<AbstractLayer> {
         layers.add(layer);
         refresh();
     }
+    
+    public void addLayerAndSelectIt(AbstractLayer layer) {
+        layers.add(layer);
+        refresh();
+        setSelectedLayer(layer);
+        ds.refresh();
+    }
 
     public void refresh() {
         if (controllerTree != null) {
@@ -56,7 +63,7 @@ public class LayerManager implements Iterable<AbstractLayer> {
     public void clear() {
         layers.clear();
         
-        GraphToTests.addGraph(ds.getLayerManager()); /** @todo */
+        GraphToTests.defaultGraph(ds.getLayerManager()); /** @todo */
         
         refresh();
         ds.refresh();

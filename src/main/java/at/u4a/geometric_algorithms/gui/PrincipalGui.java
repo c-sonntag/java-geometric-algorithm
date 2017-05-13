@@ -31,6 +31,8 @@ import at.u4a.geometric_algorithms.gui.element.StatusBar;
 import at.u4a.geometric_algorithms.gui.element.ToolButton;
 import at.u4a.geometric_algorithms.gui.tools.Tool;
 import at.u4a.geometric_algorithms.gui.tools.ToolCategory;
+import at.u4a.geometric_algorithms.utils.GraphToTests;
+
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -172,7 +174,12 @@ public class PrincipalGui extends JFrame {
         });
         mntmExit.setIcon(new ImageIcon("icons/action/page_delete.png"));
         mnFile.add(mntmExit);
-
+        
+        JMenu mnGenerate = new JMenu("GenerateLayer");
+        menuBar.add(mnGenerate);
+        
+        GraphToTests.addGenerateLayerMenu(ds.getLayerManager(),mnGenerate);
+        
     }
 
     /**
