@@ -113,26 +113,31 @@ public class GraphicPainter implements InterfaceGraphicVisitor {
         gc.setFill(Color.GRAY);
         gc.setStroke(Color.BLACK);
     }
+    
+    protected void setTipTextPaint() {
+        gc.setFont(tipFont);
+        gc.setStroke(Color.BLACK);
+        gc.setFontSmoothingType(FontSmoothingType.GRAY);
+    }
 
-    protected void drawTip(String t, Point p) {
-        
+    @Override
+    public void drawTip(String t, Point p) {
+        gc.save();
+        setTipTextPaint();
+        gc.strokeText(p.toString(), p.x, p.y);
+        gc.restore();
     }
 
     @Override
     public void drawEdgeTipFromList(AbstractShape as, AbstractList<Point> lp) {
         gc.save();
-
-        gc.setFont(tipFont);
-        gc.setStroke(Color.BLACK);
-        gc.setFontSmoothingType(FontSmoothingType.GRAY);
-
+        setTipTextPaint();
         final Point pToOrigin = new Point();
         for (Point p : lp) {
             pToOrigin.set(p);
             as.convertToStandard(pToOrigin);
-            drawTip(p.toString(), pToOrigin);
+            gc.strokeText(p.toString(), pToOrigin.x, pToOrigin.y);
         }
-
         gc.restore();
     }
 

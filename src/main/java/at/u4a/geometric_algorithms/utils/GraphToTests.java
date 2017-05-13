@@ -73,13 +73,14 @@ public class GraphToTests {
     static double Cloud_of_Points_FACTOR = 2;
 
     private static AbstractLayer cloud_of_points() {
-        Random rnd = new Random(11111);
+        //Random rnd = new Random(11111);
+        Random rnd = new Random(123);
 
         CloudOfPoints cloudOfPoint = new CloudOfPoints();
         cloudOfPoint.origin.set(200 + rnd.nextInt(100), 200 + rnd.nextInt(100));
 
         for (int i = 0; i < Cloud_of_Points_NB; i++) {
-            cloudOfPoint.addPoint(new Point(200 - rnd.nextInt(400) * Cloud_of_Points_FACTOR, 200 - rnd.nextInt(200) * Cloud_of_Points_FACTOR));
+            cloudOfPoint.addPoint(new Point(200 - rnd.nextInt(200) * Cloud_of_Points_FACTOR, 200 - rnd.nextInt(200) * Cloud_of_Points_FACTOR));
         }
 
         return new GeometricLayer<CloudOfPoints>(cloudOfPoint, Tool.CloudOfPoint);
