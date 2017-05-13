@@ -1,5 +1,6 @@
 package at.u4a.geometric_algorithms.geometric;
 
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -13,6 +14,24 @@ import at.u4a.geometric_algorithms.utils.Mutable;
 
 public class Polygon extends AbstractShape implements InterfaceContainer<Segment> {
 
+    /* TYPE CLASS */
+    
+    public static class ConvexPolygon extends Polygon {
+        public Type getType() {
+            return Type.Convex;
+        }
+    }
+    
+    public static class MonotonePolygon extends Polygon {
+        public MonotonePolygon(Point origin,AbstractList<Point> perimeter) {
+            super(origin,perimeter);
+        }
+        public Type getType() {
+            return Type.Monotone;
+        }
+    }
+    
+    
     /* INTERNAL CLASS */
 
     private class SegmentIterator implements Iterator<Segment> {
@@ -58,16 +77,23 @@ public class Polygon extends AbstractShape implements InterfaceContainer<Segment
 
     /* PUBLIC VARIABLES */
 
-    final public Vector<Point> perimeter = new Vector<Point>();
+    final public AbstractList<Point> perimeter;
 
     /* FUNCTION */
 
     public Polygon() {
         super();
+        this.perimeter = new Vector<Point>();
     }
 
     public Polygon(Point origin) {
         super(origin);
+        this.perimeter = new Vector<Point>();
+    }
+    
+    public Polygon(Point origin,AbstractList<Point> perimeter) {
+        super(origin);
+        this.perimeter = perimeter;
     }
     
     public int hashCode() {
@@ -75,7 +101,6 @@ public class Polygon extends AbstractShape implements InterfaceContainer<Segment
     }
 
     public Type getType() {
-
         return Type.Simple; /** < @TODO */
     }
 

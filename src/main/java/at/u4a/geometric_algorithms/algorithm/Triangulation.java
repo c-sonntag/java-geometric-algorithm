@@ -11,6 +11,7 @@ import at.u4a.geometric_algorithms.algorithm.Triangulation.PointTipped.Tip;
 import at.u4a.geometric_algorithms.geometric.AbstractShape;
 import at.u4a.geometric_algorithms.geometric.Point;
 import at.u4a.geometric_algorithms.geometric.Polygon;
+import at.u4a.geometric_algorithms.geometric.Polygon.MonotonePolygon;
 import at.u4a.geometric_algorithms.geometric.Segment;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGraphicVisitor;
 import at.u4a.geometric_algorithms.gui.layer.AbstractLayer;
@@ -67,9 +68,13 @@ public class Triangulation extends AbstractAlgorithm {
     private final AbstractList<Point> points;
     private final AbstractShape as;
 
+    private final MonotonePolygon mp;
+
     public Triangulation(AbstractList<Point> points, AbstractShape as) {
         this.points = points;
         this.as = as;
+
+        this.mp = new MonotonePolygon(as.origin, points);
     }
 
     /* ************** */
@@ -80,7 +85,7 @@ public class Triangulation extends AbstractAlgorithm {
         makeTriangulation();
 
         //
-        if (type == Polygon.Type.Monotone) {
+        if (actualType == Polygon.Type.Monotone) {
 
             //
             final Segment sToOrigin = new Segment();
@@ -100,6 +105,21 @@ public class Triangulation extends AbstractAlgorithm {
 
     /* ************** */
 
+    public boolean isMonotone() {
+        makeTriangulation();
+        return actualType == Polygon.Type.Monotone;
+    }
+
+    public MonotonePolygon getPolygon() {
+        makeTriangulation();
+        if (actualType == Polygon.Type.Monotone)
+            return mp;
+        else
+            return null;
+    }
+
+    /* ************** */
+
     private int mutablePreviousPolyHash = 0;
 
     protected void makeTriangulation() {
@@ -108,9 +128,9 @@ public class Triangulation extends AbstractAlgorithm {
         if (currentPolyHash != mutablePreviousPolyHash) {
 
             //
-            type = Polygon.Type.Simple;
+            actualType = Polygon.Type.Simple;
             if (buildTriangulation())
-                type = Polygon.Type.Monotone;
+                actualType = Polygon.Type.Monotone;
             //
             mutablePreviousPolyHash = currentPolyHash;
         }
@@ -138,7 +158,7 @@ public class Triangulation extends AbstractAlgorithm {
     /**
      * indique si le poligone est monotone
      */
-    public Polygon.Type type = Polygon.Type.Simple;
+    public Polygon.Type actualType = Polygon.Type.Simple;
 
     /* ************** */
 
