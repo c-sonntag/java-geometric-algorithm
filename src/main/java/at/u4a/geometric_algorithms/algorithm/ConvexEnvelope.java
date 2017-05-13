@@ -341,29 +341,37 @@ public class ConvexEnvelope extends AbstractAlgorithm {
             }
 
             //
-            final boolean uTop_IsOnTop_OfThePolyRight_TopLine = angleCheck(uTopPoint, vTopPointPrec, vTopPoint) < 0;
-            final boolean vTop_IsOnTop_OfThePolyLeft_TopLine = angleCheck(vTopPoint, uTopPoint, uTopPointSuiv) < 0;
-
-            //
-            if (uTop_IsOnTop_OfThePolyRight_TopLine) {
+            final boolean uTop_IsOnBottom_OfThePolyRight_TopLine = angleCheck(uTopPoint, vTopPointPrec, vTopPoint) > 0;
+            if (uTop_IsOnBottom_OfThePolyRight_TopLine) {
                 vTop = Math.floorMod(vTop - 1, polyRightSize);
                 vTopChange = true;
-                System.out.println("uTop_IsOnTop_OfThePolyRight_TopLine");
-            } else if (vTop_IsOnTop_OfThePolyLeft_TopLine) {
+                System.out.println("uTop_IsOnBottom_OfThePolyRight_TopLine");
+            } 
+            
+            //
+            final boolean vTop_IsOnBottom_OfThePolyLeft_TopLine = angleCheck(vTopPoint, uTopPoint, uTopPointSuiv) > 0;
+            if (vTop_IsOnBottom_OfThePolyLeft_TopLine) {
                 uTop = Math.floorMod(uTop + 1, polyLeftSize);
                 uTopChange = true;
-                System.out.println("vTop_IsOnTop_OfThePolyLeft_TopLine");
-            } else
+                System.out.println("vTop_IsOnBottom_OfThePolyLeft_TopLine");
+            } 
+            
+            //
+            if(!uTopChange && !vTopChange)
                 break;
 
         }
+        
+        System.out.println("");
+        System.out.println("----");
+
 
         //
         Point uBottomPoint = null, vBottomPoint = null;
         Point uBottomPointPrec = null, vBottomPointSuiv = null;
         boolean uBottomChange = true, vBottomChange = true;
 
-        Point uBottomPointSuiv = null;
+        Point uBottomPointSuiv = null, vBottomPointPrec = null;
 
         //
         while (true) {
@@ -379,27 +387,34 @@ public class ConvexEnvelope extends AbstractAlgorithm {
             if (vBottomChange) {
                 vBottomPoint = polyRight.get(vBottom);
                 vBottomPointSuiv = polyRight.get(Math.floorMod(vBottom + 1, polyRightSize));
+                //vBottomPointPrec = polyRight.get(Math.floorMod(vBottom -1, polyRightSize));
                 vBottomChange = false;
             }
 
             //
-            final boolean uBottom_IsOnBottom_OfThePolyRight_BottomLine = angleCheck(uBottomPoint, vBottomPoint, vBottomPointSuiv) > 0;
-            final boolean vBottom_IsOnBottom_OfThePolyLeft_BottomLine = angleCheck(vBottomPoint, uBottomPoint, uBottomPointPrec) > 0;
-
-            //
-            if (uBottom_IsOnBottom_OfThePolyRight_BottomLine) {
+            //final boolean uTop_IsOnBottom_OfThePolyRight_TopLine = angleCheck(uTopPoint, vTopPointPrec, vTopPoint) > 0;
+            final boolean uBottom_IsOnTop_OfThePolyRight_BottomLine = angleCheck(uBottomPoint, vBottomPointSuiv, vBottomPoint) < 0;
+            if (uBottom_IsOnTop_OfThePolyRight_BottomLine) {
                 vBottom = Math.floorMod(vBottom + 1, polyRightSize);
                 vBottomChange = true;
-                System.out.println("uBottom_IsOnBottom_OfThePolyRight_BottomLine");
-            } else if (vBottom_IsOnBottom_OfThePolyLeft_BottomLine) {
+                System.out.println("uBottom_IsOnTop_OfThePolyRight_BottomLine");
+            }  
+            
+            //
+            final boolean vBottom_IsOnTop_OfThePolyLeft_BottomLine = angleCheck(vBottomPoint, uBottomPoint, uBottomPointPrec) < 0;
+            if (vBottom_IsOnTop_OfThePolyLeft_BottomLine) {
                 // uBottom = Math.floorMod(uBottom - 1, polyLeftSize);
-                uBottom = Math.floorMod(uBottom + 1, polyLeftSize);
+                uBottom = Math.floorMod(uBottom - 1, polyLeftSize);
                 uBottomChange = true;
-                System.out.println("vBottom_IsOnBottom_OfThePolyLeft_BottomLine");
-            } else
+                System.out.println("vBottom_IsOnTop_OfThePolyLeft_BottomLine");
+            } 
+            
+            //
+            if(!uBottomChange && !vBottomChange)
                 break;
-
         }
+        
+        System.out.println("");
 
         Vector<Point> convexPoints = new Vector<Point>();
 
@@ -490,7 +505,7 @@ public class ConvexEnvelope extends AbstractAlgorithm {
     }
 
     public void visitPolygon(AbstractList<Point> p) {
-        if (p == null || mutableVisitor == null)
+        if (p == null || mutableVisitor == null || true)
             return;
         mutableVisitor.getGraphicsContext().save();
         mutableVisitor.getGraphicsContext().setStroke(Color.RED);
@@ -499,7 +514,7 @@ public class ConvexEnvelope extends AbstractAlgorithm {
     }
 
     public void visitPolygon(Polygon poly) {
-        if (poly == null || mutableVisitor == null)
+        if (poly == null || mutableVisitor == null || true)
             return;
         mutableVisitor.visit(poly);
     }
@@ -514,7 +529,7 @@ public class ConvexEnvelope extends AbstractAlgorithm {
     }
 
     public void drawLine(Line s, Color color) {
-        if (mutableVisitor == null)
+        if (mutableVisitor == null || true)
             return;
         mutableVisitor.getGraphicsContext().save();
         mutableVisitor.getGraphicsContext().setStroke(Color.color(color.getRed(), color.getGreen(), color.getBlue(), 0.3));
