@@ -7,6 +7,7 @@ import java.util.Random;
 
 import javax.swing.ImageIcon;
 
+import at.u4a.geometric_algorithms.algorithm.AbstractAlgorithm;
 import at.u4a.geometric_algorithms.geometric.AbstractShape;
 import at.u4a.geometric_algorithms.geometric.Point;
 import at.u4a.geometric_algorithms.geometric.mapper.InterfaceMapper;
@@ -79,6 +80,8 @@ public abstract class AbstractLayer {
     /* ABSTRACT PUBLIC FUNCTION - LAYER */
 
     abstract public AbstractShape getShape();
+    
+    abstract public AbstractAlgorithm getAlgorithm();
 
     abstract public LayerCategory getCategory();
 

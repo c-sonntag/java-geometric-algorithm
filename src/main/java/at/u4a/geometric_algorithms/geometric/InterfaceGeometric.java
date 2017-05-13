@@ -15,5 +15,7 @@ public interface InterfaceGeometric {
     void translate(Point p);
     
     void accept(InterfaceGeometricPainterVisitor visitor);
+    
+    int hashCode();
 
 }

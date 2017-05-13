@@ -38,6 +38,11 @@ public class AlgorithmLayer<TAlgorithm extends AbstractAlgorithm> extends Abstra
     public AbstractShape getShape() {
         return null;
     }
+    
+    @Override
+    public AbstractAlgorithm getAlgorithm() {
+        return algorithm;
+    }
 
     @Override
     public LayerCategory getCategory() {

@@ -1,7 +1,9 @@
 package at.u4a.geometric_algorithms.graphic_visitor;
 
+import java.util.AbstractList;
 import java.util.Iterator;
 
+import at.u4a.geometric_algorithms.geometric.AbstractShape;
 import at.u4a.geometric_algorithms.geometric.CloudOfPoints;
 import at.u4a.geometric_algorithms.geometric.CloudOfSegments;
 import at.u4a.geometric_algorithms.geometric.Line;
@@ -10,10 +12,16 @@ import at.u4a.geometric_algorithms.geometric.Polygon;
 import at.u4a.geometric_algorithms.geometric.Rectangle;
 import at.u4a.geometric_algorithms.geometric.Segment;
 import at.u4a.geometric_algorithms.geometric.mapper.InterfaceMapper;
+import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontSmoothingType;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 
 public class GraphicPainter implements InterfaceGraphicVisitor {
 
@@ -49,8 +57,15 @@ public class GraphicPainter implements InterfaceGraphicVisitor {
 
     /* INITIALIZER */
 
+    protected final Font tipFont = Font.font("Verdana", 12);
+
     public GraphicPainter(GraphicsContext gc) {
         this.gc = gc;
+
+        //
+        gc.setTextAlign(TextAlignment.CENTER);
+        gc.setTextBaseline(VPos.BOTTOM);
+        ;
     }
 
     /* SETTING */
@@ -64,7 +79,7 @@ public class GraphicPainter implements InterfaceGraphicVisitor {
     }
 
     public void setColor(Color color) {
-        //this.color = color;
+        // this.color = color;
         gc.setStroke(color);
     }
 
@@ -86,30 +101,12 @@ public class GraphicPainter implements InterfaceGraphicVisitor {
     public boolean getDotted() {
         return this.isDotted;
     }
-    
+
     public GraphicsContext getGraphicsContext() {
         return gc;
-        }
-
-    // public void setGraphicsContext(GraphicsContext gc) {
-    // this.gc = gc;
-    // }
+    }
 
     /* PROTECTED */
-
-    private Paint currentPaintStroke = null, currentPaintFill = null;
-
-    protected void saveCurrentPaint() {
-        currentPaintStroke = gc.getStroke();
-        currentPaintFill = gc.getFill();
-    }
-
-    protected void restoreLastPaint() {
-        if (currentPaintStroke != null)
-            gc.setStroke(currentPaintStroke);
-        if (currentPaintFill != null)
-            gc.setFill(currentPaintFill);
-    }
 
     protected void setPointPaint() {
         // gc.setFill(isSelected ? selectedColor : pointColor);
@@ -117,14 +114,36 @@ public class GraphicPainter implements InterfaceGraphicVisitor {
         gc.setStroke(Color.BLACK);
     }
 
+    protected void drawTip(String t, Point p) {
+        
+    }
+
+    @Override
+    public void drawEdgeTipFromList(AbstractShape as, AbstractList<Point> lp) {
+        gc.save();
+
+        gc.setFont(tipFont);
+        gc.setStroke(Color.BLACK);
+        gc.setFontSmoothingType(FontSmoothingType.GRAY);
+
+        final Point pToOrigin = new Point();
+        for (Point p : lp) {
+            pToOrigin.set(p);
+            as.convertToStandard(pToOrigin);
+            drawTip(p.toString(), pToOrigin);
+        }
+
+        gc.restore();
+    }
+
     /* GEOMETRIC */
 
     public void visit(Point p) {
-        saveCurrentPaint();
+        gc.save();
         setPointPaint();
         gc.fillOval((int) (p.x - 2 * Point.POINT_RAYON), (int) (p.y - 2 * Point.POINT_RAYON), 2 * 2 * Point.POINT_RAYON, 2 * 2 * Point.POINT_RAYON);
         gc.strokeOval((int) (p.x - 2 * Point.POINT_RAYON), (int) (p.y - 2 * Point.POINT_RAYON), 2 * 2 * Point.POINT_RAYON, 2 * 2 * Point.POINT_RAYON);
-        restoreLastPaint();
+        gc.restore();
     }
 
     /** TODO doit dessiner une ligne et non un segment ! */
@@ -246,7 +265,7 @@ public class GraphicPainter implements InterfaceGraphicVisitor {
             clouds.convertToStandard(pToOrigin);
             visit(pToOrigin);
         }
-            
+
     }
 
     /** @todo test */

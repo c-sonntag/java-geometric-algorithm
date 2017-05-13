@@ -2,13 +2,14 @@ package at.u4a.geometric_algorithms.algorithm;
 
 import java.util.function.Supplier;
 import javax.swing.ImageIcon;
-import at.u4a.geometric_algorithms.algorithm.AlgorithmBuilderInterface;
+import at.u4a.geometric_algorithms.algorithm.InterfaceAlgorithmBuilder;
 
 public enum Algorithm {
 
     /* ENUM */
 
-    Triangulation("Triangulation", "triangulation.png", at.u4a.geometric_algorithms.algorithm.Triangulation.Builder::new);
+    Triangulation("Triangulation", "triangulation.png", at.u4a.geometric_algorithms.algorithm.Triangulation.Builder::new), //
+    ConvexEnvelope("Convex", "convex.png", at.u4a.geometric_algorithms.algorithm.ConvexEnvelope.Builder::new);
 
 
     /* PUBLIC STATIC */
@@ -19,7 +20,7 @@ public enum Algorithm {
 
     public final String tip;
     public final String icon;
-    public final Supplier<AlgorithmBuilderInterface> supplier;
+    public final Supplier<InterfaceAlgorithmBuilder> supplier;
 
     /* PRIVATE */
 
@@ -27,7 +28,7 @@ public enum Algorithm {
         this(tip, icon, null);
     }
 
-    private Algorithm(String tip, String icon, Supplier<AlgorithmBuilderInterface> supplier) {
+    private Algorithm(String tip, String icon, Supplier<InterfaceAlgorithmBuilder> supplier) {
         this.tip = tip;
         this.icon = icon;
         this.supplier = supplier;

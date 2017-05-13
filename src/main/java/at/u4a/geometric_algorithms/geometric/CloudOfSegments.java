@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Vector;
 
 import at.u4a.geometric_algorithms.geometric.mapper.InterfaceMapper;
 import at.u4a.geometric_algorithms.geometric.mapper.MappedPoint;
 import at.u4a.geometric_algorithms.geometric.mapper.MappedSegment;
 import at.u4a.geometric_algorithms.geometric.mapper.SimplePoint;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceShapePainterVisitor;
+import at.u4a.geometric_algorithms.utils.Mutable;
 
 public class CloudOfSegments extends AbstractShape implements InterfaceContainer<Segment> {
 
@@ -69,6 +71,11 @@ public class CloudOfSegments extends AbstractShape implements InterfaceContainer
     }
 
     @Override
+    public int hashCode() {
+        return Mutable.getHashCode(cloud);
+    }
+
+    @Override
     public Iterator<Segment> iterator() {
         return cloud.iterator();
     }
@@ -112,6 +119,18 @@ public class CloudOfSegments extends AbstractShape implements InterfaceContainer
     // return mappedComposition;
     // }
 
+    /** @todo review for automatic Vector with iterator */
+    public Vector<Point> getPoints() {
+        Vector<Point> points = new Vector<Point>();
+        for (Segment s : cloud) {
+            if (!points.contains(s.a))
+                points.add(s.a);
+            if (!points.contains(s.b))
+                points.add(s.b);
+        }
+        return points;
+    }
+
     public InterfaceMapper getContainMappedComposition(Point pc) {
 
         // Points on the top
@@ -126,17 +145,17 @@ public class CloudOfSegments extends AbstractShape implements InterfaceContainer
             }, (o) -> {
                 s.b.set(o.x - origin.x, o.y - origin.y);
             });
-            
+
             //
-            
-            if(im_p1.contains(pc))
+
+            if (im_p1.contains(pc))
                 return im_p1;
             else if (im_p2.contains(pc))
                 return im_p2;
-            
+
             InterfaceMapper im_line = new MappedSegment(im_p1, im_p2);
-            
-            if(im_line.contains(pc))
+
+            if (im_line.contains(pc))
                 return im_line;
         }
 

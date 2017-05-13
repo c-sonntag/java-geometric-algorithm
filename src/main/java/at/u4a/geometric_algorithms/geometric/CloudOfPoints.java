@@ -8,6 +8,7 @@ import java.util.NoSuchElementException;
 import at.u4a.geometric_algorithms.geometric.mapper.InterfaceMapper;
 import at.u4a.geometric_algorithms.geometric.mapper.MappedPoint;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceShapePainterVisitor;
+import at.u4a.geometric_algorithms.utils.Mutable;
 
 public class CloudOfPoints extends AbstractShape implements InterfaceContainer<Point> {
 
@@ -64,6 +65,11 @@ public class CloudOfPoints extends AbstractShape implements InterfaceContainer<P
     @Override
     public void accept(InterfaceShapePainterVisitor visitor) {
         visitor.visit(this);
+    }
+    
+    @Override
+    public int hashCode() {
+        return Mutable.getHashCode(cloud);
     }
 
     @Override

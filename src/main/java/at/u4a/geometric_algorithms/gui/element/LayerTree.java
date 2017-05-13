@@ -383,6 +383,7 @@ public class LayerTree extends JTree {
         public void update(AbstractLayer node) {
             lblCategoryGen.set(node.getCategory());
             // lblLayerType.setText(node.getLayerType());
+            lblLayerType.setToolTipText(node.getLayerType());
             lblLayerType.setIcon(node.getLayerTypeIcon());
             lblLayerName.setText(node.getLayerName());
             chckbxActive.setSelected(node.isActive());

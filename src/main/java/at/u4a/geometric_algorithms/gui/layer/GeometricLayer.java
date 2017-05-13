@@ -4,6 +4,7 @@ import java.util.Vector;
 
 import javax.swing.ImageIcon;
 
+import at.u4a.geometric_algorithms.algorithm.AbstractAlgorithm;
 import at.u4a.geometric_algorithms.geometric.AbstractShape;
 import at.u4a.geometric_algorithms.geometric.Point;
 import at.u4a.geometric_algorithms.geometric.mapper.InterfaceMapper;
@@ -54,6 +55,12 @@ public class GeometricLayer<TShape extends AbstractShape> extends AbstractLayer 
     public TShape getShape() {
         return shape;
     }
+    
+
+    @Override
+    public AbstractAlgorithm getAlgorithm() {
+        return null;
+    }
 
     @Override
     public String getLayerType() {
@@ -87,5 +94,6 @@ public class GeometricLayer<TShape extends AbstractShape> extends AbstractLayer 
     public void translate(Point p) {
         shape.translate(p);
     }
+
 
 }

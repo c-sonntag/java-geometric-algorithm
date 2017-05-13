@@ -2,7 +2,7 @@ package at.u4a.geometric_algorithms.algorithm;
 
 import at.u4a.geometric_algorithms.gui.layer.AbstractLayer;
 
-public interface AlgorithmBuilderInterface {
+public interface InterfaceAlgorithmBuilder {
 
     String getName();
 

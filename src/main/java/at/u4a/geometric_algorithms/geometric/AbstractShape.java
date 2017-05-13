@@ -3,6 +3,7 @@ package at.u4a.geometric_algorithms.geometric;
 import at.u4a.geometric_algorithms.geometric.mapper.InterfaceMapper;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGeometricPainterVisitor;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceShapePainterVisitor;
+import at.u4a.geometric_algorithms.utils.Mutable;
 
 public abstract class AbstractShape implements InterfaceGeometric {
 
@@ -29,7 +30,6 @@ public abstract class AbstractShape implements InterfaceGeometric {
         p.x = p.x + origin.x;
         p.y = p.y + origin.y;
     }
-    
     
     //public boolean contains(Point p) {
     //    return contains(p, 0);

@@ -51,6 +51,11 @@ public class Rectangle extends AbstractShape {
     }
 
     @Override
+    public int hashCode() {
+        return size.hashCode() * 31 + origin.hashCode();
+    }
+
+    @Override
     public void accept(InterfaceShapePainterVisitor visitor) {
         visitor.visit(this);
     }

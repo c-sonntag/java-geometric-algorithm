@@ -17,7 +17,7 @@ import javax.swing.JButton;
 import javax.swing.SwingConstants;
 
 import at.u4a.geometric_algorithms.algorithm.Algorithm;
-import at.u4a.geometric_algorithms.algorithm.AlgorithmBuilderInterface;
+import at.u4a.geometric_algorithms.algorithm.InterfaceAlgorithmBuilder;
 import at.u4a.geometric_algorithms.gui.layer.AbstractLayer;
 import at.u4a.geometric_algorithms.gui.layer.LayerCategory;
 import at.u4a.geometric_algorithms.gui.layer.LayerManager;
@@ -289,7 +289,7 @@ public class PrincipalGui extends JFrame {
         private class AlgorithmEntry {
 
             public final Algorithm a;
-            public final AlgorithmBuilderInterface abi;
+            public final InterfaceAlgorithmBuilder abi;
             public final String name;
             public final JMenuItem jmi;
 
@@ -411,7 +411,7 @@ public class PrincipalGui extends JFrame {
         }
 
         @Override
-        public void applyAlgorithm(AlgorithmBuilderInterface abi) {
+        public void applyAlgorithm(InterfaceAlgorithmBuilder abi) {
             LayerManager lm = ds.getLayerManager();
             AbstractLayer selectedLayer = lm.getSelectedLayer();
             AbstractLayer algorithmLayer = abi.builder(selectedLayer);

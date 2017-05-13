@@ -1,12 +1,14 @@
 package at.u4a.geometric_algorithms.algorithm;
 
+import java.util.AbstractList;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Vector;
 
-import at.u4a.geometric_algorithms.algorithm.AlgorithmBuilderInterface;
+import at.u4a.geometric_algorithms.algorithm.InterfaceAlgorithmBuilder;
 import at.u4a.geometric_algorithms.algorithm.Triangulation.PointTipped.Tip;
+import at.u4a.geometric_algorithms.geometric.AbstractShape;
 import at.u4a.geometric_algorithms.geometric.Point;
 import at.u4a.geometric_algorithms.geometric.Polygon;
 import at.u4a.geometric_algorithms.geometric.Segment;
@@ -25,7 +27,7 @@ import javafx.scene.text.TextAlignment;
  */
 public class Triangulation extends AbstractAlgorithm {
 
-    public static class Builder implements AlgorithmBuilderInterface {
+    public static class Builder implements InterfaceAlgorithmBuilder {
 
         @Override
         public String getName() {
@@ -34,28 +36,40 @@ public class Triangulation extends AbstractAlgorithm {
 
         @Override
         public boolean canApply(AbstractLayer l) {
-            return (l.getShape() instanceof Polygon);
+            return (l.getShape() instanceof Polygon) || (l.getAlgorithm() instanceof ConvexEnvelope);
         }
 
         static int TriangulationCount = 1;
 
         @Override
         public AbstractLayer builder(AbstractLayer l) {
-            if (!canApply(l))
-                throw new RuntimeException("Triangulation need a Polygon !");
+
             //
-            AbstractLayer al = new AlgorithmLayer<Triangulation>(new Triangulation((Polygon) l.getShape()), Algorithm.Triangulation, l);
-            al.setLayerName("r" + String.valueOf(TriangulationCount));
+            Polygon poly = null;
+            if (l.getAlgorithm() instanceof ConvexEnvelope) {
+                ConvexEnvelope ce = (ConvexEnvelope) l.getAlgorithm();
+                poly = ce.getPolygon();
+            } else if (l.getShape() instanceof Polygon) {
+                poly = (Polygon) l.getShape();
+            } else {
+                throw new RuntimeException("Triangulation need a Polygon or ConvexEnvelope !");
+            }
+
+            //
+            AbstractLayer al = new AlgorithmLayer<Triangulation>(new Triangulation(poly.perimeter, poly), Algorithm.Triangulation, l);
+            al.setLayerName("t" + String.valueOf(TriangulationCount));
             TriangulationCount++;
             return al;
         }
 
     };
 
-    private final Polygon poly;
+    private final AbstractList<Point> points;
+    private final AbstractShape as;
 
-    public Triangulation(Polygon poly) {
-        this.poly = poly;
+    public Triangulation(AbstractList<Point> points, AbstractShape as) {
+        this.points = points;
+        this.as = as;
     }
 
     /* ************** */
@@ -63,37 +77,24 @@ public class Triangulation extends AbstractAlgorithm {
     @Override
     public void accept(Vector<AbstractLayer> v, InterfaceGraphicVisitor visitor) {
 
-        triangulation();
+        makeTriangulation();
 
         //
-        if (type != Polygon.Type.Monotone)
-            return;
+        if (type == Polygon.Type.Monotone) {
 
-        GraphicsContext gc = visitor.getGraphicsContext();
-        gc.setTextAlign(TextAlignment.CENTER);
-        gc.setFont(Font.font("Verdana", 12));
-
-        //
-        Vector<Point> aleradyWrite = new Vector<Point>();
-
-        final Segment sToOrigin = new Segment();
-        for (Segment tf : triangulationFusion) {
-            sToOrigin.set(tf);
-            poly.convertToStandard(sToOrigin.a);
-            poly.convertToStandard(sToOrigin.b);
-            visitor.visit_unit(sToOrigin);
-
-            if (!aleradyWrite.contains(tf.a)) {
-                gc.strokeText(tf.a.toString(), sToOrigin.a.x, sToOrigin.a.y);
-                aleradyWrite.add(tf.a);
-            }
-
-            if (!aleradyWrite.contains(tf.b)) {
-                gc.strokeText(tf.b.toString(), sToOrigin.b.x, sToOrigin.b.y);
-                aleradyWrite.add(tf.b);
+            //
+            final Segment sToOrigin = new Segment();
+            for (Segment tf : triangulationFusion) {
+                sToOrigin.set(tf);
+                as.convertToStandard(sToOrigin.a);
+                as.convertToStandard(sToOrigin.b);
+                visitor.visit_unit(sToOrigin);
             }
 
         }
+
+        //
+        // visitor.drawEdgeTipFromList(poly, poly.perimeter);
 
     }
 
@@ -101,9 +102,9 @@ public class Triangulation extends AbstractAlgorithm {
 
     private int mutablePreviousPolyHash = 0;
 
-    protected void triangulation() {
+    protected void makeTriangulation() {
 
-        int currentPolyHash = poly.hashCode();
+        int currentPolyHash = as.hashCode();
         if (currentPolyHash != mutablePreviousPolyHash) {
 
             //
@@ -144,10 +145,7 @@ public class Triangulation extends AbstractAlgorithm {
     static class PointTipped extends Point {
 
         static enum Tip {
-            None("?", 0b000), Left("L", 0b001), Right("R", 0b010), Up("U", 0b0111), Down("D", 0b1011), OnlyUpDown("UD", 0b1100);
-
-            // UpDown("UD",
-            // 0b1111);
+            None("?", 0b000), Left("L", 0b001), Right("R", 0b010), Up("U", 0b0111), Down("D", 0b1011);
 
             public final String str;
             public final int code;
@@ -187,17 +185,16 @@ public class Triangulation extends AbstractAlgorithm {
      * Algorithme qui recherche l'index du point en haut et en bas
      */
     private boolean searchUpDonwSide() {
+
         topPointIndex = -1;
         bottomPointIndex = -1;
-        type = Polygon.Type.Simple;
 
-        final int size = poly.perimeter.size();
+        final int size = points.size();
 
         if (size < 3)
             return false;
 
         double topY = 0, bottomY = 0;
-        final Vector<Point> points = poly.perimeter;
 
         Point precPoint = null, precPrecPoint = null, currentPoint;
         int countAngle = 0;
@@ -247,15 +244,14 @@ public class Triangulation extends AbstractAlgorithm {
     class SideTuple {
         Vector<Point> side = new Vector<Point>();
         double minX, maxX;
-    }
+    };
 
     /**
      * Algorithme qui fusionne les cotés des points
      */
     SideTuple makeSide(boolean clockwise, boolean withUpDown) {
 
-        final Vector<Point> points = poly.perimeter;
-        final int size = poly.perimeter.size();
+        final int size = points.size();
 
         SideTuple st = new SideTuple();
 
@@ -371,7 +367,6 @@ public class Triangulation extends AbstractAlgorithm {
 
     static boolean inP(Point pA, PointTipped pOrigine, Point pB) {
         double produit = resumeProduitVectorielZ(pA, pOrigine, pB);
-        System.out.print("inP(" + pA + " * " + pOrigine + " * " + pB + ")=" + produit + " \t");
         return (((produit > 0) && (pOrigine.tip == Tip.Right)) || ((produit < 0) && (pOrigine.tip == Tip.Left)) || (pOrigine.tip == Tip.Up) || (pOrigine.tip == Tip.Down));
     }
 
@@ -399,24 +394,15 @@ public class Triangulation extends AbstractAlgorithm {
         //
         for (int i = 2; i < fusionPointsSize - 1; i++) {
 
-            // PointTipped lastPoint = fusionPoints.get(i - 1);
             PointTipped currentPoint = fusionPoints.get(i);
-            // PointTipped nextPoint = fusionPoints.get(i + 1);
-
-            // Intersection between points with different side
-            /*
-             * if (lastPoint.tip == nextPoint.tip) if (lastPoint.tip !=
-             * currentPoint.tip) if (inP(lastPoint, currentPoint, nextPoint))
-             * return false;
-             */
-
             PointTipped stackFirst = stack.getFirst();
 
-            if ((currentPoint.tip.code & stackFirst.tip.code) != 0) { // same
-                                                                      // chain
-                //
+            // same chain
+            if ((currentPoint.tip.code & stackFirst.tip.code) != 0) {
+
                 PointTipped stackPop = stack.pop();
 
+                //
                 while (!stack.isEmpty()) {
                     stackFirst = stack.peekFirst();
 
@@ -434,47 +420,27 @@ public class Triangulation extends AbstractAlgorithm {
                 stack.push(stackPop);
                 stack.push(currentPoint);
 
-            } else {
+            } else { // oposite chain
 
                 //
-                System.out.print("ADD:");
-
-                if (true) {
-
-                    Iterator<PointTipped> stack_it = stack.descendingIterator();
-                    if (stack_it.hasNext()) { // last item
-                        PointTipped stackPoint, endStackPoint = stack_it.next();
-                        System.out.print("pop(" + endStackPoint + ") \t");
-
-                        while (stack_it.hasNext()) {
-                            stackPoint = stack_it.next();
-                            System.out.print("s(" + currentPoint + " * " + stackPoint + ") ");
-                            //
-                            if (endStackPoint != null)
-                                if (inP(endStackPoint, stackPoint, currentPoint))
-                                    return false;
-
-                            System.out.print(" +++ \t ");
-                            triangulationFusion.add(new Segment(currentPoint, stackPoint));
-                            endStackPoint = null;
-                        }
-                    }
-
-                } else {
-
-                    Iterator<PointTipped> stack_it = stack.iterator();
+                Iterator<PointTipped> stack_it = stack.descendingIterator();
+                if (stack_it.hasNext()) {
+                    PointTipped endStackPoint = stack_it.next();
                     while (stack_it.hasNext()) {
                         PointTipped stackPoint = stack_it.next();
-                        if (stack_it.hasNext()) {
-                            System.out.print("s(" + currentPoint + " * " + stackPoint + ") \t");
-                            triangulationFusion.add(new Segment(currentPoint, stackPoint));
-                        }
-                    }
 
+                        // block vertex that can traverse edge of opposite side
+                        if (endStackPoint != null)
+                            if (inP(endStackPoint, stackPoint, currentPoint))
+                                return false;
+
+                        triangulationFusion.add(new Segment(currentPoint, stackPoint));
+                        endStackPoint = null;
+                    }
                 }
 
+                //
                 stack.clear();
-                System.out.print(" |\n  ");
 
                 //
                 stack.push(fusionPoints.get(i - 1));
@@ -483,9 +449,8 @@ public class Triangulation extends AbstractAlgorithm {
             }
         }
 
-        // except the first and the last one diagonals
+        // except the first diagonals
         triangulationFusion.remove(0);
-        // triangulationFusion.remove(triangulationFusion.size() - 1);
 
         return true;
     }

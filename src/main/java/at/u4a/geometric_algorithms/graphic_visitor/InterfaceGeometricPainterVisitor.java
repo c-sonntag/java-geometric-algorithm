@@ -12,4 +12,6 @@ public interface InterfaceGeometricPainterVisitor {
 
     public void visit_unit(Segment s);
     public void visit(Segment s);
+   
+    
 }
