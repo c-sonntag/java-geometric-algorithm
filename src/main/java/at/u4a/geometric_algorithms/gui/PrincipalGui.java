@@ -174,12 +174,11 @@ public class PrincipalGui extends JFrame {
         });
         mntmExit.setIcon(new ImageIcon("icons/action/page_delete.png"));
         mnFile.add(mntmExit);
-        
+
         JMenu mnGenerate = new JMenu("GenerateLayer");
         menuBar.add(mnGenerate);
-        
-        GraphToTests.addGenerateLayerMenu(ds.getLayerManager(),mnGenerate);
-        
+
+        GraphToTests.addGenerateLayerMenu(ds.getLayerManager(), mnGenerate);
     }
 
     /**
@@ -305,6 +304,7 @@ public class PrincipalGui extends JFrame {
                 this.abi = a.supplier.get();
                 this.name = abi.getName();
                 this.jmi = new JMenuItem(this.name);
+                this.jmi.setIcon(a.getImageIcon());
 
                 this.jmi.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent arg0) {
@@ -317,7 +317,7 @@ public class PrincipalGui extends JFrame {
         }
 
         private final JMenu mnAlgorithmMenu;
-        private final JButton btnLayerDelete;
+        private final JButton btnLayerDelete, btnLayerDeleteAlgorithm;
         private final JToolBar toolbar;
 
         private final List<AlgorithmEntry> algorithms;
@@ -362,14 +362,27 @@ public class PrincipalGui extends JFrame {
             btnLayerDelete.setEnabled(false);
             btnLayerDelete.setToolTipText("Delete layer");
             btnLayerDelete.setIcon(new ImageIcon("icons/action/cancel.png"));
-
             toolbar.add(btnLayerDelete);
 
+            btnLayerDeleteAlgorithm = new JButton("");
+            btnLayerDeleteAlgorithm.setEnabled(false);
+            btnLayerDeleteAlgorithm.setToolTipText("Delete an algorithm (recover its contents)");
+            btnLayerDeleteAlgorithm.setIcon(new ImageIcon("icons/action/cancel_algorithm.png"));
+            toolbar.add(btnLayerDeleteAlgorithm);
         }
 
         @Override
         public void addLayerActionListenerOfDelete(Runnable func) {
             btnLayerDelete.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent arg0) {
+                    func.run();
+                }
+            });
+        }
+
+        @Override
+        public void addLayerActionListenerOfDeleteAlgorithm(Runnable func) {
+            btnLayerDeleteAlgorithm.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent arg0) {
                     func.run();
                 }
@@ -385,23 +398,23 @@ public class PrincipalGui extends JFrame {
             }
 
             btnLayerDelete.setEnabled(l.isAuthorized(AuthorizedAction.Delete));
+            btnLayerDeleteAlgorithm.setEnabled(l.isAuthorized(AuthorizedAction.DeleteAlgorithm));
 
+            //
             if (!l.isAuthorized(AuthorizedAction.ApplyAlgorithm)) {
                 mnAlgorithmMenu.setEnabled(false);
-                return;
-            }
-
-            boolean atLeastOnAlgorithm = false;
-            for (AlgorithmEntry ae : algorithms) {
-                if (ae.abi.canApply(l)) {
-                    ae.jmi.setEnabled(true);
-                    atLeastOnAlgorithm = true;
-                } else {
-                    ae.jmi.setEnabled(false);
+            } else {
+                boolean atLeastOnAlgorithm = false;
+                for (AlgorithmEntry ae : algorithms) {
+                    if (ae.abi.canApply(l)) {
+                        ae.jmi.setEnabled(true);
+                        atLeastOnAlgorithm = true;
+                    } else {
+                        ae.jmi.setEnabled(false);
+                    }
                 }
+                mnAlgorithmMenu.setEnabled(atLeastOnAlgorithm);
             }
-
-            mnAlgorithmMenu.setEnabled(atLeastOnAlgorithm);
 
         }
 

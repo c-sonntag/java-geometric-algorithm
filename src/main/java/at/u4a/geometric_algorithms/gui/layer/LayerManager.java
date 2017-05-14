@@ -35,6 +35,12 @@ public class LayerManager implements Iterable<AbstractLayer> {
                 deleteLayer(selectedLayer);
         });
 
+        //
+        la.addLayerActionListenerOfDeleteAlgorithm(() -> {
+            if (selectedLayer != null)
+                deleteAlgorithmLayer(selectedLayer);
+        });
+
     }
 
     /* */
@@ -43,7 +49,7 @@ public class LayerManager implements Iterable<AbstractLayer> {
         layers.add(layer);
         refresh();
     }
-    
+
     public void addLayerAndSelectIt(AbstractLayer layer) {
         layers.add(layer);
         refresh();
@@ -62,9 +68,9 @@ public class LayerManager implements Iterable<AbstractLayer> {
 
     public void clear() {
         layers.clear();
-        
+
         GraphToTests.defaultGraph(ds.getLayerManager()); /** @todo */
-        
+
         refresh();
         ds.refresh();
         setSelectedLayer(null);
@@ -109,6 +115,38 @@ public class LayerManager implements Iterable<AbstractLayer> {
         else if (!layers.isEmpty())
             selectedLayer = layers.lastElement();
 
+        refresh();
+        ds.refresh();
+    }
+
+    public void deleteAlgorithmLayer(AbstractLayer l) {
+        if (l.getCategory() != LayerCategory.Algorithm)
+            return;
+
+        //
+        Vector<AbstractLayer> subLayers = l.getSubLayer();
+        if (subLayers == null) {
+            deleteLayer(l);
+            return;
+        }
+        if (subLayers.isEmpty()) {
+            deleteLayer(l);
+            return;
+        }
+
+        //
+        layers.remove(l);
+        
+        //
+        for(AbstractLayer as : subLayers) {
+            as.restoreAuthorization();
+            layers.add(as);
+        }
+        
+        //
+        setSelectedLayer(subLayers.firstElement());
+
+        //
         refresh();
         ds.refresh();
     }

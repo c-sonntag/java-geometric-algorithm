@@ -21,6 +21,7 @@ public class GeometricLayer<TShape extends AbstractShape> extends AbstractLayer 
     private final ColorSet shapeColor;
 
     public GeometricLayer(TShape shape, Tool toolType) {
+        super(getAuthorizationForGeometricLayer());
         this.shape = shape;
         this.toolType = toolType;
         
@@ -34,6 +35,12 @@ public class GeometricLayer<TShape extends AbstractShape> extends AbstractLayer 
     @Override
     public LayerCategory getCategory() {
         return LayerCategory.Geometry;
+    }
+    
+    @Override
+    public void restoreAuthorization() {
+        authorized.clear();
+        authorized.addAll(getAuthorizationForGeometricLayer());
     }
 
     @Override
@@ -94,6 +101,5 @@ public class GeometricLayer<TShape extends AbstractShape> extends AbstractLayer 
     public void translate(Point p) {
         shape.translate(p);
     }
-
 
 }

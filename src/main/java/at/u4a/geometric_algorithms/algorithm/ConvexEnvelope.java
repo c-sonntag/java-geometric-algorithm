@@ -129,8 +129,16 @@ public class ConvexEnvelope extends AbstractAlgorithm {
         convexPoly.clear();
 
         //
-        Vector<Point> convexPoints = devideToRing(points, 0);
-        if (convexPoints == null) {
+        try {
+            Vector<Point> convexPoints = devideToRing(points, 0);
+            if (convexPoints == null) {
+                return false;
+            }
+        } catch (StackOverflowError e) {
+            System.out.println("Can't make ConvexeEnvelope due of error : StackOverflowError");
+            return false;
+        } catch (Exception e) {
+            System.out.println("Error during process of ConvexEnvelop : " + e.getMessage());
             return false;
         }
 

@@ -16,9 +16,23 @@ import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGraphicVisitor;
 public abstract class AbstractLayer {
 
     static public enum AuthorizedAction {
-        Delete, ApplyAlgorithm
+        Delete, ApplyAlgorithm, DeleteAlgorithm
     };
 
+    /* BASIC CONFIGURATION */
+    
+    public static EnumSet<AuthorizedAction> getAllAuthorization() {
+        return EnumSet.allOf(AuthorizedAction.class);
+    }
+    
+    public static EnumSet<AuthorizedAction> getAuthorizationForGeometricLayer() {
+        return EnumSet.of(AuthorizedAction.Delete,AuthorizedAction.ApplyAlgorithm);
+    }
+    
+    public static EnumSet<AuthorizedAction> getAuthorizationForAlgorithmLayer() {
+        return EnumSet.of(AuthorizedAction.Delete,AuthorizedAction.ApplyAlgorithm,AuthorizedAction.DeleteAlgorithm);
+    }
+    
     /* PUBLIC STRUCT */
 
     public static class ColorSet {
@@ -75,7 +89,7 @@ public abstract class AbstractLayer {
 
     protected Vector<ColorSet> colors;
 
-    protected final EnumSet<AuthorizedAction> authorized = EnumSet.allOf(AuthorizedAction.class);
+    protected final EnumSet<AuthorizedAction> authorized;
 
     /* ABSTRACT PUBLIC FUNCTION - LAYER */
 
@@ -84,6 +98,8 @@ public abstract class AbstractLayer {
     abstract public AbstractAlgorithm getAlgorithm();
 
     abstract public LayerCategory getCategory();
+    
+    abstract public void restoreAuthorization();
 
     abstract public String getLayerType();
 
@@ -109,13 +125,14 @@ public abstract class AbstractLayer {
 
     /* PUBLIC FUCNTION */
 
-    public AbstractLayer() {
-        this(null);
+    public AbstractLayer(EnumSet<AuthorizedAction> authorized) {
+        this(null, authorized); 
     }
 
-    public AbstractLayer(AbstractLayer parent) {
+    public AbstractLayer(AbstractLayer parent,EnumSet<AuthorizedAction> authorized) {
         this.parent = parent;
         this.active = true;
+        this.authorized = authorized; 
     }
 
     public String getLayerName() {

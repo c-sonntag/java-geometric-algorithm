@@ -1,8 +1,11 @@
 package at.u4a.geometric_algorithms.utils;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Random;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -47,57 +50,6 @@ public class GraphToTests {
         }
     }
 
-    /* ****** GENERATE LAYER MENU ****** */
-
-    private static boolean makeOptionPane(JPanel panel, String title) {
-        return JOptionPane.OK_OPTION == JOptionPane.showConfirmDialog(null, panel, //
-                title, JOptionPane.OK_CANCEL_OPTION);
-    }
-
-    private static void addPolygon(LayerManager lm) {
-        Random rnd = new Random();
-        JSpinner seed = new JSpinner(new SpinnerNumberModel(rnd.nextLong(), Long.MIN_VALUE, Long.MAX_VALUE, 1));
-        JSpinner side = new JSpinner(new SpinnerNumberModel(6, 1, 1000000, 1));
-        JSpinner factor = new JSpinner(new SpinnerNumberModel(1, 1, 100, 0.5));
-        JCheckBox reverseCheck = new JCheckBox("");
-        JPanel pRoot = new JPanel();
-        pRoot.setLayout(new BoxLayout(pRoot, BoxLayout.Y_AXIS));
-        
-        JPanel p = new JPanel();
-        p.add(Box.createHorizontalStrut(5));
-        p.add(new JLabel("Side:"));
-        p.add(side);
-        p.add(Box.createHorizontalStrut(5));
-        p.add(new JLabel("Factor:"));
-        p.add(factor);
-        p.add(Box.createHorizontalStrut(5));
-        p.add(new JLabel("Reverse:"));
-        p.add(reverseCheck);
-        pRoot.add(p);
-        
-        JPanel pSeed = new JPanel();
-        pSeed.add(new JLabel("Seed:"));
-        pSeed.add(seed);
-        pRoot.add(pSeed);
-       
-        //
-        if (makeOptionPane(pRoot, "Polygon generator"))
-            lm.addLayerAndSelectIt(polygon( //
-                    ((Number) seed.getValue()).longValue(), //
-                    ((Number) side.getValue()).intValue(), //
-                    ((Number) factor.getValue()).doubleValue(), //
-                    reverseCheck.isSelected())//
-            );
-    }
-
-    public static void addGenerateLayerMenu(LayerManager lm, JMenu mnGenerate) {
-
-        JMenuItem mntmMonotonePolygon = new JMenuItem("MonotonePolygon");
-        mntmMonotonePolygon.addActionListener((arg) -> addPolygon(lm));
-        mnGenerate.add(mntmMonotonePolygon);
-
-    }
-
     /* ****** ALGORITHM LAYER ****** */
 
     private static AbstractLayer convex_envelope(AbstractLayer layer) {
@@ -116,8 +68,8 @@ public class GraphToTests {
         Random rnd = new Random(seed);
         return new GeometricLayer<Rectangle>(//
                 new Rectangle(//
-                        new Point(rnd.nextInt(100) + 100 * factor, rnd.nextInt(100) + 20 * factor), //
-                        new Point(rnd.nextInt(100) + 20 * factor, rnd.nextInt(100) + 20 * factor))//
+                        new Point(200 - rnd.nextInt(150), 200 - rnd.nextInt(150)), //
+                        new Point(rnd.nextInt(100) + 20, rnd.nextInt(100) + 20 * factor))//
                 , Tool.ShapeRectangle);
     }
 
@@ -160,6 +112,107 @@ public class GraphToTests {
         }
 
         return new GeometricLayer<CloudOfPoints>(cloudOfPoint, Tool.CloudOfPoint);
+    }
+
+    /* ****** GENERATE LAYER MENU ****** */
+
+    private static boolean makeOptionPane(JPanel panel, String title) {
+        return JOptionPane.OK_OPTION == JOptionPane.showConfirmDialog(null, panel, //
+                title, JOptionPane.OK_CANCEL_OPTION);
+    }
+
+    private static JPanel makePanelRoot(JPanel... pans) {
+        JPanel pRoot = new JPanel();
+        pRoot.setLayout(new BoxLayout(pRoot, BoxLayout.Y_AXIS));
+        for (JPanel p : pans)
+            pRoot.add(p);
+        return pRoot;
+    }
+
+    private static void makeInputItem(JPanel p, String label, Component item) {
+        p.add(Box.createHorizontalStrut(5));
+        p.add(new JLabel(label));
+        p.add(item);
+    }
+    
+    
+    private static void addRectangle(LayerManager lm) {
+        Random rnd = new Random();
+        JSpinner seed = new JSpinner(new SpinnerNumberModel(rnd.nextLong(), Long.MIN_VALUE, Long.MAX_VALUE, 1));
+        JSpinner factor = new JSpinner(new SpinnerNumberModel(1, 1, 100, 0.5));
+        //
+        JPanel p = new JPanel();
+        makeInputItem(p, "Factor:", factor);
+        //
+        JPanel pSeed = new JPanel();
+        makeInputItem(pSeed, "Seed:", seed);
+        //
+        if (makeOptionPane(makePanelRoot(p, pSeed), "Rectangle generator"))
+            lm.addLayerAndSelectIt(rectangle( //
+                    ((Number) seed.getValue()).longValue(), //
+                    ((Number) factor.getValue()).doubleValue() //
+            ));
+    }
+
+    private static void addPolygon(LayerManager lm) {
+        Random rnd = new Random();
+        JSpinner seed = new JSpinner(new SpinnerNumberModel(rnd.nextLong(), Long.MIN_VALUE, Long.MAX_VALUE, 1));
+        JSpinner side = new JSpinner(new SpinnerNumberModel(6, 1, 1000000, 1));
+        JSpinner factor = new JSpinner(new SpinnerNumberModel(1, 1, 100, 0.5));
+        JCheckBox reverseCheck = new JCheckBox("");
+        //
+        JPanel p = new JPanel();
+        makeInputItem(p, "Side:", side);
+        makeInputItem(p, "Factor:", factor);
+        makeInputItem(p, "Reverse:", reverseCheck);
+        //
+        JPanel pSeed = new JPanel();
+        makeInputItem(pSeed, "Seed:", seed);
+        //
+        if (makeOptionPane(makePanelRoot(p, pSeed), "Polygon generator"))
+            lm.addLayerAndSelectIt(polygon( //
+                    ((Number) seed.getValue()).longValue(), //
+                    ((Number) side.getValue()).intValue(), //
+                    ((Number) factor.getValue()).doubleValue(), //
+                    reverseCheck.isSelected())//
+            );
+    }
+
+    private static void addCloudOfPoints(LayerManager lm) {
+        Random rnd = new Random();
+        JSpinner seed = new JSpinner(new SpinnerNumberModel(rnd.nextLong(), Long.MIN_VALUE, Long.MAX_VALUE, 1));
+        JSpinner nb = new JSpinner(new SpinnerNumberModel(6, 1, 1000000, 1));
+        JSpinner factor = new JSpinner(new SpinnerNumberModel(1, 1, 100, 0.5));
+        //
+        JPanel p = new JPanel();
+        makeInputItem(p, "Nb points:", nb);
+        makeInputItem(p, "Factor:", factor);
+        //
+        JPanel pSeed = new JPanel();
+        makeInputItem(pSeed, "Seed:", seed);
+        //
+        if (makeOptionPane(makePanelRoot(p, pSeed), "CloudOfPoints generator"))
+            lm.addLayerAndSelectIt(cloud_of_points( //
+                    ((Number) seed.getValue()).longValue(), //
+                    ((Number) nb.getValue()).intValue(), //
+                    ((Number) factor.getValue()).doubleValue() //
+            ));
+    }
+
+    public static void addGenerateLayerMenu(LayerManager lm, JMenu mnGenerate) {
+
+        //
+        BiConsumer<String, ActionListener> a = (String itemMenuName, ActionListener func) -> {
+            JMenuItem item = new JMenuItem(itemMenuName);
+            item.addActionListener(func);
+            mnGenerate.add(item);
+        };
+
+        //
+        a.accept("Rectangle", (arg) -> addRectangle(lm));
+        a.accept("MonotonePolygon", (arg) -> addPolygon(lm));
+        a.accept("CloudOfPoints", (arg) -> addCloudOfPoints(lm));
+
     }
 
 }

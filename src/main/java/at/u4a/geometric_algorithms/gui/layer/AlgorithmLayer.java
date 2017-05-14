@@ -23,6 +23,7 @@ public class AlgorithmLayer<TAlgorithm extends AbstractAlgorithm> extends Abstra
     private final ColorSet algorithmColor;
 
     public AlgorithmLayer(TAlgorithm algorithm, Algorithm algorithmType, AbstractLayer... subLayer) {
+        super(getAuthorizationForAlgorithmLayer());
         this.algorithm = algorithm;
         this.algorithmType = algorithmType;
         this.subLayer = new Vector<AbstractLayer>(Arrays.asList(subLayer));
@@ -47,6 +48,12 @@ public class AlgorithmLayer<TAlgorithm extends AbstractAlgorithm> extends Abstra
     @Override
     public LayerCategory getCategory() {
         return LayerCategory.Algorithm;
+    }
+    
+    @Override
+    public void restoreAuthorization() {
+        authorized.clear();
+        authorized.addAll(getAuthorizationForAlgorithmLayer());
     }
 
     @Override
