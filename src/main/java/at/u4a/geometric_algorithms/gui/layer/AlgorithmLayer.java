@@ -37,7 +37,7 @@ public class AlgorithmLayer<TAlgorithm extends AbstractAlgorithm> extends Abstra
 
     @Override
     public AbstractShape getShape() {
-        return null;
+        return algorithm.getCompositeShape();
     }
     
     @Override

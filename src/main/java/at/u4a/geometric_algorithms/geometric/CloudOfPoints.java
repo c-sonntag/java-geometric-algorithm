@@ -13,6 +13,16 @@ import at.u4a.geometric_algorithms.utils.Mutable;
 
 public class CloudOfPoints extends AbstractShape implements InterfaceContainer<Point> {
 
+    public CloudOfPoints() {
+        super();
+    }
+
+    public CloudOfPoints(Point origin) {
+        super(origin);
+    }
+    
+    /* **** */
+    
     final public Vector<Point> cloud = new Vector<Point>();
 
     public ArrayList<Point> getOnPosition(Point p) {

@@ -1,12 +1,7 @@
 package at.u4a.geometric_algorithms.algorithm;
 
 import java.util.Vector;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
-import java.util.Vector;
 
 import at.u4a.geometric_algorithms.algorithm.InterfaceAlgorithmBuilder;
 import at.u4a.geometric_algorithms.geometric.*;
@@ -16,7 +11,6 @@ import at.u4a.geometric_algorithms.gui.layer.AbstractLayer;
 import at.u4a.geometric_algorithms.gui.layer.AlgorithmLayer;
 import at.u4a.geometric_algorithms.utils.Calc;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 
 /**
  * Triangulation
@@ -119,6 +113,13 @@ public class ConvexEnvelope extends AbstractAlgorithm {
 
     public Polygon getPolygon() {
         return convexPoly;
+    }
+    
+    /* ************** */
+    
+    @Override
+    public AbstractShape getCompositeShape() {
+        return getPolygon();
     }
 
     /* ************** */

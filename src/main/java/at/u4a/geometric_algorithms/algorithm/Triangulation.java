@@ -2,7 +2,6 @@ package at.u4a.geometric_algorithms.algorithm;
 
 import java.util.AbstractList;
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -17,9 +16,6 @@ import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGraphicVisitor;
 import at.u4a.geometric_algorithms.gui.layer.AbstractLayer;
 import at.u4a.geometric_algorithms.gui.layer.AlgorithmLayer;
 import at.u4a.geometric_algorithms.utils.Calc;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.text.Font;
-import javafx.scene.text.TextAlignment;
 
 /**
  * Triangulation
@@ -38,7 +34,7 @@ public class Triangulation extends AbstractAlgorithm {
 
         @Override
         public boolean canApply(AbstractLayer l) {
-            return (l.getShape() instanceof Polygon) || (l.getAlgorithm() instanceof ConvexEnvelope);
+            return (l.getShape() instanceof Polygon);
         }
 
         static int TriangulationCount = 1;
@@ -47,15 +43,12 @@ public class Triangulation extends AbstractAlgorithm {
         public AbstractLayer builder(AbstractLayer l) {
 
             //
-            Polygon poly = null;
-            if (l.getAlgorithm() instanceof ConvexEnvelope) {
-                ConvexEnvelope ce = (ConvexEnvelope) l.getAlgorithm();
-                poly = ce.getPolygon();
-            } else if (l.getShape() instanceof Polygon) {
-                poly = (Polygon) l.getShape();
-            } else {
-                throw new RuntimeException("Triangulation need a Polygon or ConvexEnvelope !");
-            }
+            AbstractShape as = l.getShape();
+            if (!(as instanceof Polygon)) 
+                throw new RuntimeException("Triangulation need a Polygon Shape !");
+
+            //
+            Polygon poly = (Polygon) as;
 
             //
             AbstractLayer al = new AlgorithmLayer<Triangulation>(new Triangulation(poly.perimeter, poly), Algorithm.Triangulation, l);
@@ -117,6 +110,13 @@ public class Triangulation extends AbstractAlgorithm {
             return mp;
         else
             return null;
+    }
+
+    /* ************** */
+
+    @Override
+    public AbstractShape getCompositeShape() {
+        return null;
     }
 
     /* ************** */
@@ -448,4 +448,5 @@ public class Triangulation extends AbstractAlgorithm {
 
         return true;
     }
+
 };

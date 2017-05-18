@@ -15,6 +15,16 @@ import at.u4a.geometric_algorithms.utils.Mutable;
 
 public class CloudOfSegments extends AbstractShape implements InterfaceContainer<Segment> {
 
+    public CloudOfSegments() {
+        super();
+    }
+
+    public CloudOfSegments(Point origin) {
+        super(origin);
+    }
+    
+    /* **** */
+    
     final public ArrayList<Segment> cloud = new ArrayList<Segment>();
 
     public ArrayList<Segment> getOnPosition(Point p) {

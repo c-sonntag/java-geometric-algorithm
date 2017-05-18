@@ -9,7 +9,8 @@ public enum Algorithm {
     /* ENUM */
 
     Triangulation("Triangulation", "triangulation.png", at.u4a.geometric_algorithms.algorithm.Triangulation.Builder::new), //
-    ConvexEnvelope("Convex", "convex.png", at.u4a.geometric_algorithms.algorithm.ConvexEnvelope.Builder::new);
+    ConvexEnvelope("ConvexEnvelope", "convex.png", at.u4a.geometric_algorithms.algorithm.ConvexEnvelope.Builder::new),
+    SegmentIntersection("SegmentIntersection", "segment_intersection.png", at.u4a.geometric_algorithms.algorithm.SegmentIntersection.Builder::new);
 
 
     /* PUBLIC STATIC */
