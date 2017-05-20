@@ -7,6 +7,7 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.NavigableSet;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -131,13 +132,12 @@ public class SegmentIntersection extends AbstractAlgorithm {
     /* ************** */
 
     private class SweepLineComparator implements Comparator<SegmentAssoc> {
-
         @Override
         public int compare(SegmentAssoc s1, SegmentAssoc s2) {
-            if (s1.equals(s2))
+            if (s1.upper.equals(s2.upper) && s1.lower.equals(s2.lower))
                 return 0;
-            //
-            return 0; // fix it
+            final double wS1Decal = Math.abs(s1.s.a.x - s1.s.b.x), wS2Decal = Math.abs(s2.s.a.x - s2.s.b.x);
+            return (wS1Decal == wS2Decal) ? ((s1.upper.x < s2.upper.x) ? -1 : 1) : ((wS1Decal < wS2Decal) ? -1 : 1);
         }
     };
 
@@ -153,18 +153,6 @@ public class SegmentIntersection extends AbstractAlgorithm {
                 return 0;
             //
             return 0; // fix it
-        }
-    };
-
-    private class ArrangementComparator_SegmentASSOC implements Comparator<SegmentAssoc> {
-        @Override
-        public int compare(SegmentAssoc e1, SegmentAssoc e2) {
-            return (//
-            e1.upper.equals(e2.upper) ? 0 : ( //
-            (e1.upper.y == e2.upper.y) ? //
-                    ((e1.upper.x < e2.upper.x) ? -1 : 1) : //
-                    ((e1.upper.y < e2.upper.y) ? -1 : 1)//
-            ));
         }
     };
 
@@ -192,20 +180,16 @@ public class SegmentIntersection extends AbstractAlgorithm {
                 add(new EventPoint(s, EventType.Lower));
             }
         }
-
     }
 
-    private class ArrangementComparator implements Comparator<SegmentAssoc> {
-        @Override
-        public int compare(SegmentAssoc e1, SegmentAssoc e2) {
-            return (//
-            e1.upper.equals(e2.upper) ? 0 : ( //
-            (e1.upper.y == e2.upper.y) ? //
-                    ((e1.upper.x < e2.upper.x) ? -1 : 1) : //
-                    ((e1.upper.y < e2.upper.y) ? -1 : 1)//
-            ));
-        }
-    };
+    /*
+     * private class ArrangementComparator implements Comparator<SegmentAssoc> {
+     * 
+     * @Override public int compare(SegmentAssoc e1, SegmentAssoc e2) { return
+     * (// e1.upper.equals(e2.upper) ? 0 : ( // (e1.upper.y == e2.upper.y) ? //
+     * ((e1.upper.x < e2.upper.x) ? -1 : 1) : // ((e1.upper.y < e2.upper.y) ? -1
+     * : 1)// )); } };
+     */
 
     /* ************** */
 
@@ -222,11 +206,16 @@ public class SegmentIntersection extends AbstractAlgorithm {
     // TreeSet<SegmentAssoc>(new ArrangementComparator());
 
     private final Set<SegmentAssoc> sweepline = new TreeSet<SegmentAssoc>(new SweepLineComparator());
+    private final NavigableSet<SegmentAssoc> sweeplineNavigator = (NavigableSet<SegmentAssoc>)sweepline;
+
     private final Set<Event> sweeplineStatus = new TreeSet<Event>(new EventComparator());
 
     // private final Set<Point> intersectionsQueue = new TreeSet<Point>(new
     // Point.PointComparator());
-    private final ArrayDeque<SegmentAssoc> intersectionsQueue = new ArrayDeque<SegmentAssoc>();
+
+    private final ArrayDeque<EventPoint> intersectionsQueue = new ArrayDeque<EventPoint>();
+
+    private final Set<Point> intersectionsSet = new TreeSet<Point>(new Point.PointComparator());
 
     // private final HashMap<Point, Vector<Segment>> intersectionsQueue = new
     // HashMap<Point, Vector<Segment>>();
@@ -257,12 +246,11 @@ public class SegmentIntersection extends AbstractAlgorithm {
         Upper, Lower, Intersection
     };
 
-    
     private static class EventPoint {
         final public Segment s;
         final public EventType type;
         final public Point p;
-        
+
         public EventPoint(Point p) {
             this.s = null;
             this.p = p;
@@ -278,7 +266,6 @@ public class SegmentIntersection extends AbstractAlgorithm {
             p = (type == EventType.Upper) ? (aIsTop ? s.a : s.b) : (aIsTop ? s.b : s.a);
         }
     }
-
 
     /**
      * Permet d’indiquer le statut d’un Point, entre autre, s’il est un «upper»,
@@ -307,13 +294,83 @@ public class SegmentIntersection extends AbstractAlgorithm {
     /* ************** */
 
     private void findIntersections() {
-        ArrayDeque<Event> Q = new ArrayDeque<Event>();
-        Q.push(new SegmentAssoc(arrangements.iterator().next()));
-        while (!Q.isEmpty())
-            handleEventPointBook(Q.pop());
+        intersectionsQueue.clear();
+        intersectionsQueue.push(arrangements.iterator().next());
+        while (!intersectionsQueue.isEmpty())
+            handleEventPoint(intersectionsQueue.pop());
     }
 
-    private void handleEventPointBook(SegmentAssoc sa) {
+    private void addIfIntersection(Segment s1, Segment s2) {
+        final Point intersectionPoint = Calc.intersection(s1, s2);
+        if (intersectionPoint != null)
+            intersectionsSet.add(intersectionPoint);
+    }
+
+    private void handleEventPoint(EventPoint ep) {
+        Vector<SegmentAssoc> upper = new Vector<SegmentAssoc>();
+        Vector<SegmentAssoc> contain = new Vector<SegmentAssoc>();
+        Vector<SegmentAssoc> lower = new Vector<SegmentAssoc>();
+
+        //
+        for (SegmentAssoc sa : sweepline) {
+            /**
+             * @todo check is better to use else if is not "upper" for contain
+             */
+            if ((sa.upper.y < ep.p.y) && (sa.lower.y > ep.p.y))
+                contain.add(sa);
+            else if (sa.upper.equals(ep.p))
+                upper.add(sa);
+            else if (sa.lower.equals(ep.p))
+                lower.add(sa);
+        }
+
+        //
+        if ((contain.size() + upper.size() + lower.size()) > 1) {
+            final Iterator<SegmentAssoc> contain_it = contain.iterator(), upper_it = upper.iterator(), lower_it = lower.iterator();
+            boolean iterate = true;
+            while (iterate) {
+                iterate = false;
+                if (contain_it.hasNext()) {
+                    addIfIntersection(ep.s, contain_it.next().s);
+                    iterate = true;
+                }
+                if (upper_it.hasNext()) {
+                    addIfIntersection(ep.s, upper_it.next().s);
+                    iterate = true;
+                }
+                if (lower_it.hasNext()) {
+                    addIfIntersection(ep.s, lower_it.next().s);
+                    iterate = true;
+                }
+            }
+        }
+
+        // Why not ...
+        sweepline.removeAll(lower);
+        sweepline.removeAll(contain);
+
+        // Why ???
+        sweepline.removeAll(upper);
+        sweepline.removeAll(contain);
+
+        //
+        /**
+         * @todo ?? (∗ Deleting and re-inserting the segments of C(p) reverses
+         *       their order. ∗) ??
+         **/
+
+        if ((contain.size() + upper.size()) > 1) {
+
+            NavigableSet<?> navig = (NavigableSet<?>)sweepline;
+            
+            navig.
+           
+            
+            // findNewEvent()
+
+        } else {
+
+        }
 
     }
 
@@ -327,8 +384,9 @@ public class SegmentIntersection extends AbstractAlgorithm {
         /** @todo check "on it" intersection */
         if (intersectionPoint != null) {
             if (intersectionPoint.x > p.x) {
-                if (!intersectionsQueue.contains(new EventPoint(null, type)))
-                    intersectionsQueue.push(intersectionPoint);
+                EventPoint intersectionEventPoint = new EventPoint(intersectionPoint);
+                if (!intersectionsQueue.contains(intersectionEventPoint))
+                    intersectionsQueue.push(intersectionEventPoint);
             }
         }
 
@@ -359,9 +417,8 @@ public class SegmentIntersection extends AbstractAlgorithm {
 
         //
         drawArrangementTip();
-        
+
         //
-        
 
         //
         // for (Segment s : cloud)
