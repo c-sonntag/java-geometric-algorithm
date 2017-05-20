@@ -7,6 +7,7 @@ import at.u4a.geometric_algorithms.algorithm.InterfaceAlgorithmBuilder;
 import at.u4a.geometric_algorithms.geometric.*;
 import at.u4a.geometric_algorithms.geometric.Polygon.*;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGraphicVisitor;
+import at.u4a.geometric_algorithms.gui.element.StatusBar;
 import at.u4a.geometric_algorithms.gui.layer.AbstractLayer;
 import at.u4a.geometric_algorithms.gui.layer.AlgorithmLayer;
 import at.u4a.geometric_algorithms.utils.Calc;
@@ -100,7 +101,14 @@ public class ConvexEnvelope extends AbstractAlgorithm {
         if (currentShapeHash != mutablePreviousShapeHash) {
 
             //
-            buildConvexPolygon();
+            statusStartBuild();
+
+            //
+            if (buildConvexPolygon())
+                statusFinishBuild();
+            else
+                statusInteruptBuild();
+
             //
             mutablePreviousShapeHash = currentShapeHash;
         }
@@ -114,9 +122,9 @@ public class ConvexEnvelope extends AbstractAlgorithm {
     public Polygon getPolygon() {
         return convexPoly;
     }
-    
+
     /* ************** */
-    
+
     @Override
     public AbstractShape getCompositeShape() {
         return getPolygon();
@@ -410,6 +418,8 @@ public class ConvexEnvelope extends AbstractAlgorithm {
     }
 
     private Vector<Point> devideToRing(Vector<Point> poly, int deph) {
+
+        statusAddCounter();
 
         //
         int polySize = poly.size();

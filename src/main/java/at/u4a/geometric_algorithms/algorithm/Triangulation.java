@@ -44,7 +44,7 @@ public class Triangulation extends AbstractAlgorithm {
 
             //
             AbstractShape as = l.getShape();
-            if (!(as instanceof Polygon)) 
+            if (!(as instanceof Polygon))
                 throw new RuntimeException("Triangulation need a Polygon Shape !");
 
             //
@@ -129,9 +129,17 @@ public class Triangulation extends AbstractAlgorithm {
         if (currentPolyHash != mutablePreviousPolyHash) {
 
             //
+            statusStartBuild();
+
+            //
             actualType = Polygon.Type.Simple;
-            if (buildTriangulation())
+            if (buildTriangulation()) {
                 actualType = Polygon.Type.Monotone;
+                statusFinishBuild();
+            } else
+                statusInteruptBuild();
+                
+
             //
             mutablePreviousPolyHash = currentPolyHash;
         }
@@ -221,6 +229,10 @@ public class Triangulation extends AbstractAlgorithm {
         int countAngle = 0;
 
         for (int i = 0; i < size + 2; i++) {
+
+            //
+            statusAddCounter();
+
             currentPoint = points.get(i % size);
 
             if (precPoint != null) {
@@ -327,6 +339,10 @@ public class Triangulation extends AbstractAlgorithm {
         Iterator<Point> rightPoint_it = sideRight.iterator();
         //
         while (true) {
+
+            //
+            statusAddCounter();
+
             if (leftPoint_it.hasNext() && rightPoint_it.hasNext()) {
 
                 if (leftPoint == null)
@@ -391,6 +407,10 @@ public class Triangulation extends AbstractAlgorithm {
         //
         for (int i = 2; i < fusionPointsSize - 1; i++) {
 
+            //
+            statusAddCounter();
+
+            //
             PointTipped currentPoint = fusionPoints.get(i);
             PointTipped stackFirst = stack.getFirst();
 

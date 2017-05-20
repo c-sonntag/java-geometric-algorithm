@@ -133,6 +133,9 @@ public class DrawerScene {
     public void setTool(Tool tool) {
 
         //
+        StatusBar.clearActive();
+        
+        //
         if (fx == null)
             throw new RuntimeException("Need FX is initialized");
 

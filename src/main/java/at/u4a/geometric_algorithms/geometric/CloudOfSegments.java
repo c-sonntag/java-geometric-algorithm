@@ -41,6 +41,14 @@ public class CloudOfSegments extends AbstractShape implements InterfaceContainer
         return segments;
     }
 
+    public void addSegment(Segment s) {
+        cloud.add(s);
+    }
+    
+    public void addSegment(Point pa, Point pb) {
+        cloud.add(new Segment(pa, pb));
+    }
+    
     @Override
     public boolean contains(Point p) {
         return (getContains(p) != null);

@@ -14,7 +14,7 @@ import javafx.scene.input.MouseEvent;
 
 public class CloudOfSegmentsToolState extends ToolState {
 
-    private static final Point MIN_SEGMENT_SIZE = new Point(5, 5);
+    private static final double MIN_SEGMENT_SIZE = 5;
 
     /* */
 
@@ -68,7 +68,7 @@ public class CloudOfSegmentsToolState extends ToolState {
     }
 
     public void valid(Drawer drawer) {
-        GeometricLayer<CloudOfSegments> cofLayer = new GeometricLayer<CloudOfSegments>(cof,Tool.LotOfSegment);
+        GeometricLayer<CloudOfSegments> cofLayer = new GeometricLayer<CloudOfSegments>(cof,Tool.CloudOfSegment);
         cofLayer.setLayerName("cof" + String.valueOf(ColoudOfSegmentsCount));
         ColoudOfSegmentsCount++;
 
@@ -128,7 +128,7 @@ public class CloudOfSegmentsToolState extends ToolState {
             s.b.set(event.getX(), event.getY());
             cof.convertToOrigin(s.b);
 
-            if (((Math.abs(s.a.x - s.b.x) >= MIN_SEGMENT_SIZE.x) && (Math.abs(s.a.y - s.b.y) >= MIN_SEGMENT_SIZE.y))) {
+            if (((Math.abs(s.a.x - s.b.x) >= MIN_SEGMENT_SIZE) || (Math.abs(s.a.y - s.b.y) >= MIN_SEGMENT_SIZE))) {
                 //
                 cof.cloud.add(s);
                 s = new Segment();

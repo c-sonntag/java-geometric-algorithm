@@ -438,7 +438,7 @@ public class PrincipalGui extends JFrame {
             //
             selectedLayer.getAuthorized().clear();
             //
-            lm.remplaceLayer(lm.getSelectedLayer(), algorithmLayer);
+            lm.remplaceLayer(selectedLayer, algorithmLayer);
         }
 
     }

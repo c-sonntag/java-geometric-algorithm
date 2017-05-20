@@ -75,7 +75,6 @@ public class SegmentIntersection extends AbstractAlgorithm {
     public SegmentIntersection(AbstractList<Segment> cloud, AbstractShape as) {
         this.cloud = cloud;
         this.as = as;
-
         this.cop = new CloudOfPoints(as.origin);
         // this.cop = new MonotonePolygon(as.origin, points);
     }
@@ -112,8 +111,11 @@ public class SegmentIntersection extends AbstractAlgorithm {
         if (currentLinesHash != mutablePreviousLinesHash) {
 
             //
-            //buildSegmentInteraction();
-            buildSegmentInteractionQuadratique();
+            statusStartBuild();
+
+            //
+            //statusBuildIs(buildSegmentInteractionQuadratique());
+            statusBuildIs(buildSegmentInteraction());
 
             //
             mutablePreviousLinesHash = currentLinesHash;
@@ -193,27 +195,28 @@ public class SegmentIntersection extends AbstractAlgorithm {
         cop.clear();
         Set<Point> intersections = new HashSet<Point>();
 
-        
         for (Segment s1 : cloud) {
             boolean firstS2 = true;
-            
+
             for (Segment s2 : cloud) {
-                
-                if(firstS2) {
+
+                if (firstS2) {
                     firstS2 = false;
                     continue;
                 }
-                
-                Point pInter = Calc.intersection(s1,s2);
-                
+
+                //
+                statusAddCounter();
+
+                //
+                Point pInter = Calc.intersection(s1, s2);
                 if (pInter == null)
                     continue;
-                
+
                 if (!intersections.contains(pInter)) {
                     intersections.add(pInter);
                     cop.addPoint(pInter);
                 }
-                
             }
         }
 

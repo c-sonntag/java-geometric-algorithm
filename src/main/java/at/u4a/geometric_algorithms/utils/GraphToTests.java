@@ -35,10 +35,15 @@ public class GraphToTests {
 
     static int Cloud_of_Points_NB = 6;
     static double Cloud_of_Points_FACTOR = 2;
+    
+    static int Cloud_of_Segments_NB = 6;
+    static double Cloud_of_Segments_FACTOR = 2;
 
     public static void defaultGraph(LayerManager lm) {
         Random rnd = new Random();
-
+        
+        lm.addLayerAndSelectIt(segment_intersection(cloud_of_segments(rnd.nextLong(), Cloud_of_Segments_NB, Cloud_of_Segments_FACTOR)));
+        
         //
         if (activeDefault) {
             lm.addLayerAndSelectIt(rectangle(rnd.nextLong(), Square_FACTOR));
@@ -54,12 +59,20 @@ public class GraphToTests {
 
     private static AbstractLayer convex_envelope(AbstractLayer layer) {
         ConvexEnvelope.Builder ceb = new ConvexEnvelope.Builder();
+        layer.getAuthorized().clear();
         return ceb.builder(layer);
     }
 
     static AbstractLayer triangulation(AbstractLayer layer) {
         Triangulation.Builder tb = new Triangulation.Builder();
+        layer.getAuthorized().clear();
         return tb.builder(layer);
+    }
+
+    static AbstractLayer segment_intersection(AbstractLayer layer) {
+        SegmentIntersection.Builder si = new SegmentIntersection.Builder();
+        layer.getAuthorized().clear();
+        return si.builder(layer);
     }
 
     /* ****** SHAPE LAYER ****** */
@@ -114,6 +127,22 @@ public class GraphToTests {
         return new GeometricLayer<CloudOfPoints>(cloudOfPoint, Tool.CloudOfPoint);
     }
 
+    private static AbstractLayer cloud_of_segments(long seed, int nb, double factor) {
+        Random rnd = new Random(seed);
+
+        CloudOfSegments cloudOfSegments = new CloudOfSegments();
+        cloudOfSegments.origin.set(200 + rnd.nextInt(100), 200 + rnd.nextInt(100));
+
+        for (int i = 0; i < nb * 2; i+=2) {
+            cloudOfSegments.addSegment( //
+                    new Point(200 - rnd.nextInt(200) * factor, 200 - rnd.nextInt(200) * factor), //
+                    new Point(200 - rnd.nextInt(200) * factor, i%2 * 100 + 200 - rnd.nextInt(200) * factor) //
+            );
+        }
+
+        return new GeometricLayer<CloudOfSegments>(cloudOfSegments, Tool.CloudOfSegment);
+    }
+
     /* ****** GENERATE LAYER MENU ****** */
 
     private static boolean makeOptionPane(JPanel panel, String title) {
@@ -134,8 +163,7 @@ public class GraphToTests {
         p.add(new JLabel(label));
         p.add(item);
     }
-    
-    
+
     private static void addRectangle(LayerManager lm) {
         Random rnd = new Random();
         JSpinner seed = new JSpinner(new SpinnerNumberModel(rnd.nextLong(), Long.MIN_VALUE, Long.MAX_VALUE, 1));

@@ -7,14 +7,58 @@ public class Line implements InterfaceGeometric {
     /* HELPER CLASS */
 
     public class Inclinaison {
+
+        public final double gradiant;
+        public final double decal;
+        public final boolean isInfinite;
+        public final boolean compute;
+
+        public Inclinaison() {
+
+            final double xDecal = b.x - a.x;
+            final double yDecal = b.y - a.y;
+
+            if ((xDecal == 0) && (yDecal == 0)) {
+                gradiant = 0;
+                decal = 0;
+                isInfinite = false;
+                compute = false;
+                return;
+            }
+
+            if (xDecal == 0) {
+                gradiant = 0;
+                isInfinite = true;
+                decal = a.x;
+            } else {
+                gradiant = yDecal / xDecal;
+                decal = a.y - gradiant * a.x;
+                isInfinite = false;
+            }
+            compute = true;
+        }
+
+        public boolean equals(InclinaisonHV other) {
+            return this.gradiant == other.gradiant && this.decal == other.decal;
+        }
+    }
+
+    
+    /** @todo in construction for more precision, see Calc.intersectionHV */
+    public class InclinaisonHV {
+
         public final double gradiant;
         public final double decal;
         public final boolean isHorizontal;
         public final boolean compute;
 
-        public Inclinaison() {
-            final double xDecal = b.x - a.x;
-            final double yDecal = b.y - a.y;
+        public final double xDecal;
+        public final double yDecal;
+
+        public InclinaisonHV() {
+
+            xDecal = b.x - a.x;
+            yDecal = b.y - a.y;
 
             if ((xDecal == 0) && (yDecal == 0)) {
                 gradiant = 0;
@@ -38,7 +82,7 @@ public class Line implements InterfaceGeometric {
 
         }
 
-        public boolean equals(Inclinaison other) {
+        public boolean equals(InclinaisonHV other) {
             return this.gradiant == other.gradiant && this.isHorizontal == other.isHorizontal && this.decal == other.decal;
         }
     }
@@ -96,8 +140,12 @@ public class Line implements InterfaceGeometric {
         visitor.visit(this);
     }
 
-    public Inclinaison getInclinaison() {
+    public final Inclinaison getInclinaison() {
         return new Inclinaison();
+    }
+
+    public final InclinaisonHV getInclinaisonHV() {
+        return new InclinaisonHV();
     }
 
 }

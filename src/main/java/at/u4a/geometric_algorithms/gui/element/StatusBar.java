@@ -5,15 +5,36 @@ import java.awt.Dimension;
 import javax.swing.JLabel;
 
 public class StatusBar extends JLabel {
-    
+
+    /* STATIC */
+
+    private static StatusBar active = null;
+
+    public static void setActiveMessage(String message) {
+        if (active != null)
+            StatusBar.active.setMessage(message);
+    }
+
+    public static void clearActive() {
+        if (active != null)
+            StatusBar.active.clear();
+    }
+
+    /*  */
+
     /** Creates a new instance of StatusBar */
     public StatusBar() {
         super();
         super.setPreferredSize(new Dimension(100, 16));
-        setMessage("Ready");
+        this.setMessage("Ready");
+        StatusBar.active = this;
     }
-     
+
     public void setMessage(String message) {
-        setText(" "+message);        
-    }        
+        setText(" " + message);
+    }
+
+    public void clear() {
+        setText(" ");
+    }
 }

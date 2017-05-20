@@ -73,6 +73,10 @@ public class DrawerContext {
     }
 
     public void cancel() {
+        //
+        StatusBar.clearActive();
+        
+        //
         if (ds.getCurrentState() != null)
             ds.getCurrentState().cancel(drawer);
         repaint();
