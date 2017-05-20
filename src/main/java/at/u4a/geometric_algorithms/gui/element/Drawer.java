@@ -1,19 +1,7 @@
 package at.u4a.geometric_algorithms.gui.element;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.beans.EventHandler;
-
-import javax.swing.JOptionPane;
-
-import at.u4a.geometric_algorithms.geometric.AbstractShape;
-import at.u4a.geometric_algorithms.geometric.Point;
-import at.u4a.geometric_algorithms.geometric.Rectangle;
 import at.u4a.geometric_algorithms.graphic_visitor.GraphicPainter;
 import at.u4a.geometric_algorithms.gui.layer.AbstractLayer;
-import at.u4a.geometric_algorithms.gui.layer.GeometricLayer;
-import at.u4a.geometric_algorithms.gui.tools.Tool;
-import at.u4a.geometric_algorithms.utils.GraphToTests;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 
@@ -34,18 +22,12 @@ public class Drawer extends Canvas {
 
     private final GraphicPainter gp = new GraphicPainter(getGraphicsContext2D());
 
-    // public Drawer(double width, double height) {
     public Drawer(DrawerScene ds) {
-        // super(width, height);
-        // super(400, 400);
         this.ds = ds;
         this.context = new DrawerContext(this);
         //
         setFocusTraversable(true);
-        /*
-         * setOnMouseMoved(new EventHandle<MouseEvent>() { public void
-         * handle(MouseEvent event) { context.mouseMoved(event); } });
-         */
+
         setOnMouseEntered(context::mouseEntered);
         setOnMouseExited(context::mouseExited);
 
@@ -101,12 +83,6 @@ public class Drawer extends Canvas {
         //
         for (AbstractLayer layer : ds.getLayerManager()) {
             layer.accept(gp);
-
-            /*
-             * layer. AbstractShape shape = layer.getShape();
-             * 
-             * if( shape.contains(p) ) .accept(sp);
-             */
         }
 
         this.context.paint(gp);

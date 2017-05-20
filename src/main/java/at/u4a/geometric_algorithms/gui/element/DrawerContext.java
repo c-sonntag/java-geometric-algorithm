@@ -11,6 +11,9 @@ import javafx.scene.input.MouseEvent;
 
 public class DrawerContext {
 
+    EnumSet<KeyCode> validKey = EnumSet.of(KeyCode.ENTER);
+    EnumSet<KeyCode> cancelKey = EnumSet.of(KeyCode.ESCAPE);
+
     private final Drawer drawer;
     private final DrawerScene ds;
 
@@ -31,9 +34,15 @@ public class DrawerContext {
             eventKeys.add(KeyCode.SHIFT);
 
         //
-        Tool toolChoose = Tool.getByKeyCode(eventKeys);
-        if (toolChoose != null)
-            ds.setTool(toolChoose);
+        if (eventKeys.equals(validKey))
+            valid();
+        else if (eventKeys.equals(cancelKey))
+            cancel();
+        else {
+            Tool toolChoose = Tool.getByKeyCode(eventKeys);
+            if (toolChoose != null)
+                ds.setTool(toolChoose);
+        }
     }
 
     /* */

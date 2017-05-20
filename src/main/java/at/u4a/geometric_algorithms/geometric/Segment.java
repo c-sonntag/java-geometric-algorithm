@@ -11,13 +11,13 @@ public class Segment extends Line {
     public Segment() {
         super();
     }
-    
+
     public String toString() {
-        return "["+a.toString()+";"+b.toString()+"]";
+        return "[" + a.toString() + ";" + b.toString() + "]";
     }
 
     public boolean contains(Point p) {
-        return
+        return (a.contains(p) || b.contains(p)) ? true :
         /* minX */ ((p.x >= Math.min(a.x, b.x)) &&
         /* maxX */ (p.x <= Math.max(a.x, b.x)) &&
         /* minY */ (p.y >= Math.min(a.y, b.y)) &&
@@ -25,10 +25,10 @@ public class Segment extends Line {
         /* In Range */ super.contains(p) :
         /* Out Range */ false;
     }
-    
+
     @Override
     public void accept(InterfaceGeometricPainterVisitor visitor) {
         visitor.visit(this);
     }
-    
+
 }

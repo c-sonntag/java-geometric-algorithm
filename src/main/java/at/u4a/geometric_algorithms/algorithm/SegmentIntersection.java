@@ -2,8 +2,14 @@ package at.u4a.geometric_algorithms.algorithm;
 
 import java.util.AbstractList;
 import java.util.ArrayDeque;
+import java.util.Comparator;
 import java.util.Deque;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.Vector;
 
 import at.u4a.geometric_algorithms.algorithm.InterfaceAlgorithmBuilder;
@@ -11,8 +17,6 @@ import at.u4a.geometric_algorithms.geometric.AbstractShape;
 import at.u4a.geometric_algorithms.geometric.CloudOfPoints;
 import at.u4a.geometric_algorithms.geometric.CloudOfSegments;
 import at.u4a.geometric_algorithms.geometric.Point;
-import at.u4a.geometric_algorithms.geometric.Polygon;
-import at.u4a.geometric_algorithms.geometric.Polygon.MonotonePolygon;
 import at.u4a.geometric_algorithms.geometric.Segment;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGraphicVisitor;
 import at.u4a.geometric_algorithms.gui.layer.AbstractLayer;
@@ -108,7 +112,8 @@ public class SegmentIntersection extends AbstractAlgorithm {
         if (currentLinesHash != mutablePreviousLinesHash) {
 
             //
-            buildSegmentInteraction();
+            //buildSegmentInteraction();
+            buildSegmentInteractionQuadratique();
 
             //
             mutablePreviousLinesHash = currentLinesHash;
@@ -118,17 +123,53 @@ public class SegmentIntersection extends AbstractAlgorithm {
 
     /* ************** */
 
-    /**
-     * 
-     */
-    private void findIntersections(Segment s) {
+    private class TComparator implements Comparator<Segment> {
 
-        ArrayDeque<Point> Q = new ArrayDeque<Point>();
-        Q.push(s.b);
-        
-        
-        
-        
+        @Override
+        public int compare(Segment arg0, Segment arg1) {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+
+    };
+
+    /* ************** */
+
+    private final HashMap<Point, Vector<Segment>> intersections = new HashMap<Point, Vector<Segment>>();
+
+    private final SortedMap<Segment, Segment> T = new TreeMap<Segment, Segment>(new TComparator());
+
+    /* ************** */
+
+    /**
+     * Permet d'associer un Segment avec un Point et de trouver le point e plus
+     * en haut ou a gauche
+     */
+    class SegmentAssoc {
+        public Segment s;
+        public Point upper, downer;
+
+        public SegmentAssoc(Segment s) {
+            this.s = s;
+            if ((s.a.y > s.b.y) ? true : ((s.a.y < s.b.y) ? false : ((s.a.x >= s.b.x) ? true : false))) {
+                upper = s.a;
+                downer = s.b;
+            } else {
+                upper = s.b;
+                downer = s.a;
+            }
+        }
+    }
+
+    private void findIntersections(Segment s) {
+        ArrayDeque<SegmentAssoc> Q = new ArrayDeque<SegmentAssoc>();
+        Q.push(new SegmentAssoc(s));
+        while (!Q.isEmpty())
+            handleEventPoint(Q.pop());
+    }
+
+    private void handleEventPoint(SegmentAssoc sa) {
+
     }
 
     /* ************** */
@@ -136,10 +177,47 @@ public class SegmentIntersection extends AbstractAlgorithm {
     /**
      */
     private boolean buildSegmentInteraction() {
-
         //
         cop.clear();
 
         return true;
     }
+
+    /* ************** */
+
+    /**
+     * Used for test and compare
+     */
+    protected boolean buildSegmentInteractionQuadratique() {
+        //
+        cop.clear();
+        Set<Point> intersections = new HashSet<Point>();
+
+        
+        for (Segment s1 : cloud) {
+            boolean firstS2 = true;
+            
+            for (Segment s2 : cloud) {
+                
+                if(firstS2) {
+                    firstS2 = false;
+                    continue;
+                }
+                
+                Point pInter = Calc.intersection(s1,s2);
+                
+                if (pInter == null)
+                    continue;
+                
+                if (!intersections.contains(pInter)) {
+                    intersections.add(pInter);
+                    cop.addPoint(pInter);
+                }
+                
+            }
+        }
+
+        return true;
+    }
+
 };

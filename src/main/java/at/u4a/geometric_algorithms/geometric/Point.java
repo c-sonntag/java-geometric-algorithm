@@ -6,6 +6,7 @@ public class Point implements InterfaceGeometric {
 
     public final static float POINT_RAYON = 1.5f;
     public final static float POINT_DIAMETRE = POINT_RAYON * 2;
+    public final static float CONTAIN_DIAMETRE = POINT_DIAMETRE + 5;
 
     public double x, y;
 
@@ -48,7 +49,8 @@ public class Point implements InterfaceGeometric {
     }
 
     public boolean contains(Point p) {
-        return (Math.abs(x - p.x) <= POINT_DIAMETRE) && (Math.abs(y - p.y) <= POINT_DIAMETRE);
+        return (Math.abs(x - p.x) <= CONTAIN_DIAMETRE) && (Math.abs(y - p.y) <= CONTAIN_DIAMETRE);
+        //return (Math.abs(x - p.x) <= POINT_DIAMETRE) && (Math.abs(y - p.y) <= POINT_DIAMETRE);
         // return (x == p.x) && (y == p.y);
     }
 

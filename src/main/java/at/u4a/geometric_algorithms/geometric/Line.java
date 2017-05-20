@@ -4,6 +4,47 @@ import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGeometricPainterVisi
 
 public class Line implements InterfaceGeometric {
 
+    /* HELPER CLASS */
+
+    public class Inclinaison {
+        public final double gradiant;
+        public final double decal;
+        public final boolean isHorizontal;
+        public final boolean compute;
+
+        public Inclinaison() {
+            final double xDecal = b.x - a.x;
+            final double yDecal = b.y - a.y;
+
+            if ((xDecal == 0) && (yDecal == 0)) {
+                gradiant = 0;
+                decal = 0;
+                isHorizontal = false;
+                compute = false;
+                return;
+            }
+
+            if (Math.abs(xDecal) >= Math.abs(yDecal)) {
+                isHorizontal = true;
+                gradiant = yDecal / xDecal;
+                decal = a.y - gradiant * a.x;
+            } else {
+                isHorizontal = false;
+                gradiant = xDecal / yDecal;
+                decal = a.x - gradiant * a.y;
+            }
+
+            compute = true;
+
+        }
+
+        public boolean equals(Inclinaison other) {
+            return this.gradiant == other.gradiant && this.isHorizontal == other.isHorizontal && this.decal == other.decal;
+        }
+    }
+
+    /* */
+
     private final static double EPSILON = 1;
 
     public final Point a, b;
@@ -37,7 +78,7 @@ public class Line implements InterfaceGeometric {
     }
 
     public boolean contains(Point p) {
-        return Math.abs(distance(p)) <= EPSILON;
+        return (Math.abs(distance(p)) <= EPSILON) || a.contains(p) || b.contains(p);
     }
 
     @Override
@@ -53,6 +94,10 @@ public class Line implements InterfaceGeometric {
     @Override
     public void accept(InterfaceGeometricPainterVisitor visitor) {
         visitor.visit(this);
+    }
+
+    public Inclinaison getInclinaison() {
+        return new Inclinaison();
     }
 
 }

@@ -1,6 +1,8 @@
 package at.u4a.geometric_algorithms.utils;
 
+import at.u4a.geometric_algorithms.geometric.Line;
 import at.u4a.geometric_algorithms.geometric.Point;
+import at.u4a.geometric_algorithms.geometric.Segment;
 
 public class Calc {
 
@@ -17,6 +19,28 @@ public class Calc {
         final double pBy = pB.y - pOrigine.y;
 
         return pAx * pBy - pAy * pBx;
+    }
+
+    /**
+     * Renvoi l'intersegtion entre 2 segments Si aucune intersection trouvé
+     * renvoie nulle
+     */
+    public static Point intersection(Segment sa, Segment sb) {
+
+        Segment.Inclinaison aInc = sa.getInclinaison();
+        Segment.Inclinaison bInc = sb.getInclinaison();
+
+        if (//
+        ((aInc.gradiant == bInc.gradiant) && (aInc.isHorizontal == bInc.isHorizontal)) || //
+                (!aInc.compute || !bInc.compute) //
+        )
+            return null;
+
+        /** @todo its only for the same orientation */
+        final double x = (bInc.decal - aInc.decal) / (aInc.gradiant - bInc.gradiant);
+        final double y = aInc.gradiant * x + aInc.decal;
+
+        return new Point(x, y);
     }
 
 }

@@ -23,7 +23,8 @@ public enum Tool {
 
     // Null(null, (EnumSet<KeyCode>) null, ToolCategory.Invisible, null,
     // NullToolState::new), //
-    Escape(null, KeyCode.ESCAPE, ToolCategory.Invisible, null, NullToolState::new), //
+    // Escape(null, KeyCode.ESCAPE, ToolCategory.Invisible, null,
+    // NullToolState::new), //
 
     Selection("Outil Selection", KeyCode.V, ToolCategory.Transform, "selection.png", SelectionToolState::new), //
     DirectSelection("Outil Selection directe", KeyCode.A, ToolCategory.Transform, "selection_direct.png", DirectSelectionToolState::new), //
@@ -115,7 +116,7 @@ public enum Tool {
     }
 
     private ImageIcon mutableImageIcon = null;
-    
+
     public ImageIcon getImageIcon() {
         if (mutableImageIcon == null)
             mutableImageIcon = new ImageIcon(Tool.iconRessource + icon);
