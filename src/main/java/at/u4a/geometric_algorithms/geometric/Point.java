@@ -1,12 +1,29 @@
 package at.u4a.geometric_algorithms.geometric;
 
+import java.util.Comparator;
+
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGeometricPainterVisitor;
 
 public class Point implements InterfaceGeometric {
 
+    /* STATIC VARS */
+
     public final static float POINT_RAYON = 1.5f;
     public final static float POINT_DIAMETRE = POINT_RAYON * 2;
     public final static float CONTAIN_DIAMETRE = POINT_DIAMETRE + 5;
+
+    /* STATIC CLASS */
+
+    public static class PointComparator implements Comparator<Point> {
+        @Override
+        public int compare(Point p1, Point p2) {
+            if (p1.equals(p2))
+                return 0;
+            return (p1.x != p2.x) ? ((p1.x < p2.x) ? -1 : 1) : ((p1.y < p2.y) ? -1 : 1);
+        }
+    };
+
+    /* */
 
     public double x, y;
 
