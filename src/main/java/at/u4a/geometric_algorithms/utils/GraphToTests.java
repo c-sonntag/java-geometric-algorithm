@@ -1,11 +1,9 @@
 package at.u4a.geometric_algorithms.utils;
 
 import java.awt.Component;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Random;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -16,7 +14,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
-import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 
 import at.u4a.geometric_algorithms.algorithm.*;
@@ -40,7 +37,7 @@ public class GraphToTests {
     static double Cloud_of_Segments_FACTOR = 2;
 
     public static void defaultGraph(LayerManager lm) {
-        Random rnd = new Random();
+        Random rnd = new Random(111222244L);
         
         lm.addLayerAndSelectIt(segment_intersection(cloud_of_segments(rnd.nextLong(), Cloud_of_Segments_NB, Cloud_of_Segments_FACTOR)));
         
@@ -213,7 +210,7 @@ public class GraphToTests {
         JSpinner factor = new JSpinner(new SpinnerNumberModel(1, 1, 100, 0.5));
         //
         JPanel p = new JPanel();
-        makeInputItem(p, "Nb points:", nb);
+        makeInputItem(p, "Nb segments:", nb);
         makeInputItem(p, "Factor:", factor);
         //
         JPanel pSeed = new JPanel();
@@ -221,6 +218,27 @@ public class GraphToTests {
         //
         if (makeOptionPane(makePanelRoot(p, pSeed), "CloudOfPoints generator"))
             lm.addLayerAndSelectIt(cloud_of_points( //
+                    ((Number) seed.getValue()).longValue(), //
+                    ((Number) nb.getValue()).intValue(), //
+                    ((Number) factor.getValue()).doubleValue() //
+            ));
+    }
+    
+    private static void addCloudOfSegments(LayerManager lm) {
+        Random rnd = new Random();
+        JSpinner seed = new JSpinner(new SpinnerNumberModel(rnd.nextLong(), Long.MIN_VALUE, Long.MAX_VALUE, 1));
+        JSpinner nb = new JSpinner(new SpinnerNumberModel(6, 1, 1000000, 1));
+        JSpinner factor = new JSpinner(new SpinnerNumberModel(1, 1, 100, 0.5));
+        //
+        JPanel p = new JPanel();
+        makeInputItem(p, "Nb points:", nb);
+        makeInputItem(p, "Factor:", factor);
+        //
+        JPanel pSeed = new JPanel();
+        makeInputItem(pSeed, "Seed:", seed);
+        //
+        if (makeOptionPane(makePanelRoot(p, pSeed), "CloudOfSegments generator"))
+            lm.addLayerAndSelectIt(cloud_of_segments( //
                     ((Number) seed.getValue()).longValue(), //
                     ((Number) nb.getValue()).intValue(), //
                     ((Number) factor.getValue()).doubleValue() //
@@ -240,6 +258,7 @@ public class GraphToTests {
         a.accept("Rectangle", (arg) -> addRectangle(lm));
         a.accept("MonotonePolygon", (arg) -> addPolygon(lm));
         a.accept("CloudOfPoints", (arg) -> addCloudOfPoints(lm));
+        a.accept("CloudOfSegments", (arg) -> addCloudOfSegments(lm));
 
     }
 

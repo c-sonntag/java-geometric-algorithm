@@ -120,7 +120,7 @@ public class SegmentIntersection extends AbstractAlgorithm {
             statusStartBuild();
 
             //
-            // statusBuildIs(buildSegmentInteractionQuadratique());
+            //statusBuildIs(buildSegmentInteractionQuadratique());
             statusBuildIs(buildSegmentInteraction());
 
             //
@@ -143,7 +143,7 @@ public class SegmentIntersection extends AbstractAlgorithm {
     private class SweepLineComparator implements Comparator<Segment> {
         @Override
         public int compare(Segment s1, Segment s2) {
-            if (s1.a.equals(s1.a) && s2.b.equals(s2.b))
+            if (s1.a.equals(s2.a) && s2.b.equals(s2.b))
                 return 0;
             final double wS1Decal = Math.abs(s1.a.x - s1.b.x), wS2Decal = Math.abs(s2.a.x - s2.b.x);
             return ((wS1Decal == wS2Decal) ? //
@@ -299,12 +299,6 @@ public class SegmentIntersection extends AbstractAlgorithm {
             this.as = as;
             this.type = type;
             this.p = (type == EventType.Upper) ? as.upper : as.lower;
-            if (type == EventType.Upper)
-                test();
-        }
-
-        private void test() {
-
         }
     }
 
@@ -318,7 +312,7 @@ public class SegmentIntersection extends AbstractAlgorithm {
         while (arrangements_it.hasNext()) {
             intersectionsQueue.push(arrangements_it.next());
             while (!intersectionsQueue.isEmpty())
-                handleEventPoint(intersectionsQueue.pop());
+                handleEventPoint(intersectionsQueue.pollFirst());
         }
     }
 
@@ -340,9 +334,13 @@ public class SegmentIntersection extends AbstractAlgorithm {
     }
 
     private void handleEventPoint(EventPoint ep) {
+        
+        if(ep==null)
+            return;
 
         statusAddCounter();
 
+        //
         Vector<Segment> upper = new Vector<Segment>();
         Vector<Segment> contain = new Vector<Segment>();
         Vector<Segment> lower = new Vector<Segment>();
@@ -420,6 +418,8 @@ public class SegmentIntersection extends AbstractAlgorithm {
                     //
                     if (sRightPrime == null)
                         sRightPrime = cNext;
+                    else if (sweeplineComparator.compare(sRightPrime, cNext) < 0)
+                        sRightPrime = cNext;
 
                     iterate = true;
                 }
@@ -428,6 +428,8 @@ public class SegmentIntersection extends AbstractAlgorithm {
                     final Segment uNext = upper_it.next();
 
                     if (sLeftPrime == null)
+                        sLeftPrime = uNext;
+                    else if (sweeplineComparator.compare(sLeftPrime, uNext) > 0)
                         sLeftPrime = uNext;
 
                     if (sRightPrime == null)
@@ -468,16 +470,6 @@ public class SegmentIntersection extends AbstractAlgorithm {
                     intersectionsQueue.push(intersectionEventPoint);
             }
         }
-
-    }
-
-    /* ************** */
-
-    private void advanceSegment(SegmentAssoc as) {
-
-        // sweepline.add(as);
-        // sweeplineStatus.add(new Event(as));
-
     }
 
     /* ************** */
@@ -502,22 +494,6 @@ public class SegmentIntersection extends AbstractAlgorithm {
         findIntersections();
 
         //
-
-        //
-        // for (Segment s : cloud)
-        // arrangements.add(new SegmentAssoc(s));
-
-        // for (Segment s : cloud)
-        // sweeplineStatus.add(new SegmentAssoc(s));
-
-        //
-        // drawArrangementTip();
-        // drawEventTip();
-
-        //
-        // for (SegmentAssoc as : arrangements)
-        // advanceSegment(as);
-
         return true;
     }
 
@@ -592,11 +568,11 @@ public class SegmentIntersection extends AbstractAlgorithm {
         for (EventPoint e : arrangements) {
             switch (e.type) {
             case Upper:
-                drawTextTip("Up(" + counterU + ")", e.p);
+                drawTextTip("Up(" + counterU + ")["+e.p.toString()+"]", e.p);
                 counterU++;
                 break;
             case Lower:
-                drawTextTip("Low(" + counterL + ")", e.p);
+                drawTextTip("Low(" + counterL + ")["+e.p.toString()+"]", e.p);
                 counterL++;
                 break;
             }
