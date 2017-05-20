@@ -37,7 +37,7 @@ public class GraphToTests {
     static double Cloud_of_Segments_FACTOR = 2;
 
     public static void defaultGraph(LayerManager lm) {
-        Random rnd = new Random(111222244L);
+        Random rnd = new Random();
         
         lm.addLayerAndSelectIt(segment_intersection(cloud_of_segments(rnd.nextLong(), Cloud_of_Segments_NB, Cloud_of_Segments_FACTOR)));
         
