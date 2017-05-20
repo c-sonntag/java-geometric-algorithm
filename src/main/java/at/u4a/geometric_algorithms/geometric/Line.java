@@ -43,7 +43,6 @@ public class Line implements InterfaceGeometric {
         }
     }
 
-    
     /** @todo in construction for more precision, see Calc.intersectionHV */
     public class InclinaisonHV {
 
@@ -101,6 +100,10 @@ public class Line implements InterfaceGeometric {
     public Line() {
         a = new Point();
         b = new Point();
+    }
+
+    public boolean equals(Line other) {
+        return this.a.equals(other.a) && this.b.equals(other.b);
     }
 
     public String toString() {

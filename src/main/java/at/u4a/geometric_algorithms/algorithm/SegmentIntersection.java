@@ -10,12 +10,14 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.Vector;
 
 import at.u4a.geometric_algorithms.algorithm.InterfaceAlgorithmBuilder;
 import at.u4a.geometric_algorithms.geometric.AbstractShape;
 import at.u4a.geometric_algorithms.geometric.CloudOfPoints;
 import at.u4a.geometric_algorithms.geometric.CloudOfSegments;
+import at.u4a.geometric_algorithms.geometric.Line;
 import at.u4a.geometric_algorithms.geometric.Point;
 import at.u4a.geometric_algorithms.geometric.Segment;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGraphicVisitor;
@@ -81,8 +83,11 @@ public class SegmentIntersection extends AbstractAlgorithm {
 
     /* ************** */
 
+    InterfaceGraphicVisitor mutableVisitorForDebugging = null;
+
     @Override
     public void accept(Vector<AbstractLayer> v, InterfaceGraphicVisitor visitor) {
+        mutableVisitorForDebugging = visitor;
         makeSegmentInteraction();
         visitor.visit(cop);
     }
@@ -114,7 +119,7 @@ public class SegmentIntersection extends AbstractAlgorithm {
             statusStartBuild();
 
             //
-            //statusBuildIs(buildSegmentInteractionQuadratique());
+            // statusBuildIs(buildSegmentInteractionQuadratique());
             statusBuildIs(buildSegmentInteraction());
 
             //
@@ -125,21 +130,57 @@ public class SegmentIntersection extends AbstractAlgorithm {
 
     /* ************** */
 
-    private class TComparator implements Comparator<Segment> {
+    /**
+     * The left-to-right order of the segments along the sweep line corresponds
+     * to the left-to-right order of the leaves in T.
+     */
+    private class SweepLineComparator implements Comparator<Segment> {
 
         @Override
-        public int compare(Segment arg0, Segment arg1) {
-            // TODO Auto-generated method stub
-            return 0;
+        public int compare(Segment s1, Segment s2) {
+            if (s1.equals(s2))
+                return 0;
+            //
+            return 0; // fix it
         }
+    };
 
+    private class EventComparator implements Comparator<Event> {
+
+        @Override
+        public int compare(Event e1, Event e2) {
+            if (e1.equals(e2))
+                return 0;
+            //
+            return 0; // fix it
+        }
+    };
+
+    private class ArrangementComparator implements Comparator<SegmentAssoc> {
+        @Override
+        public int compare(SegmentAssoc e1, SegmentAssoc e2) {
+            return (//
+            e1.upper.equals(e2.upper) ? 0 : ( //
+            (e1.upper.y == e2.upper.y) ? //
+                    ((e1.upper.x < e2.upper.x) ? -1 : 1) : //
+                    ((e1.upper.y < e2.upper.y) ? -1 : 1)//
+            ));
+        }
     };
 
     /* ************** */
 
+    /**
+     * Contient le "cloud" qui est enregistré dans un "Set" avec comparator
+     * "top-left" pour simuler le passage du "sweepline"
+     */
+    private final Set<SegmentAssoc> arrangements = new TreeSet<SegmentAssoc>(new ArrangementComparator());
+
     private final HashMap<Point, Vector<Segment>> intersections = new HashMap<Point, Vector<Segment>>();
 
-    private final SortedMap<Segment, Segment> T = new TreeMap<Segment, Segment>(new TComparator());
+    private final SortedMap<Segment, Segment> statusT = new TreeMap<Segment, Segment>(new SweepLineComparator());
+
+    private final Set<Event> events = new TreeSet<Event>(new EventComparator());
 
     /* ************** */
 
@@ -149,21 +190,29 @@ public class SegmentIntersection extends AbstractAlgorithm {
      */
     class SegmentAssoc {
         public Segment s;
-        public Point upper, downer;
+        public Point upper, downer; // Upper point is also called "endpoint"
 
         public SegmentAssoc(Segment s) {
             this.s = s;
             if ((s.a.y > s.b.y) ? true : ((s.a.y < s.b.y) ? false : ((s.a.x >= s.b.x) ? true : false))) {
-                upper = s.a;
-                downer = s.b;
-            } else {
                 upper = s.b;
                 downer = s.a;
+            } else {
+                upper = s.a;
+                downer = s.b;
+
             }
         }
     }
 
+    class Event {
+
+    }
+
+    /* ************** */
+
     private void findIntersections(Segment s) {
+
         ArrayDeque<SegmentAssoc> Q = new ArrayDeque<SegmentAssoc>();
         Q.push(new SegmentAssoc(s));
         while (!Q.isEmpty())
@@ -179,8 +228,21 @@ public class SegmentIntersection extends AbstractAlgorithm {
     /**
      */
     private boolean buildSegmentInteraction() {
+
+        //
+        if (cloud.size() <= 2)
+            return buildSegmentInteractionQuadratique();
+
         //
         cop.clear();
+        arrangements.clear();
+
+        //
+        for (Segment s : cloud)
+            arrangements.add(new SegmentAssoc(s));
+
+        //
+        drawArrangementTip();
 
         return true;
     }
@@ -191,6 +253,7 @@ public class SegmentIntersection extends AbstractAlgorithm {
      * Used for test and compare
      */
     protected boolean buildSegmentInteractionQuadratique() {
+
         //
         cop.clear();
         Set<Point> intersections = new HashSet<Point>();
@@ -221,6 +284,34 @@ public class SegmentIntersection extends AbstractAlgorithm {
         }
 
         return true;
+    }
+
+    /* ********* DEBUG ONLY ********* */
+
+    public void drawTextTip(String txt, Point p) {
+        if (mutableVisitorForDebugging == null)
+            return;
+        final Point pToOrigin = new Point();
+        pToOrigin.set(p);
+        as.convertToStandard(pToOrigin);
+        mutableVisitorForDebugging.drawTip(txt, pToOrigin);
+    }
+
+    public void drawTip(Point p) {
+        if (mutableVisitorForDebugging == null)
+            return;
+        final Point pToOrigin = new Point();
+        pToOrigin.set(p);
+        as.convertToStandard(pToOrigin);
+        mutableVisitorForDebugging.drawTip(p.toString(), pToOrigin);
+    }
+
+    public void drawArrangementTip() {
+        int counter = 0;
+        for (SegmentAssoc as : arrangements) {
+            drawTextTip(String.valueOf(counter), as.upper);
+            counter++;
+        }
     }
 
 };
