@@ -312,15 +312,22 @@ public class SegmentIntersection extends AbstractAlgorithm {
 
     private void findIntersections() {
         intersectionsQueue.clear();
-        intersectionsQueue.push(arrangements.iterator().next());
-        while (!intersectionsQueue.isEmpty())
-            handleEventPoint(intersectionsQueue.pop());
+
+        Iterator<EventPoint> arrangements_it = arrangements.iterator();
+
+        while (arrangements_it.hasNext()) {
+            intersectionsQueue.push(arrangements_it.next());
+            while (!intersectionsQueue.isEmpty())
+                handleEventPoint(intersectionsQueue.pop());
+        }
     }
 
     private void addIfIntersection(Segment s1, Segment s2) {
         final Point intersectionPoint = Calc.intersection(s1, s2);
-        if (intersectionPoint != null)
+        if (intersectionPoint != null) {
             intersectionsSet.add(intersectionPoint);
+            cop.addPoint(intersectionPoint);
+        }
     }
 
     private void addInSweepline(Vector<Segment> ls) {
@@ -388,13 +395,12 @@ public class SegmentIntersection extends AbstractAlgorithm {
          * @todo ?? (∗ Deleting and re-inserting the segments of C(p) reverses
          *       their order. ∗) ??
          **/
-
         if ((contain.size() + upper.size()) == 0) {
             final Segment sLeft = sweeplineNavigator.lower(ep.s);
             final Segment sRight = sweeplineNavigator.higher(ep.s);
             if ((sLeft != null) && (sRight != null))
                 findNewEvent(sLeft, sRight, ep.p);
-            
+
         } else {
 
             Segment sLeftPrime = null, sRightPrime = null;
@@ -487,6 +493,7 @@ public class SegmentIntersection extends AbstractAlgorithm {
         //
         cop.clear();
         arrangements.init(cloud);
+        sweepline.clear();
 
         //
         drawArrangementTip();
