@@ -25,6 +25,7 @@ import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGraphicVisitor;
 import at.u4a.geometric_algorithms.gui.layer.AbstractLayer;
 import at.u4a.geometric_algorithms.gui.layer.AlgorithmLayer;
 import at.u4a.geometric_algorithms.utils.Calc;
+import javafx.scene.paint.Color;
 
 /**
  * Triangulation
@@ -120,7 +121,7 @@ public class SegmentIntersection extends AbstractAlgorithm {
             statusStartBuild();
 
             //
-            //statusBuildIs(buildSegmentInteractionQuadratique());
+            // statusBuildIs(buildSegmentInteractionQuadratique());
             statusBuildIs(buildSegmentInteraction());
 
             //
@@ -156,22 +157,9 @@ public class SegmentIntersection extends AbstractAlgorithm {
         }
     };
 
-    /**
-     * The left-to-right order of the segments along the sweep line corresponds
-     * to the left-to-right order of the leaves in T.
-     */
-    private class EventComparator implements Comparator<Event> {
-
-        @Override
-        public int compare(Event e1, Event e2) {
-            if (e1.equals(e2))
-                return 0;
-            //
-            return 0; // fix it
-        }
-    };
-
     private static class Arrangement extends TreeSet<EventPoint> {
+
+        private static final long serialVersionUID = -4678038553487397218L;
 
         private static class ArrangementComparator implements Comparator<EventPoint> {
 
@@ -225,7 +213,8 @@ public class SegmentIntersection extends AbstractAlgorithm {
     private final Set<Segment> sweepline = new TreeSet<Segment>(sweeplineComparator);
     private final NavigableSet<Segment> sweeplineNavigator = (NavigableSet<Segment>) sweepline;
 
-    private final Set<Event> sweeplineStatus = new TreeSet<Event>(new EventComparator());
+    // private final Set<Event> sweeplineStatus = new TreeSet<Event>(new
+    // EventComparator());
 
     // private final Set<Point> intersectionsQueue = new TreeSet<Point>(new
     // Point.PointComparator());
@@ -317,6 +306,8 @@ public class SegmentIntersection extends AbstractAlgorithm {
     }
 
     private void addIfIntersection(Segment s1, Segment s2) {
+        if ((s1 == null) || (s2 == null))
+            return;
         final Point intersectionPoint = Calc.intersection(s1, s2);
         if (intersectionPoint != null) {
             intersectionsSet.add(intersectionPoint);
@@ -324,6 +315,11 @@ public class SegmentIntersection extends AbstractAlgorithm {
         }
     }
 
+    private void removeInSweepline(Vector<Segment> ls) {
+        for (Segment s : ls)
+            sweepline.remove(s);
+    }
+    
     private void addInSweepline(Vector<Segment> ls) {
         for (Segment s : ls)
             addInSweepline(s);
@@ -334,8 +330,8 @@ public class SegmentIntersection extends AbstractAlgorithm {
     }
 
     private void handleEventPoint(EventPoint ep) {
-        
-        if(ep==null)
+
+        if (ep == null)
             return;
 
         statusAddCounter();
@@ -381,8 +377,9 @@ public class SegmentIntersection extends AbstractAlgorithm {
         }
 
         // Why not ...
-        sweepline.removeAll(lower);
-        sweepline.removeAll(contain);
+        removeInSweepline(lower);
+        removeInSweepline(contain);
+
 
         // Why ???
         addInSweepline(upper);
@@ -494,6 +491,9 @@ public class SegmentIntersection extends AbstractAlgorithm {
         findIntersections();
 
         //
+        drawSweepline();
+
+        //
         return true;
     }
 
@@ -556,11 +556,30 @@ public class SegmentIntersection extends AbstractAlgorithm {
         mutableVisitorForDebugging.drawTip(p.toString(), pToOrigin);
     }
 
+    public void drawSegment(Segment s) {
+        if (mutableVisitorForDebugging == null)
+            return;
+        final Segment sToOrigin = new Segment();
+        sToOrigin.set(s);
+        as.convertToStandard(sToOrigin.a);
+        as.convertToStandard(sToOrigin.b);
+        mutableVisitorForDebugging.getGraphicsContext().save();
+        mutableVisitorForDebugging.getGraphicsContext().setStroke(Color.RED);
+        mutableVisitorForDebugging.visit_unit(s);
+        mutableVisitorForDebugging.getGraphicsContext().restore();
+    }
+
     /*
      * public void drawArrangementTip() { int counter = 0; for (SegmentAssoc as
      * : arrangements) { drawTextTip(String.valueOf(counter), as.upper);
      * counter++; } }
      */
+
+    public void drawSweepline() {
+        for (Segment s : sweepline) {
+            drawSegment(s);
+        }
+    }
 
     public void drawArrangementTip() {
         int counterU = 0;
@@ -568,32 +587,22 @@ public class SegmentIntersection extends AbstractAlgorithm {
         for (EventPoint e : arrangements) {
             switch (e.type) {
             case Upper:
-                drawTextTip("Up(" + counterU + ")["+e.p.toString()+"]", e.p);
+                drawTextTip("Up(" + counterU + ")[" + e.p.toString() + "]", e.p);
                 counterU++;
                 break;
             case Lower:
-                drawTextTip("Low(" + counterL + ")["+e.p.toString()+"]", e.p);
+                drawTextTip("Low(" + counterL + ")[" + e.p.toString() + "]", e.p);
                 counterL++;
                 break;
             }
         }
     }
 
-    public void drawEventTip() {
-        int counterU = 0;
-        int counterL = 0;
-        for (Event e : sweeplineStatus) {
-            switch (e.type) {
-            case Upper:
-                drawTextTip("Up(" + counterU + ")", e.p);
-                counterU++;
-                break;
-            case Lower:
-                drawTextTip("Low(" + counterL + ")", e.p);
-                counterL++;
-                break;
-            }
-        }
-    }
+    /*
+     * public void drawEventTip() { int counterU = 0; int counterL = 0; for
+     * (Event e : sweeplineStatus) { switch (e.type) { case Upper:
+     * drawTextTip("Up(" + counterU + ")", e.p); counterU++; break; case Lower:
+     * drawTextTip("Low(" + counterL + ")", e.p); counterL++; break; } } }
+     */
 
 };
