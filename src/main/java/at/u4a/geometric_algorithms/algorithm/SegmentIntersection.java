@@ -82,7 +82,7 @@ public class SegmentIntersection extends AbstractAlgorithm {
 
     /* ************** */
 
-    //InterfaceGraphicVisitor mutableVisitorForDebugging = null;
+    InterfaceGraphicVisitor mutableVisitorForDebugging = null;
 
     @Override
     public void accept(Vector<AbstractLayer> v, InterfaceGraphicVisitor visitor) {
