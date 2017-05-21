@@ -268,7 +268,7 @@ public class ConvexEnvelope extends AbstractAlgorithm {
         drawLine(new Line(P, A), Color.BROWN);
         drawLine(new Line(P, B), Color.CHOCOLATE);
 
-        printDebug("P(" + P + ") * A(" + A + ") * B(" + B + ") = " + v + "   ");
+        //printDebug("P(" + P + ") * A(" + A + ") * B(" + B + ") = " + v + "   ");
         return v;
     }
 
@@ -289,7 +289,7 @@ public class ConvexEnvelope extends AbstractAlgorithm {
         int vBottom = polyRight.indexOf(sideSearchHozIdRight.bottom);
 
         //
-        printLnDebug("top(" + sideSearchHozIdLeft.top + ")  right(" + sideSearchHozIdLeft.right + ")  bottom(" + sideSearchHozIdLeft.bottom + ")  left(" + sideSearchHozIdLeft.left + ")  ");
+        //printLnDebug("top(" + sideSearchHozIdLeft.top + ")  right(" + sideSearchHozIdLeft.right + ")  bottom(" + sideSearchHozIdLeft.bottom + ")  left(" + sideSearchHozIdLeft.left + ")  ");
 
         if ((uTop < 0) || (vTop < 0) || (uBottom < 0) || (vBottom < 0)) {
             throw new RuntimeException("Internal error from script");
@@ -324,7 +324,7 @@ public class ConvexEnvelope extends AbstractAlgorithm {
             if (uTop_IsOnBottom_OfThePolyRight_TopLine) {
                 vTop = Math.floorMod(vTop - 1, polyRightSize);
                 vTopChange = true;
-                printLnDebug("uTop_IsOnBottom_OfThePolyRight_TopLine");
+                //printLnDebug("uTop_IsOnBottom_OfThePolyRight_TopLine");
             }
 
             //
@@ -332,7 +332,7 @@ public class ConvexEnvelope extends AbstractAlgorithm {
             if (vTop_IsOnBottom_OfThePolyLeft_TopLine) {
                 uTop = Math.floorMod(uTop + 1, polyLeftSize);
                 uTopChange = true;
-                printLnDebug("vTop_IsOnBottom_OfThePolyLeft_TopLine");
+                //printLnDebug("vTop_IsOnBottom_OfThePolyLeft_TopLine");
             }
 
             //
@@ -341,15 +341,13 @@ public class ConvexEnvelope extends AbstractAlgorithm {
 
         }
 
-        printLnDebug("");
-        printLnDebug("----");
+        //printLnDebug("");
+        //printLnDebug("----");
 
         //
         Point uBottomPoint = null, vBottomPoint = null;
         Point uBottomPointPrec = null, vBottomPointSuiv = null;
         boolean uBottomChange = true, vBottomChange = true;
-
-        Point uBottomPointSuiv = null, vBottomPointPrec = null;
 
         //
         while (true) {
@@ -358,13 +356,13 @@ public class ConvexEnvelope extends AbstractAlgorithm {
             if (uBottomChange) {
                 uBottomPoint = polyLeft.get(uBottom);
                 uBottomPointPrec = polyLeft.get(Math.floorMod(uBottom - 1, polyLeftSize));
-                uBottomPointSuiv = polyLeft.get(Math.floorMod(uBottom + 1, polyLeftSize));
+                //uBottomPointSuiv = polyLeft.get(Math.floorMod(uBottom + 1, polyLeftSize));
                 uBottomChange = false;
             }
             if (vBottomChange) {
                 vBottomPoint = polyRight.get(vBottom);
                 vBottomPointSuiv = polyRight.get(Math.floorMod(vBottom + 1, polyRightSize));
-                vBottomPointPrec = polyRight.get(Math.floorMod(vBottom - 1, polyRightSize));
+                //vBottomPointPrec = polyRight.get(Math.floorMod(vBottom - 1, polyRightSize));
                 vBottomChange = false;
             }
 
@@ -458,8 +456,8 @@ public class ConvexEnvelope extends AbstractAlgorithm {
         Vector<Point> polyRight = devideToRing(sides.pointsRight, deph + 1);
 
         //
-        visitPolygon(polyLeft);
-        visitPolygon(polyRight);
+        //visitPolygon(polyLeft);
+        //visitPolygon(polyRight);
 
         //
         return envelopeUnion(polyLeft, polyRight, deph);
