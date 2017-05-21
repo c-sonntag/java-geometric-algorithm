@@ -82,7 +82,7 @@ public class SegmentIntersection extends AbstractAlgorithm {
 
     /* ************** */
 
-    InterfaceGraphicVisitor mutableVisitorForDebugging = null;
+    //InterfaceGraphicVisitor mutableVisitorForDebugging = null;
 
     @Override
     public void accept(Vector<AbstractLayer> v, InterfaceGraphicVisitor visitor) {
@@ -180,7 +180,7 @@ public class SegmentIntersection extends AbstractAlgorithm {
             }
         };
 
-        public final NavigableSet<EventPoint> navigator = (NavigableSet<EventPoint>) this;
+        //public final NavigableSet<EventPoint> navigator = (NavigableSet<EventPoint>) this;
 
         public Arrangement() {
             super(new ArrangementComparator());
@@ -197,29 +197,6 @@ public class SegmentIntersection extends AbstractAlgorithm {
                 Segment upperPointIsA = swapToUpperIsOnPointA(s);
                 add(new EventPoint(upperPointIsA, EventType.Upper));
                 add(new EventPoint(upperPointIsA, EventType.Lower));
-            }
-        }
-
-        boolean isInUpperLowerInterval(Point p, Segment in) {
-            return (p.y >= in.a.y) && (p.y < in.b.y);
-        }
-
-        /**
-         * @todo Work on optimization with binary tree specialized to find
-         *       quickly
-         */
-        void findContaintInUpperLowerInterval(Set<Segment> contain, EventPoint ep) {
-            for (EventPoint epLower = navigator.lower(ep); epLower != null; epLower = navigator.lower(epLower)) {
-                if (epLower.type == EventType.Lower)
-                    continue;
-                if (isInUpperLowerInterval(ep.p, epLower.s))
-                    contain.add(epLower.s);
-            }
-            for (EventPoint epHigher = navigator.higher(ep); epHigher != null; epHigher = navigator.higher(epHigher)) {
-                if (epHigher.type == EventType.Upper)
-                    continue;
-                if (isInUpperLowerInterval(ep.p, epHigher.s))
-                    contain.add(epHigher.s);
             }
         }
 
@@ -254,18 +231,7 @@ public class SegmentIntersection extends AbstractAlgorithm {
 
     /* ************** */
 
-    private void findIntersections_3() {
-        intersectionsQueue.clear();
-        if (arrangements.isEmpty())
-            return;
-        intersectionsQueue.push(arrangements.navigator.first());
-        while (!intersectionsQueue.isEmpty()) {
-            EventPoint epPop = intersectionsQueue.pop();
-            handleEventPoint(epPop);
-        }
-    }
-
-    private void findIntersections_2() {
+    private void findIntersections() {
         intersectionsQueue.clear();
         if (arrangements.isEmpty())
             return;
@@ -278,44 +244,14 @@ public class SegmentIntersection extends AbstractAlgorithm {
         }
     }
 
-    private void findIntersections() {
-        intersectionsQueue.clear();
-        if (arrangements.isEmpty())
-            return;
-
-        intersectionsQueue.push(arrangements.navigator.first());
-        do {
-            EventPoint epPop = null;
-            while (!intersectionsQueue.isEmpty()) {
-                epPop = intersectionsQueue.pop();
-                handleEventPoint(epPop);
-            }
-            if (epPop != null) {
-                if (epPop.type != EventType.Intersection) {
-                    EventPoint nextEventToScan = arrangements.navigator.higher(epPop);
-                    if (nextEventToScan != null) {
-                        intersectionsQueue.push(nextEventToScan);
-                        countForcePush++;
-                    }
-                }
-            }
-        } while (!intersectionsQueue.isEmpty());
-
-    }
-
     private void addIfIntersection(Segment s1, Segment s2) {
         statusAddCounter();
         final Point intersectionPoint = Calc.intersection(s1, s2);
         if (intersectionPoint != null) {
-            // intersectionsSet.add(intersectionPoint);
             cop.addPoint(intersectionPoint);
         }
     }
 
-    /*
-     * private void addInSweepline(Set<Segment> ls) { for (Segment s : ls)
-     * sweepline.add(swapToUpperIsOnPointA(s)); }
-     */
 
     private Vector<Segment> upper = new Vector<Segment>();
     private Vector<Segment> contain = new Vector<Segment>();
@@ -451,13 +387,6 @@ public class SegmentIntersection extends AbstractAlgorithm {
         }
     }
 
-    /*
-     * for (EventPoint epHigher = navigator.higher(ep); epHigher != null;
-     * epHigher = navigator.higher(epHigher)) { if (epHigher.type ==
-     * EventType.Upper) continue; if (isInUpperLowerInterval(ep.p, epHigher.s))
-     * contain.add(epHigher.s); }
-     */
-
     /**
      * Il est nécessaire de vérifier si les segments sont adjacent et ou encore
      * non découvert
@@ -465,6 +394,7 @@ public class SegmentIntersection extends AbstractAlgorithm {
     private void findNewEvent(Segment left, Segment right, Point p) {
         statusAddCounter();
         Point intersectionPoint = Calc.intersection(left, right);
+        
         /** @todo check "on it" intersection */
 
         if (intersectionPoint != null) {
@@ -478,7 +408,7 @@ public class SegmentIntersection extends AbstractAlgorithm {
 
     /* ************** */
 
-    int countForcePush = 0;
+    //int countForcePush = 0;
 
     /**
      */
@@ -494,11 +424,11 @@ public class SegmentIntersection extends AbstractAlgorithm {
         sweepline.clear();
 
         //
-        countForcePush = 0;
+        //countForcePush = 0;
         findIntersections();
 
-        System.out.println("CountForcePush : " + countForcePush);
-        System.out.println("Size : " + arrangements.size());
+        //System.out.println("CountForcePush : " + countForcePush);
+        //System.out.println("Size : " + arrangements.size());
 
         //
         return true;
