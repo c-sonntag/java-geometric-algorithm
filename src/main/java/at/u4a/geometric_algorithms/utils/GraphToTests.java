@@ -37,7 +37,7 @@ public class GraphToTests {
     static double Cloud_of_Segments_FACTOR = 3;
 
     public static void defaultGraph(LayerManager lm) {
-        Random rnd = new Random(11235813213455L);
+        Random rnd = new Random(1123581321345589L);
         
         lm.addLayer(segment_intersection(cloud_of_segments(rnd.nextLong(), Cloud_of_Segments_NB, Cloud_of_Segments_FACTOR)));
         
@@ -128,7 +128,7 @@ public class GraphToTests {
         Random rnd = new Random(seed);
 
         CloudOfSegments cloudOfSegments = new CloudOfSegments();
-        cloudOfSegments.origin.set(100+(10 + rnd.nextInt(100))* factor, 100+(10 + rnd.nextInt(100))* factor);
+        cloudOfSegments.origin.set(100+(30 + rnd.nextInt(100))* factor, 100+(40 + rnd.nextInt(100))* factor);
 
         for (int i = 0; i < nb * 2; i+=2) {
             cloudOfSegments.addSegment( //
