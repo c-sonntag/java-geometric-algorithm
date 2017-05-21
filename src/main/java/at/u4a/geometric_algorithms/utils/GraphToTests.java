@@ -33,22 +33,22 @@ public class GraphToTests {
     static int Cloud_of_Points_NB = 6;
     static double Cloud_of_Points_FACTOR = 2;
     
-    static int Cloud_of_Segments_NB = 6;
-    static double Cloud_of_Segments_FACTOR = 2;
+    static int Cloud_of_Segments_NB = 10;
+    static double Cloud_of_Segments_FACTOR = 3;
 
     public static void defaultGraph(LayerManager lm) {
-        Random rnd = new Random();
+        Random rnd = new Random(11235813213455L);
         
-        lm.addLayerAndSelectIt(segment_intersection(cloud_of_segments(rnd.nextLong(), Cloud_of_Segments_NB, Cloud_of_Segments_FACTOR)));
+        lm.addLayer(segment_intersection(cloud_of_segments(rnd.nextLong(), Cloud_of_Segments_NB, Cloud_of_Segments_FACTOR)));
         
         //
         if (activeDefault) {
-            lm.addLayerAndSelectIt(rectangle(rnd.nextLong(), Square_FACTOR));
-            lm.addLayerAndSelectIt(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, false));
-            lm.addLayerAndSelectIt(triangulation(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, false)));
-            lm.addLayerAndSelectIt(triangulation(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, true)));
-            lm.addLayerAndSelectIt(cloud_of_points(rnd.nextLong(), Cloud_of_Points_NB, Cloud_of_Points_FACTOR));
-            lm.addLayerAndSelectIt(convex_envelope(cloud_of_points(rnd.nextLong(), Cloud_of_Points_NB, Cloud_of_Points_FACTOR)));
+            lm.addLayer(rectangle(rnd.nextLong(), Square_FACTOR));
+            lm.addLayer(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, false));
+            lm.addLayer(triangulation(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, false)));
+            lm.addLayer(triangulation(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, true)));
+            lm.addLayer(cloud_of_points(rnd.nextLong(), Cloud_of_Points_NB, Cloud_of_Points_FACTOR));
+            lm.addLayer(convex_envelope(cloud_of_points(rnd.nextLong(), Cloud_of_Points_NB, Cloud_of_Points_FACTOR)));
         }
     }
 
@@ -128,12 +128,12 @@ public class GraphToTests {
         Random rnd = new Random(seed);
 
         CloudOfSegments cloudOfSegments = new CloudOfSegments();
-        cloudOfSegments.origin.set(200 + rnd.nextInt(100), 200 + rnd.nextInt(100));
+        cloudOfSegments.origin.set(100+(10 + rnd.nextInt(100))* factor, 100+(10 + rnd.nextInt(100))* factor);
 
         for (int i = 0; i < nb * 2; i+=2) {
             cloudOfSegments.addSegment( //
-                    new Point(200 - rnd.nextInt(200) * factor, 200 - rnd.nextInt(200) * factor), //
-                    new Point(200 - rnd.nextInt(200) * factor, i%2 * 100 + 200 - rnd.nextInt(200) * factor) //
+                    new Point((100 - rnd.nextInt(200)) * factor, (100 - rnd.nextInt(200)) * factor), //
+                    new Point((100 - rnd.nextInt(200)) * factor, (i%2 * 100 + 100 - rnd.nextInt(200)) * factor) //
             );
         }
 

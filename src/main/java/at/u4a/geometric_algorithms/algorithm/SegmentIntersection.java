@@ -139,12 +139,30 @@ public class SegmentIntersection extends AbstractAlgorithm {
 
     /* ************** */
 
-    private class SweepLineComparator implements Comparator<Segment> {
+    /**
+     * Contient le "cloud" qui est enregistré dans un "Set" avec comparator
+     * "top-left" pour simuler le passage du "sweepline"
+     */
+
+    private static final SweepLineComparator sweeplineComparator = new SweepLineComparator();
+
+    private final Arrangement arrangements = new Arrangement();
+
+    private final Set<Segment> sweepline = new TreeSet<Segment>(sweeplineComparator);
+    private final NavigableSet<Segment> sweeplineNavigator = (NavigableSet<Segment>) sweepline;
+
+    private final ArrayDeque<EventPoint> intersectionsQueue = new ArrayDeque<EventPoint>();
+    // private final Set<Point> intersectionsSet = new TreeSet<Point>(new
+    // Point.PointComparator());
+
+    /* ************** */
+
+    private static class SweepLineComparator implements Comparator<Segment> {
         @Override
         public int compare(Segment s1, Segment s2) {
             if (s1.a.equals(s2.a) && s2.b.equals(s2.b))
                 return 0;
-            final double wS1Decal = Math.abs(s1.a.x - s1.b.x), wS2Decal = Math.abs(s2.a.x - s2.b.x);
+            final double wS1Decal = (s1.a.x + s1.b.x) / 2, wS2Decal = (s2.a.x + s2.b.x) / 2;
             return ((wS1Decal == wS2Decal) ? //
                     ((s1.a.x == s2.a.x) ? //
                             ((s1.b.x < s2.b.x) ? -1 : 1) : //
@@ -160,7 +178,6 @@ public class SegmentIntersection extends AbstractAlgorithm {
         private static final long serialVersionUID = -4678038553487397218L;
 
         private static class ArrangementComparator implements Comparator<EventPoint> {
-
             public int compare(EventPoint psa1, EventPoint psa2) {
                 return (psa1.p.equals(psa2.p) ? 0 : ( //
                 (psa1.p.y == psa2.p.y) ? //
@@ -170,12 +187,39 @@ public class SegmentIntersection extends AbstractAlgorithm {
             }
         };
 
+        /*
+         * private static class SegmentComparator implements Comparator<Segment>
+         * { public int compare(Segment s1, Segment s2) {
+         * 
+         * if (s1.a.equals(s2.a) && s1.b.equals(s2.b)) return 0;
+         * 
+         * final double wS1Decal = (s1.a.x + s1.b.x) / 2, wS2Decal = (s2.a.x +
+         * s2.b.x) / 2; int xPosition = ((wS1Decal == wS2Decal) ? ((s1.a.x ==
+         * s2.a.x) ? ((s1.b.x < s2.b.x) ? -1 : 1) : ((s1.a.x < s2.a.x) ? -1 :
+         * 1)) : ((wS1Decal < wS2Decal) ? -1 : 1));
+         * 
+         * if(s1.a.y == s1.a.y) return xPosition;
+         * 
+         * 
+         * 
+         * 
+         * int yPosition = 0;
+         * 
+         * } };
+         */
+
+        // public final Set<Segment> segments = new TreeSet<Segment>(new
+        // SegmentComparator());
+        // private final NavigableSet<Segment> segmentsNavigator =
+        // (NavigableSet<Segment>) segments;
+
         public Arrangement() {
             super(new ArrangementComparator());
         }
 
         public void init(AbstractList<Segment> ls) {
             clear();
+            // segments.clear();
             for (Segment s : ls) {
                 if (s == null)
                     continue;
@@ -183,10 +227,21 @@ public class SegmentIntersection extends AbstractAlgorithm {
                     continue;
                 //
                 Segment upperPointIsA = swapToUpperIsOnPointA(s);
+                // segments.add(upperPointIsA);
                 add(new EventPoint(upperPointIsA, EventType.Upper));
                 add(new EventPoint(upperPointIsA, EventType.Lower));
             }
         }
+
+        /*
+         * Vector<Segment> getContain(Point p) { Vector<Segment> vs = new
+         * Vector<Segment>(); Segment s = new Segment(p, p); Segment sLower =
+         * null; while ((sLower = segmentsNavigator.lower(s)) != null) { if
+         * (sLower.b.y < p.y) break; vs.add(sLower); } Segment sHigher = null;
+         * while ((sHigher = segmentsNavigator.higher(s)) != null) { if
+         * (sHigher.a.y > p.y) break; vs.add(sHigher); } return vs; }
+         */
+
     }
 
     /*
@@ -197,24 +252,6 @@ public class SegmentIntersection extends AbstractAlgorithm {
      * ((e1.upper.x < e2.upper.x) ? -1 : 1) : // ((e1.upper.y < e2.upper.y) ? -1
      * : 1)// )); } };
      */
-
-    /* ************** */
-
-    /**
-     * Contient le "cloud" qui est enregistré dans un "Set" avec comparator
-     * "top-left" pour simuler le passage du "sweepline"
-     */
-
-    private final Arrangement arrangements = new Arrangement();
-
-    private final SweepLineComparator sweeplineComparator = new SweepLineComparator();
-
-    private final Set<Segment> sweepline = new TreeSet<Segment>(sweeplineComparator);
-    private final NavigableSet<Segment> sweeplineNavigator = (NavigableSet<Segment>) sweepline;
-
-    private final ArrayDeque<EventPoint> intersectionsQueue = new ArrayDeque<EventPoint>();
-    // private final Set<Point> intersectionsSet = new TreeSet<Point>(new
-    // Point.PointComparator());
 
     /* ************** */
 
@@ -286,10 +323,10 @@ public class SegmentIntersection extends AbstractAlgorithm {
 
     private void handleEventPoint(EventPoint ep) {
 
-        if (!intersectionAlreadyHandle.contains(ep.p))
-            intersectionAlreadyHandle.add(ep.p);
+        //if (!intersectionAlreadyHandle.contains(ep.p))
+         //   intersectionAlreadyHandle.add(ep.p);
 
-        statusAddCounter();
+        //statusAddCounter();
 
         // drawEventPoint(ep);
 
@@ -304,15 +341,20 @@ public class SegmentIntersection extends AbstractAlgorithm {
                 upper.add(sa);
             else if (sa.b.equals(ep.p))
                 lower.add(sa);
-            else if ((sa.a.y > ep.p.y) && (sa.b.y < ep.p.y))
+            // else if ((sa.a.y > ep.p.y) && (sa.b.y < ep.p.y))
+            else
                 contain.add(sa);
         }
 
         //
         if (ep.type != EventType.Intersection) {
 
-            if (!upper.contains(ep.s))
-            upper.add(ep.s);
+            if (ep.type == EventType.Upper)
+                if (!upper.contains(ep.s))
+                    upper.add(ep.s);
+            if (ep.type == EventType.Lower)
+                if (!lower.contains(ep.s))
+                    lower.add(ep.s);
 
             //
             if ((contain.size() + upper.size() + lower.size()) > 1) {
@@ -341,7 +383,7 @@ public class SegmentIntersection extends AbstractAlgorithm {
 
         // drawLotsOfEventSegment(lower, EventType.Lower);
 
-        drawTopBottom(upper.iterator());
+        // drawTopBottom(upper.iterator());
         drawTopBottom(contain.iterator());
 
         // Why not ...
@@ -352,7 +394,7 @@ public class SegmentIntersection extends AbstractAlgorithm {
         addInSweepline(upper);
         addInSweepline(contain);
 
-        //drawSweepline();
+        // drawSweepline();
 
         //
         /**
@@ -458,7 +500,8 @@ public class SegmentIntersection extends AbstractAlgorithm {
         sweepline.clear();
 
         //
-        drawArrangementTip();
+        // drawArrangementTip();
+        // drawArrangementSegmentTip();
 
         //
         findIntersections();
@@ -583,28 +626,37 @@ public class SegmentIntersection extends AbstractAlgorithm {
     }
 
     private int count_drawTopBottom = 0;
-    
+
     public void drawTopBottom(Iterator<Segment> ls_it) {
         if (mutableVisitorForDebugging == null)
             return;
         if (!ls_it.hasNext())
             return;
-        
-        //count_drawTopBottom++;
-        
-        //if((count_drawTopBottom%8)!=0)
-        //    return;
-        
+
+        // count_drawTopBottom++;
+
+        // if((count_drawTopBottom%8)!=0)
+        // return;
 
         //
-        Random rdn = new Random();
-        mutableVisitorForDebugging.getGraphicsContext().save();
-        mutableVisitorForDebugging.getGraphicsContext().setStroke(Color.color(rdn.nextFloat() * 0.5 + 0.4, rdn.nextFloat() * 0.5 + 0.4, rdn.nextFloat() * 0.5 + 0.4, 0.4));
-        mutableVisitorForDebugging.getGraphicsContext().setLineWidth(3);
-        // mutableVisitorForDebugging.getGraphicsContext().setStroke(Color.RED);
+        /*
+         * Random rdn = new Random();
+         * mutableVisitorForDebugging.getGraphicsContext().save();
+         * mutableVisitorForDebugging.getGraphicsContext().setStroke(Color.color
+         * (rdn.nextFloat() * 0.5 + 0.4, rdn.nextFloat() * 0.5 + 0.4,
+         * rdn.nextFloat() * 0.5 + 0.4, 0.4));
+         * mutableVisitorForDebugging.getGraphicsContext().setLineWidth(3); //
+         * mutableVisitorForDebugging.getGraphicsContext().setStroke(Color.RED);
+         */
         Segment s = ls_it.next();
         Point minY = s.a;
         Point maxY = s.b;
+        int counter = 0;
+        final Point pCenter = new Point();
+
+        mutableVisitorForDebugging.getGraphicsContext().save();
+        mutableVisitorForDebugging.getGraphicsContext().setStroke(Color.GREEN);
+
         boolean first = true;
         while (ls_it.hasNext()) {
 
@@ -620,7 +672,13 @@ public class SegmentIntersection extends AbstractAlgorithm {
             if (maxY.y < s.b.y)
                 maxY = s.b;
 
-            drawSegment(s);
+            // drawSegment(s);
+
+            pCenter.x = (s.a.x + s.b.x) / 2;
+            pCenter.y = (s.a.y + s.b.y) / 2;
+            drawTextTip("(" + counter + ")", pCenter);
+            counter++;
+
             first = false;
         }
 
@@ -636,25 +694,40 @@ public class SegmentIntersection extends AbstractAlgorithm {
         mutableVisitorForDebugging.getGraphicsContext().strokeLine(pMinToOrigin.x - 300, pMinToOrigin.y - 2, pMinToOrigin.x + 300, pMinToOrigin.y - 2);
         mutableVisitorForDebugging.getGraphicsContext().setStroke(Color.SEAGREEN);
         mutableVisitorForDebugging.getGraphicsContext().strokeLine(pMaxToOrigin.x - 300, pMaxToOrigin.y + 2, pMaxToOrigin.x + 300, pMaxToOrigin.y + 2);
+
         mutableVisitorForDebugging.getGraphicsContext().restore();
     }
 
     public void drawArrangementTip() {
+        int counter = 0;
         int counterU = 0;
         int counterL = 0;
         for (EventPoint e : arrangements) {
             switch (e.type) {
             case Upper:
-                drawTextTip("Up(" + counterU + ")[" + e.p.toString() + "]", e.p);
+                drawTextTip("Up(" + counterU + ")(" + counter + ")[" + e.p.toString() + "]", e.p);
                 counterU++;
                 break;
             case Lower:
-                drawTextTip("Low(" + counterL + ")[" + e.p.toString() + "]", e.p);
+                drawTextTip("Low(" + counterL + ")(" + counter + ")[" + e.p.toString() + "]", e.p);
                 counterL++;
+
                 break;
             }
+            counter++;
         }
     }
+
+    /*
+     * public void drawArrangementSegmentTip() { if (mutableVisitorForDebugging
+     * == null) return; int counter = 0; final Point pCenter = new Point();
+     * mutableVisitorForDebugging.getGraphicsContext().save();
+     * mutableVisitorForDebugging.getGraphicsContext().setStroke(Color.RED); for
+     * (Segment s : arrangements.segments) { pCenter.x = (s.a.x + s.b.x) / 2;
+     * pCenter.y = (s.a.y + s.b.y) / 2; drawTextTip("(" + counter + ")",
+     * pCenter); counter++; }
+     * mutableVisitorForDebugging.getGraphicsContext().restore(); }
+     */
 
     /*
      * public void drawEventTip() { int counterU = 0; int counterL = 0; for
