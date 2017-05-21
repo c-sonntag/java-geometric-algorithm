@@ -2,11 +2,15 @@ package at.u4a.geometric_algorithms.algorithm;
 
 import java.util.AbstractList;
 import java.util.ArrayDeque;
+import java.util.Comparator;
 import java.util.Iterator;
+import java.util.NavigableSet;
+import java.util.PriorityQueue;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.Vector;
 
 import at.u4a.geometric_algorithms.algorithm.InterfaceAlgorithmBuilder;
-import at.u4a.geometric_algorithms.algorithm.Monotisation.PointTipped.Tip;
 import at.u4a.geometric_algorithms.geometric.AbstractShape;
 import at.u4a.geometric_algorithms.geometric.Point;
 import at.u4a.geometric_algorithms.geometric.Polygon;
@@ -18,7 +22,7 @@ import at.u4a.geometric_algorithms.gui.layer.AlgorithmLayer;
 import at.u4a.geometric_algorithms.utils.Calc;
 
 /**
- * Triangulation
+ * Monotisation
  * 
  * @author Hip
  *
@@ -37,7 +41,7 @@ public class Monotisation extends AbstractAlgorithm {
             return (l.getShape() instanceof Polygon);
         }
 
-        static int TriangulationCount = 1;
+        static int MonotisationCount = 1;
 
         @Override
         public AbstractLayer builder(AbstractLayer l) {
@@ -45,15 +49,15 @@ public class Monotisation extends AbstractAlgorithm {
             //
             AbstractShape as = l.getShape();
             if (!(as instanceof Polygon))
-                throw new RuntimeException("Triangulation need a Polygon Shape !");
+                throw new RuntimeException("Monotisation need a Polygon Shape !");
 
             //
             Polygon poly = (Polygon) as;
 
             //
-            AbstractLayer al = new AlgorithmLayer<Monotisation>(new Monotisation(poly.perimeter, poly), Algorithm.Triangulation, l);
-            al.setLayerName("t" + String.valueOf(TriangulationCount));
-            TriangulationCount++;
+            AbstractLayer al = new AlgorithmLayer<Monotisation>(new Monotisation(poly.perimeter, poly), Algorithm.Monotisation, l);
+            al.setLayerName("m" + String.valueOf(MonotisationCount));
+            MonotisationCount++;
             return al;
         }
 
@@ -62,54 +66,42 @@ public class Monotisation extends AbstractAlgorithm {
     private final AbstractList<Point> points;
     private final AbstractShape as;
 
-    private final MonotonePolygon mp;
+    private final Vector<MonotonePolygon> mp_v;
 
     public Monotisation(Vector<Point> points, AbstractShape as) {
         this.points = points;
         this.as = as;
-
-        this.mp = new MonotonePolygon(as.origin, points);
+        this.mp_v = new Vector<MonotonePolygon>();
+        // this.mp_v = new MonotonePolygon(as.origin, points);
     }
 
     /* ************** */
+
+    private InterfaceGraphicVisitor mutableVisitorForDebugging = null;
 
     @Override
     public void accept(Vector<AbstractLayer> v, InterfaceGraphicVisitor visitor) {
 
-        makeTriangulation();
+        mutableVisitorForDebugging = vistor;
 
-        //
-        if (actualType == Polygon.Type.Monotone) {
-
-            //
-            final Segment sToOrigin = new Segment();
-            for (Segment tf : triangulationFusion) {
-                sToOrigin.set(tf);
-                as.convertToStandard(sToOrigin.a);
-                as.convertToStandard(sToOrigin.b);
-                visitor.visit_unit(sToOrigin);
+        makeMonotisation();
+        if (haveMake) {
+            for (MonotonePolygon mp : mp_v) {
+                visitor.visit(mp);
             }
-
         }
-
-        //
-        // visitor.drawEdgeTipFromList(poly, poly.perimeter);
-
     }
 
     /* ************** */
 
-    public boolean isMonotone() {
-        makeTriangulation();
-        return actualType == Polygon.Type.Monotone;
+    public boolean haveMadeSubMonotonePolyon() {
+        makeMonotisation();
+        return haveMake;
     }
 
-    public MonotonePolygon getPolygon() {
-        makeTriangulation();
-        if (actualType == Polygon.Type.Monotone)
-            return mp;
-        else
-            return null;
+    public Vector<MonotonePolygon> getMonotonesPolygon() {
+        makeMonotisation();
+        return (haveMake) ? mp_v : null;
     }
 
     /* ************** */
@@ -122,8 +114,9 @@ public class Monotisation extends AbstractAlgorithm {
     /* ************** */
 
     private int mutablePreviousPolyHash = 0;
+    private boolean haveMake = false;
 
-    protected void makeTriangulation() {
+    protected void makeMonotisation() {
 
         int currentPolyHash = as.hashCode();
         if (currentPolyHash != mutablePreviousPolyHash) {
@@ -132,13 +125,10 @@ public class Monotisation extends AbstractAlgorithm {
             statusStartBuild();
 
             //
-            actualType = Polygon.Type.Simple;
-            if (buildTriangulation()) {
-                actualType = Polygon.Type.Monotone;
+            if (haveMake = buildMonotisation()) {
                 statusFinishBuild();
             } else
                 statusInteruptBuild();
-                
 
             //
             mutablePreviousPolyHash = currentPolyHash;
@@ -148,325 +138,168 @@ public class Monotisation extends AbstractAlgorithm {
 
     /* ************** */
 
-    /**
-     * Index du point le plus haut et le plus bas dans la listes des points
-     */
-    int topPointIndex, bottomPointIndex;
-    Point topPoint, bottomPoint;
+    private static class StatusComparator implements Comparator<Segment> {
+        @Override
+        public int compare(Segment s1, Segment s2) {
+            if (s1.a.equals(s2.a) && s2.b.equals(s2.b))
+                return 0;
 
-    /**
-     * La liste des points affiché.
-     */
-    private Vector<PointTipped> fusionPoints = new Vector<PointTipped>();
+            final double wS1Decal = (s1.a.x + s1.b.x) / 2, wS2Decal = (s2.a.x + s2.b.x) / 2;
+            return ((wS1Decal == wS2Decal) ? //
+                    ((s1.a.x == s2.a.x) ? //
+                            ((s1.b.x < s2.b.x) ? -1 : 1) : //
+                            ((s1.a.x < s2.a.x) ? -1 : 1) //
+                    ) : //
+                    ((wS1Decal < wS2Decal) ? -1 : 1) //
+            );
+        }
+    };
 
-    /**
-     * Le tableau des triangulation affiché en fonction de fusion.
+    /*
+     * private static class VertexInformComparator implements
+     * Comparator<VertexInform> { private Comparator<Point> comparator = new
+     * Point.PointUpLeftAlignementComparator();
+     * 
+     * public int compare(VertexInform vi1, VertexInform vi2) { return
+     * comparator.compare(vi1, vi2); } };
      */
-    public Vector<Segment> triangulationFusion = new Vector<Segment>();
+    
+    
+    /* ************** */
 
-    /**
-     * indique si le poligone est monotone
-     */
-    public Polygon.Type actualType = Polygon.Type.Simple;
+    private final Set<Segment> status = new TreeSet<Segment>(new StatusComparator());
+    private final NavigableSet<Segment> statusNavigator = (NavigableSet<Segment>) status;
+
+    // private final PriorityQueue<VertexInform> intersectionsQueue = new
+    // PriorityQueue<VertexInform>();
+    // private final PriorityQueue<VertexInform> intersectionsQueue = new
+    // PriorityQueue<VertexInform>();
+
+    private final Set<VertexInform> vertexInform = new TreeSet<VertexInform>(new Point.PointUpLeftAlignementComparator());
 
     /* ************** */
 
-    static class PointTipped extends Point {
+    static enum VertexType {
+        Unknown, Start, End, Regular, Split, Merge
+    };
 
-        static enum Tip {
-            None("?", 0b000), Left("L", 0b001), Right("R", 0b010), Up("U", 0b0111), Down("D", 0b1011);
+    class VertexInform extends Point {
+        public VertexType type = VertexType.Unknown;
+        public VertexInform back = null, next = null;
 
-            public final String str;
-            public final int code;
-
-            private Tip(String value, int code) {
-                this.str = value;
-                this.code = code;
-            }
-
-            public String toString() {
-                return this.str;
-            }
+        public VertexInform(Point p) {
+            super(p);
         }
-
-        public PointTipped(Point p) {
-            set(p);
-            tip = Tip.None;
-        }
-
-        public PointTipped(Point p, Tip t) {
-            set(p);
-            tip = t;
-        }
-
-        public String toString() {
-            return tip.toString() + "(" + super.toString() + ")";
-        }
-
-        /**
-         * Position dans la le polygone monotone
-         */
-        public Tip tip;
 
     };
 
-    /**
-     * Algorithme qui recherche l'index du point en haut et en bas
-     */
-    private boolean searchUpDonwSide() {
+    /* ************** */
 
-        topPointIndex = -1;
-        bottomPointIndex = -1;
+    private void handleStartVertex(Point v) {
 
-        final int size = points.size();
-
-        if (size < 3)
-            return false;
-
-        double topY = 0, bottomY = 0;
-
-        Point precPoint = null, precPrecPoint = null, currentPoint;
-        int countAngle = 0;
-
-        for (int i = 0; i < size + 2; i++) {
-
-            //
-            statusAddCounter();
-
-            currentPoint = points.get(i % size);
-
-            if (precPoint != null) {
-
-                //
-                if (currentPoint.y < topY) {
-                    topY = currentPoint.y;
-                    topPointIndex = i;
-                } else if (currentPoint.y > bottomY) {
-                    bottomY = currentPoint.y;
-                    bottomPointIndex = i;
-                }
-
-                //
-                if (precPrecPoint != null) {
-
-                    if (((precPrecPoint.y > precPoint.y) && (currentPoint.y > precPoint.y)) || ((precPrecPoint.y < precPoint.y) && (currentPoint.y < precPoint.y))) {
-                        countAngle++;
-
-                        if (countAngle > 2)
-                            return false;
-                    }
-                }
-
-            } else {
-                topY = currentPoint.y;
-                bottomY = currentPoint.y;
-                topPointIndex = i;
-                bottomPointIndex = i;
-            }
-
-            precPrecPoint = precPoint;
-            precPoint = currentPoint;
-        }
-
-        topPoint = points.get(topPointIndex);
-        bottomPoint = points.get(bottomPointIndex);
-
-        return true;
     }
 
-    class SideTuple {
-        Vector<Point> side = new Vector<Point>();
-        double minX, maxX;
-    };
+    private boolean partitionPolygon() {
 
-    /**
-     * Algorithme qui fusionne les cotés des points
-     */
-    SideTuple makeSide(boolean clockwise, boolean withUpDown) {
-
-        final int size = points.size();
-
-        SideTuple st = new SideTuple();
-
-        int start = Math.floorMod(topPointIndex + (withUpDown ? (clockwise ? 0 : -1) : (clockwise ? 1 : -1)), size);
-        int end = Math.floorMod(bottomPointIndex + (withUpDown ? (clockwise ? 0 : -1) : (clockwise ? 0 : 0)), size);
-        int add = clockwise ? 1 : -1;
-
-        // Add first
-        Point p = points.get(start);
-        st.side.addElement(p);
-        st.maxX = st.minX = p.x;
-        start = Math.floorMod(start + add, size);
-
-        //
-        for (int i = start; i != end; i = Math.floorMod(i + add, size)) {
-
-            p = points.get(i);
-            st.side.addElement(p);
-
-            if (p.x > st.maxX)
-                st.maxX = p.x;
-            else if (p.x < st.minX)
-                st.minX = p.x;
-        }
-
-        return st;
-    }
-
-    /**
-     * Algorithme qui fusionne les cotés des points
-     */
-    private boolean buildFusion() {
-        if (!searchUpDonwSide())
-            return false;
-        //
-        fusionPoints.clear();
-
-        SideTuple sideClockwise = makeSide(true, true);
-        SideTuple sideUnclockwise = makeSide(false, true);
-
-        boolean normalSens = sideUnclockwise.minX < sideClockwise.maxX;
-
-        Vector<Point> sideRight = normalSens ? sideClockwise.side : sideUnclockwise.side;
-        Vector<Point> sideLeft = normalSens ? sideUnclockwise.side : sideClockwise.side;
-
-        // Add Top
-        fusionPoints.add(new PointTipped(topPoint, Tip.Up));
-
-        //
-        Point leftPoint = null, rightPoint = null;
-        Iterator<Point> leftPoint_it = sideLeft.iterator();
-        Iterator<Point> rightPoint_it = sideRight.iterator();
-        //
-        while (true) {
-
-            //
-            statusAddCounter();
-
-            if (leftPoint_it.hasNext() && rightPoint_it.hasNext()) {
-
-                if (leftPoint == null)
-                    leftPoint = leftPoint_it.next();
-                if (rightPoint == null)
-                    rightPoint = rightPoint_it.next();
-
-                if (leftPoint.y <= rightPoint.y) {
-                    fusionPoints.add(new PointTipped(leftPoint, Tip.Left));
-                    leftPoint = null;
-                } else {
-                    fusionPoints.add(new PointTipped(rightPoint, Tip.Right));
-                    rightPoint = null;
-                }
-            } else if (rightPoint_it.hasNext() || (rightPoint != null)) {
-                if (rightPoint == null)
-                    rightPoint = rightPoint_it.next();
-                fusionPoints.add(new PointTipped(rightPoint, Tip.Right));
-                rightPoint = null;
-            } else if (leftPoint_it.hasNext() || (leftPoint != null)) {
-                if (leftPoint == null)
-                    leftPoint = leftPoint_it.next();
-                fusionPoints.add(new PointTipped(leftPoint, Tip.Left));
-                leftPoint = null;
-
-            } else
+        for (VertexInform p : vertexInform) {
+            switch (p.type) {
+            case End:
                 break;
+            case Merge:
+                break;
+            case Regular:
+                break;
+            case Split:
+                break;
+            case Start:
+                break;
+            }
         }
-
-        // Add Bottom
-        // fusionPoints.add(new PointTipped(bottomPoint, Tip.Down));
-
         return true;
     }
 
-    static boolean inP(Point pA, PointTipped pOrigine, Point pB) {
-        double produit = Calc.resumeProduitVectorielZ(pA, pOrigine, pB);
-        return (((produit > 0) && (pOrigine.tip == Tip.Right)) || ((produit < 0) && (pOrigine.tip == Tip.Left)) || (pOrigine.tip == Tip.Up) || (pOrigine.tip == Tip.Down));
+    /* ************** */
+
+    private void markTypeOfVertexInform(VertexInform vi) {
+        //
+        final boolean normalSens = vi.back.x <= vi.next.x;
+        final VertexInform left = normalSens ? vi.back : vi.next;
+        final VertexInform right = normalSens ? vi.next : vi.back;
+        final double produit = Calc.resumeProduitVectorielZ(left, vi, right);
+
+        /** @todo find the ambiguity with (Start or Split) and (End or Merge) */
+
+        //
+        if ((vi.y > left.y) && (vi.y > right.y)) // is : Start or Split
+            vi.type = VertexType.Split;
+        else if ((vi.y < left.y) && (vi.y < right.y)) // is : End or Merge
+            vi.type = VertexType.Merge;
+        else if ((vi.y < left.y) && (vi.y < right.y)) // is : regular
+            vi.type = VertexType.Regular;
     }
 
-    /**
-     * Algorithme qui Créer les segments de la triangulation
-     * 
-     * @see Computational Geometry - Algorithms and Applications -
-     *      TRIANGULATEMONOTONEPOLYGON
-     */
-    private boolean buildTriangulation() {
-        if (!buildFusion())
+    private boolean createVertexInform() {
+
+        if (points.size() < 3)
+            return false;
+
+        vertexInform.clear();
+
+        //
+        Iterator<Point> p_it = points.iterator();
+        final VertexInform firstVI = new VertexInform(p_it.next());
+        VertexInform lastVI = firstVI, newVI = null;
+
+        //
+        while (p_it.hasNext()) {
+            newVI = new VertexInform(p_it.next());
+            newVI.back = lastVI;
+            lastVI.next = newVI;
+
+            //
+            if (lastVI.back != null) {
+                markTypeOfVertexInform(lastVI);
+            }
+
+            //
+            lastVI = newVI;
+            vertexInform.add(newVI);
+        }
+
+        //
+        firstVI.back = newVI;
+        markTypeOfVertexInform(firstVI);
+        vertexInform.add(firstVI);
+        
+        //
+        /** @todo find if the polygon have colision */
+        return true;         
+    }
+
+    /* ************** */
+
+    private boolean buildMonotisation() {
+
+        //
+        if (!createVertexInform())
             return false;
 
         //
-        triangulationFusion.clear();
-
-        //
-        ArrayDeque<PointTipped> stack = new ArrayDeque<PointTipped>();
-        int fusionPointsSize = fusionPoints.size();
-
-        //
-        stack.add(fusionPoints.get(0));
-        stack.add(fusionPoints.get(1));
-
-        //
-        for (int i = 2; i < fusionPointsSize - 1; i++) {
-
-            //
-            statusAddCounter();
-
-            //
-            PointTipped currentPoint = fusionPoints.get(i);
-            PointTipped stackFirst = stack.getFirst();
-
-            // same chain
-            if ((currentPoint.tip.code & stackFirst.tip.code) != 0) {
-
-                PointTipped stackPop = stack.pop();
-
-                //
-                while (!stack.isEmpty()) {
-                    stackFirst = stack.peekFirst();
-
-                    if (inP(currentPoint, stackPop, stackFirst)) {
-                        stackPop = stack.pop();
-                        triangulationFusion.add(new Segment(currentPoint, stackPop));
-                    } else
-                        break;
-                }
-
-                //
-                stack.push(stackPop);
-                stack.push(currentPoint);
-
-            } else { // oposite chain
-
-                //
-                Iterator<PointTipped> stack_it = stack.descendingIterator();
-                if (stack_it.hasNext()) {
-                    PointTipped endStackPoint = stack_it.next();
-                    while (stack_it.hasNext()) {
-                        PointTipped stackPoint = stack_it.next();
-
-                        // block vertex that can traverse edge of opposite side
-                        if (endStackPoint != null)
-                            if (inP(endStackPoint, stackPoint, currentPoint))
-                                return false;
-
-                        triangulationFusion.add(new Segment(currentPoint, stackPoint));
-                        endStackPoint = null;
-                    }
-                }
-
-                //
-                stack.clear();
-
-                //
-                stack.push(fusionPoints.get(i - 1));
-                stack.push(currentPoint);
-
-            }
-        }
-
-        // except the first diagonals
-        triangulationFusion.remove(0);
+        if (!partitionPolygon())
+            return false;
 
         return true;
+    }
+
+    /* ********* DEBUG ONLY ********* */
+
+    public void drawTextTip(String txt, Point p) {
+        if (mutableVisitorForDebugging == null)
+            return;
+        final Point pToOrigin = new Point();
+        pToOrigin.set(p);
+        as.convertToStandard(pToOrigin);
+        mutableVisitorForDebugging.drawTip(txt, pToOrigin);
     }
 
 };

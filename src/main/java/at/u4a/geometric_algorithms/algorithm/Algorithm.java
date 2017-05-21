@@ -11,7 +11,8 @@ public enum Algorithm {
     Triangulation("Triangulation", "triangulation.png", at.u4a.geometric_algorithms.algorithm.Triangulation.Builder::new), //
     ConvexEnvelope("ConvexEnvelope", "convex.png", at.u4a.geometric_algorithms.algorithm.ConvexEnvelope.Builder::new),
     SegmentIntersection("SegmentIntersection", "segment_intersection.png", at.u4a.geometric_algorithms.algorithm.SegmentIntersection.Builder::new),
-    SegmentIntersectionQuadratic("SegmentIntersection", "segment_intersection.png", at.u4a.geometric_algorithms.algorithm.SegmentIntersectionQuadratic.Builder::new);
+    SegmentIntersectionQuadratic("SegmentIntersectionQuadratic", "segment_intersection.png", at.u4a.geometric_algorithms.algorithm.SegmentIntersectionQuadratic.Builder::new),
+    Monotisation("Monotisation", "monotisation.png", at.u4a.geometric_algorithms.algorithm.Monotisation.Builder::new);
 
 
     /* PUBLIC STATIC */

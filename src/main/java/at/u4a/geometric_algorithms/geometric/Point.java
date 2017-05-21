@@ -14,12 +14,21 @@ public class Point implements InterfaceGeometric {
 
     /* STATIC CLASS */
 
-    public static class PointComparator implements Comparator<Point> {
+    public static class PointLeftUpComparator implements Comparator<Point> {
         @Override
         public int compare(Point p1, Point p2) {
             if (p1.equals(p2))
                 return 0;
             return (p1.x != p2.x) ? ((p1.x < p2.x) ? -1 : 1) : ((p1.y < p2.y) ? -1 : 1);
+        }
+    };
+    
+    public static class PointUpLeftAlignementComparator implements Comparator<Point> {
+        @Override
+        public int compare(Point p1, Point p2) {
+            if (p1.equals(p2))
+                return 0;
+            return (p1.y != p2.y) ? ((p1.y < p2.y) ? -1 : 1) : ((p1.x < p2.x) ? -1 : 1);
         }
     };
 
