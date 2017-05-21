@@ -13,6 +13,7 @@ public class DrawerContext {
 
     EnumSet<KeyCode> validKey = EnumSet.of(KeyCode.ENTER);
     EnumSet<KeyCode> cancelKey = EnumSet.of(KeyCode.ESCAPE);
+    EnumSet<KeyCode> newDocumentKey = EnumSet.of(KeyCode.CONTROL, KeyCode.N);
 
     private final Drawer drawer;
     private final DrawerScene ds;
@@ -38,6 +39,8 @@ public class DrawerContext {
             valid();
         else if (eventKeys.equals(cancelKey))
             cancel();
+        else if (eventKeys.equals(newDocumentKey))
+            ds.getLayerManager().clear();
         else {
             Tool toolChoose = Tool.getByKeyCode(eventKeys);
             if (toolChoose != null)
@@ -75,7 +78,7 @@ public class DrawerContext {
     public void cancel() {
         //
         StatusBar.clearActive();
-        
+
         //
         if (ds.getCurrentState() != null)
             ds.getCurrentState().cancel(drawer);

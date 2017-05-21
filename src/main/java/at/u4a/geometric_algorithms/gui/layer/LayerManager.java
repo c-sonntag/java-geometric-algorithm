@@ -9,7 +9,6 @@ import at.u4a.geometric_algorithms.geometric.Point;
 import at.u4a.geometric_algorithms.gui.element.DrawerScene;
 import at.u4a.geometric_algorithms.gui.element.InterfaceLayerAction;
 import at.u4a.geometric_algorithms.gui.element.LayerTree;
-import at.u4a.geometric_algorithms.gui.layer.AbstractLayer.AuthorizedAction;
 import at.u4a.geometric_algorithms.utils.GraphToTests;
 
 public class LayerManager implements Iterable<AbstractLayer> {

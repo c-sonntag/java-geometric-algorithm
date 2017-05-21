@@ -3,14 +3,11 @@ package at.u4a.geometric_algorithms.algorithm;
 import java.util.AbstractList;
 import java.util.ArrayDeque;
 import java.util.Comparator;
-import java.util.Deque;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.NavigableSet;
+import java.util.Random;
 import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Vector;
 
@@ -18,13 +15,13 @@ import at.u4a.geometric_algorithms.algorithm.InterfaceAlgorithmBuilder;
 import at.u4a.geometric_algorithms.geometric.AbstractShape;
 import at.u4a.geometric_algorithms.geometric.CloudOfPoints;
 import at.u4a.geometric_algorithms.geometric.CloudOfSegments;
-import at.u4a.geometric_algorithms.geometric.Line;
 import at.u4a.geometric_algorithms.geometric.Point;
 import at.u4a.geometric_algorithms.geometric.Segment;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGraphicVisitor;
 import at.u4a.geometric_algorithms.gui.layer.AbstractLayer;
 import at.u4a.geometric_algorithms.gui.layer.AlgorithmLayer;
 import at.u4a.geometric_algorithms.utils.Calc;
+import javafx.scene.input.SwipeEvent;
 import javafx.scene.paint.Color;
 
 /**
@@ -121,7 +118,8 @@ public class SegmentIntersection extends AbstractAlgorithm {
             statusStartBuild();
 
             //
-            // statusBuildIs(buildSegmentInteractionQuadratique());
+            // statusBuildIs(buildSegmentInteractionQuadratique()); //<<- to
+            // test
             statusBuildIs(buildSegmentInteraction());
 
             //
@@ -179,6 +177,11 @@ public class SegmentIntersection extends AbstractAlgorithm {
         public void init(AbstractList<Segment> ls) {
             clear();
             for (Segment s : ls) {
+                if (s == null)
+                    continue;
+                else if ((s.a == null) || (s.b == null))
+                    continue;
+                //
                 Segment upperPointIsA = swapToUpperIsOnPointA(s);
                 add(new EventPoint(upperPointIsA, EventType.Upper));
                 add(new EventPoint(upperPointIsA, EventType.Lower));
@@ -205,35 +208,15 @@ public class SegmentIntersection extends AbstractAlgorithm {
     private final Arrangement arrangements = new Arrangement();
 
     private final SweepLineComparator sweeplineComparator = new SweepLineComparator();
-    
+
     private final Set<Segment> sweepline = new TreeSet<Segment>(sweeplineComparator);
     private final NavigableSet<Segment> sweeplineNavigator = (NavigableSet<Segment>) sweepline;
 
     private final ArrayDeque<EventPoint> intersectionsQueue = new ArrayDeque<EventPoint>();
-    //private final Set<Point> intersectionsSet = new TreeSet<Point>(new Point.PointComparator());
-
+    // private final Set<Point> intersectionsSet = new TreeSet<Point>(new
+    // Point.PointComparator());
 
     /* ************** */
-
-    /**
-     * Permet d'associer un «Segment» avec un «Point» et de trouver le point le
-     * plus en haut ou à gauche
-     */
-    private static class SegmentAssoc {
-        public Segment s;
-        public Point upper, lower;
-
-        public SegmentAssoc(Segment s) {
-            this.s = s;
-            if ((s.a.y > s.b.y) ? true : ((s.a.y < s.b.y) ? false : ((s.a.x >= s.b.x) ? true : false))) {
-                upper = s.b;
-                lower = s.a;
-            } else {
-                upper = s.a;
-                lower = s.b;
-            }
-        }
-    }
 
     public enum EventType {
         Upper, Lower, Intersection
@@ -260,42 +243,32 @@ public class SegmentIntersection extends AbstractAlgorithm {
         }
     }
 
-    /**
-     * Permet d’indiquer le statut d’un Point, entre autre, s’il est un «upper»,
-     * alors il fait les tests d’intersectionsQueue avec la «sweepline», sinon
-     * si, c’est un «lower», alors il faut arrêter ses tests, et donc le retirer
-     * des évènements
-     */
-    private class Event {
-        final public SegmentAssoc as;
-        final public EventType type;
-        final public Point p;
-
-        public Event(SegmentAssoc as, EventType type) {
-            this.as = as;
-            this.type = type;
-            this.p = (type == EventType.Upper) ? as.upper : as.lower;
-        }
-    }
-
     /* ************** */
 
     private void findIntersections() {
         intersectionsQueue.clear();
+        if (arrangements.isEmpty())
+            return;
 
-        Iterator<EventPoint> arrangements_it = arrangements.iterator();
+        // Iterator<EventPoint> arrangements_it = arrangements.iterator();
 
-        while (arrangements_it.hasNext()) {
-            intersectionsQueue.push(arrangements_it.next());
-            while (!intersectionsQueue.isEmpty())
-                handleEventPoint(intersectionsQueue.pop());
+        // while (arrangements_it.hasNext()) {
+        for (EventPoint epArrNext : arrangements) {
+
+            // EventPoint epArrNext = arrangements_it.next();
+            intersectionsQueue.push(epArrNext);
+            while (!intersectionsQueue.isEmpty()) {
+                EventPoint epPop = intersectionsQueue.pop();
+                handleEventPoint(epPop);
+            }
         }
     }
 
     private void addIfIntersection(Segment s1, Segment s2) {
+        statusAddCounter();
         final Point intersectionPoint = Calc.intersection(s1, s2);
         if (intersectionPoint != null) {
-            //intersectionsSet.add(intersectionPoint);
+            // intersectionsSet.add(intersectionPoint);
             cop.addPoint(intersectionPoint);
         }
     }
@@ -309,8 +282,16 @@ public class SegmentIntersection extends AbstractAlgorithm {
         sweepline.add(swapToUpperIsOnPointA(s));
     }
 
+    Set<Point> intersectionAlreadyHandle = new HashSet<Point>();
+
     private void handleEventPoint(EventPoint ep) {
+
+        if (!intersectionAlreadyHandle.contains(ep.p))
+            intersectionAlreadyHandle.add(ep.p);
+
         statusAddCounter();
+
+        // drawEventPoint(ep);
 
         //
         Vector<Segment> upper = new Vector<Segment>();
@@ -323,14 +304,15 @@ public class SegmentIntersection extends AbstractAlgorithm {
                 upper.add(sa);
             else if (sa.b.equals(ep.p))
                 lower.add(sa);
-            else
+            else if ((sa.a.y > ep.p.y) && (sa.b.y < ep.p.y))
                 contain.add(sa);
         }
 
         //
         if (ep.type != EventType.Intersection) {
+
             if (!upper.contains(ep.s))
-                upper.add(ep.s);
+            upper.add(ep.s);
 
             //
             if ((contain.size() + upper.size() + lower.size()) > 1) {
@@ -355,6 +337,13 @@ public class SegmentIntersection extends AbstractAlgorithm {
 
         }
 
+        // drawSweepline();
+
+        // drawLotsOfEventSegment(lower, EventType.Lower);
+
+        drawTopBottom(upper.iterator());
+        drawTopBottom(contain.iterator());
+
         // Why not ...
         sweepline.removeAll(lower);
         sweepline.removeAll(contain);
@@ -362,6 +351,8 @@ public class SegmentIntersection extends AbstractAlgorithm {
         // Why ???
         addInSweepline(upper);
         addInSweepline(contain);
+
+        //drawSweepline();
 
         //
         /**
@@ -439,6 +430,7 @@ public class SegmentIntersection extends AbstractAlgorithm {
      * non découvert
      */
     private void findNewEvent(Segment left, Segment right, Point p) {
+        statusAddCounter();
         Point intersectionPoint = Calc.intersection(left, right);
         /** @todo check "on it" intersection */
         if (intersectionPoint != null) {
@@ -466,13 +458,13 @@ public class SegmentIntersection extends AbstractAlgorithm {
         sweepline.clear();
 
         //
-        //drawArrangementTip();
+        drawArrangementTip();
 
         //
         findIntersections();
 
         //
-        //drawSweepline();
+        // drawSweepline();
 
         //
         return true;
@@ -481,7 +473,7 @@ public class SegmentIntersection extends AbstractAlgorithm {
     /* ************** */
 
     /**
-     * Used for test and compare
+     * Used for size <= 2
      */
     protected boolean buildSegmentInteractionQuadratique() {
 
@@ -544,22 +536,107 @@ public class SegmentIntersection extends AbstractAlgorithm {
         sToOrigin.set(s);
         as.convertToStandard(sToOrigin.a);
         as.convertToStandard(sToOrigin.b);
-        mutableVisitorForDebugging.getGraphicsContext().save();
-        mutableVisitorForDebugging.getGraphicsContext().setStroke(Color.RED);
         mutableVisitorForDebugging.visit_unit(sToOrigin);
+    }
+
+    public void drawLotsOfEventSegment(AbstractList<Segment> as, EventType type) {
+        for (Segment s : as) {
+            if (type != EventType.Lower)
+                drawPointWithEvent(s.a, type);
+            if (type != EventType.Upper)
+                drawPointWithEvent(s.b, type);
+        }
+    }
+
+    public void drawEventPoint(EventPoint p) {
+        drawPointWithEvent(p.p, p.type);
+    }
+
+    public void drawPointWithEvent(Point p, EventType type) {
+        if (mutableVisitorForDebugging == null)
+            return;
+
+        final Point pToOrigin = new Point();
+        pToOrigin.set(p);
+        as.convertToStandard(pToOrigin);
+
+        mutableVisitorForDebugging.getGraphicsContext().save();
+        // mutableVisitorForDebugging.visit(pToOrigin);
+
+        switch (type) {
+        case Intersection:
+            mutableVisitorForDebugging.getGraphicsContext().setStroke(Color.BROWN);
+            break;
+        case Lower:
+            mutableVisitorForDebugging.getGraphicsContext().setStroke(Color.DARKMAGENTA);
+            break;
+        case Upper:
+            mutableVisitorForDebugging.getGraphicsContext().setStroke(Color.DARKTURQUOISE);
+            break;
+        }
+        mutableVisitorForDebugging.getGraphicsContext().strokeRect(pToOrigin.x - 10, pToOrigin.y + 5, 10, 20);
         mutableVisitorForDebugging.getGraphicsContext().restore();
     }
 
-    /*
-     * public void drawArrangementTip() { int counter = 0; for (SegmentAssoc as
-     * : arrangements) { drawTextTip(String.valueOf(counter), as.upper);
-     * counter++; } }
-     */
-
     public void drawSweepline() {
-        for (Segment s : sweepline) {
+        drawTopBottom(sweepline.iterator());
+    }
+
+    private int count_drawTopBottom = 0;
+    
+    public void drawTopBottom(Iterator<Segment> ls_it) {
+        if (mutableVisitorForDebugging == null)
+            return;
+        if (!ls_it.hasNext())
+            return;
+        
+        //count_drawTopBottom++;
+        
+        //if((count_drawTopBottom%8)!=0)
+        //    return;
+        
+
+        //
+        Random rdn = new Random();
+        mutableVisitorForDebugging.getGraphicsContext().save();
+        mutableVisitorForDebugging.getGraphicsContext().setStroke(Color.color(rdn.nextFloat() * 0.5 + 0.4, rdn.nextFloat() * 0.5 + 0.4, rdn.nextFloat() * 0.5 + 0.4, 0.4));
+        mutableVisitorForDebugging.getGraphicsContext().setLineWidth(3);
+        // mutableVisitorForDebugging.getGraphicsContext().setStroke(Color.RED);
+        Segment s = ls_it.next();
+        Point minY = s.a;
+        Point maxY = s.b;
+        boolean first = true;
+        while (ls_it.hasNext()) {
+
+            if (!first)
+                s = ls_it.next();
+
+            if (minY.y > s.a.y)
+                minY = s.a;
+            if (minY.y > s.b.y)
+                minY = s.b;
+            if (maxY.y < s.a.y)
+                maxY = s.a;
+            if (maxY.y < s.b.y)
+                maxY = s.b;
+
             drawSegment(s);
+            first = false;
         }
+
+        final Point pMinToOrigin = new Point(), pMaxToOrigin = new Point();
+        pMinToOrigin.set(minY);
+        pMaxToOrigin.set(maxY);
+
+        as.convertToStandard(pMinToOrigin);
+        as.convertToStandard(pMaxToOrigin);
+
+        mutableVisitorForDebugging.getGraphicsContext().setLineWidth(1);
+        mutableVisitorForDebugging.getGraphicsContext().setStroke(Color.CORAL);
+        mutableVisitorForDebugging.getGraphicsContext().strokeLine(pMinToOrigin.x - 300, pMinToOrigin.y - 2, pMinToOrigin.x + 300, pMinToOrigin.y - 2);
+        mutableVisitorForDebugging.getGraphicsContext().setStroke(Color.SEAGREEN);
+        mutableVisitorForDebugging.getGraphicsContext().strokeLine(pMaxToOrigin.x - 300, pMaxToOrigin.y + 2, pMaxToOrigin.x + 300, pMaxToOrigin.y + 2);
+        mutableVisitorForDebugging.getGraphicsContext().restore();
     }
 
     public void drawArrangementTip() {
