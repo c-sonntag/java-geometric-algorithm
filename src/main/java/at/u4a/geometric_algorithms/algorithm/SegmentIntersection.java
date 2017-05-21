@@ -86,7 +86,7 @@ public class SegmentIntersection extends AbstractAlgorithm {
 
     @Override
     public void accept(Vector<AbstractLayer> v, InterfaceGraphicVisitor visitor) {
-        //mutableVisitorForDebugging = visitor;
+        // mutableVisitorForDebugging = visitor;
         makeSegmentInteraction();
         visitor.visit(cop);
     }
@@ -118,7 +118,7 @@ public class SegmentIntersection extends AbstractAlgorithm {
             statusStartBuild();
 
             //
-            // statusBuildIs(buildSegmentInteractionQuadratique()); 
+            // statusBuildIs(buildSegmentInteractionQuadratique());
 
             statusBuildIs(buildSegmentInteraction());
 
@@ -204,7 +204,10 @@ public class SegmentIntersection extends AbstractAlgorithm {
             return (p.y >= in.a.y) && (p.y < in.b.y);
         }
 
-        /** @todo Work on optimization with binary tree specialized to find quickly  */
+        /**
+         * @todo Work on optimization with binary tree specialized to find
+         *       quickly
+         */
         void findContaintInUpperLowerInterval(Set<Segment> contain, EventPoint ep) {
             for (EventPoint epLower = navigator.lower(ep); epLower != null; epLower = navigator.lower(epLower)) {
                 if (epLower.type == EventType.Lower)
@@ -221,15 +224,6 @@ public class SegmentIntersection extends AbstractAlgorithm {
         }
 
     }
-
-    /*
-     * private class ArrangementComparator implements Comparator<SegmentAssoc> {
-     * 
-     * @Override public int compare(SegmentAssoc e1, SegmentAssoc e2) { return
-     * (// e1.upper.equals(e2.upper) ? 0 : ( // (e1.upper.y == e2.upper.y) ? //
-     * ((e1.upper.x < e2.upper.x) ? -1 : 1) : // ((e1.upper.y < e2.upper.y) ? -1
-     * : 1)// )); } };
-     */
 
     /* ************** */
 
@@ -260,42 +254,7 @@ public class SegmentIntersection extends AbstractAlgorithm {
 
     /* ************** */
 
-    private void findIntersections_1() {
-        intersectionsQueue.clear();
-        if (arrangements.isEmpty())
-            return;
-
-        // Iterator<EventPoint> arrangements_it = arrangements.iterator();
-
-        // while (arrangements_it.hasNext()) {
-        for (EventPoint epArrNext : arrangements) {
-            // EventPoint epArrNext = arrangements_it.next();
-            intersectionsQueue.push(epArrNext);
-            while (!intersectionsQueue.isEmpty()) {
-                EventPoint epPop = intersectionsQueue.pop();
-                handleEventPoint(epPop);
-            }
-        }
-    }
-
-    private void findIntersections_2() {
-        intersectionsQueue.clear();
-        if (arrangements.isEmpty())
-            return;
-        Set<Point> intersectionAlreadyHandle = new HashSet<Point>();
-        for (EventPoint epArrNext : arrangements) {
-            if (!intersectionAlreadyHandle.contains(epArrNext.p)) {
-                intersectionAlreadyHandle.add(epArrNext.p);
-                intersectionsQueue.push(epArrNext);
-                while (!intersectionsQueue.isEmpty()) {
-                    EventPoint epPop = intersectionsQueue.pop();
-                    handleEventPoint(epPop);
-                }
-            }
-        }
-    }
-
-    private void findIntersections() {
+    private void findIntersections_3() {
         intersectionsQueue.clear();
         if (arrangements.isEmpty())
             return;
@@ -304,6 +263,44 @@ public class SegmentIntersection extends AbstractAlgorithm {
             EventPoint epPop = intersectionsQueue.pop();
             handleEventPoint(epPop);
         }
+    }
+
+    private void findIntersections_2() {
+        intersectionsQueue.clear();
+        if (arrangements.isEmpty())
+            return;
+        for (EventPoint ep : arrangements) {
+            intersectionsQueue.push(ep);
+            while (!intersectionsQueue.isEmpty()) {
+                EventPoint epPop = intersectionsQueue.pop();
+                handleEventPoint(epPop);
+            }
+        }
+    }
+
+    private void findIntersections() {
+        intersectionsQueue.clear();
+        if (arrangements.isEmpty())
+            return;
+
+        intersectionsQueue.push(arrangements.navigator.first());
+        do {
+            EventPoint epPop = null;
+            while (!intersectionsQueue.isEmpty()) {
+                epPop = intersectionsQueue.pop();
+                handleEventPoint(epPop);
+            }
+            if (epPop != null) {
+                if (epPop.type != EventType.Intersection) {
+                    EventPoint nextEventToScan = arrangements.navigator.higher(epPop);
+                    if (nextEventToScan != null) {
+                        intersectionsQueue.push(nextEventToScan);
+                        countForcePush++;
+                    }
+                }
+            }
+        } while (!intersectionsQueue.isEmpty());
+
     }
 
     private void addIfIntersection(Segment s1, Segment s2) {
@@ -315,17 +312,19 @@ public class SegmentIntersection extends AbstractAlgorithm {
         }
     }
 
-    private void addInSweepline(Set<Segment> ls) {
-        for (Segment s : ls)
-            sweepline.add(swapToUpperIsOnPointA(s));
-    }
+    /*
+     * private void addInSweepline(Set<Segment> ls) { for (Segment s : ls)
+     * sweepline.add(swapToUpperIsOnPointA(s)); }
+     */
 
     private Vector<Segment> upper = new Vector<Segment>();
     private Vector<Segment> contain = new Vector<Segment>();
     private Vector<Segment> lower = new Vector<Segment>();
-    
+
     private void handleEventPoint(EventPoint ep) {
-        
+
+        drawSquare(ep.p, 0);
+
         //
         upper.clear();
         contain.clear();
@@ -340,9 +339,6 @@ public class SegmentIntersection extends AbstractAlgorithm {
             else
                 contain.add(sa);
         }
-
-        //
-        //arrangements.findContaintInUpperLowerInterval(contain, ep);
 
         //
         if (ep.type != EventType.Intersection) {
@@ -375,24 +371,21 @@ public class SegmentIntersection extends AbstractAlgorithm {
 
         }
 
-
-        // Why not ...
+        //
         sweepline.removeAll(lower);
-        //sweepline.removeAll(contain);
+        // sweepline.removeAll(contain);
 
-        // Why ???
+        //
         sweepline.addAll(upper);
         sweepline.addAll(contain);
-        //addInSweepline(upper);
-        //addInSweepline(contain);
-
-        // drawSweepline();
 
         //
         /**
          * @todo ?? (∗ Deleting and re-inserting the segments of C(p) reverses
          *       their order. ∗) ??
          **/
+
+        //
         if ((contain.size() + upper.size()) == 0) {
 
             if (ep.type == EventType.Intersection)
@@ -456,17 +449,14 @@ public class SegmentIntersection extends AbstractAlgorithm {
                     findNewEvent(sRightPrime, sRight, ep.p);
             }
         }
-
-        //
-        if (intersectionsQueue.isEmpty()) {
-            if (ep.type != EventType.Intersection) {
-                EventPoint nextEventToScan = arrangements.navigator.higher(ep);
-                if (nextEventToScan != null)
-                    intersectionsQueue.push(nextEventToScan);
-            }
-        }
-
     }
+
+    /*
+     * for (EventPoint epHigher = navigator.higher(ep); epHigher != null;
+     * epHigher = navigator.higher(epHigher)) { if (epHigher.type ==
+     * EventType.Upper) continue; if (isInUpperLowerInterval(ep.p, epHigher.s))
+     * contain.add(epHigher.s); }
+     */
 
     /**
      * Il est nécessaire de vérifier si les segments sont adjacent et ou encore
@@ -476,6 +466,7 @@ public class SegmentIntersection extends AbstractAlgorithm {
         statusAddCounter();
         Point intersectionPoint = Calc.intersection(left, right);
         /** @todo check "on it" intersection */
+
         if (intersectionPoint != null) {
             if (intersectionPoint.x > p.x) {
                 EventPoint intersectionEventPoint = new EventPoint(intersectionPoint);
@@ -486,6 +477,8 @@ public class SegmentIntersection extends AbstractAlgorithm {
     }
 
     /* ************** */
+
+    int countForcePush = 0;
 
     /**
      */
@@ -499,9 +492,13 @@ public class SegmentIntersection extends AbstractAlgorithm {
         cop.clear();
         arrangements.init(cloud);
         sweepline.clear();
-        
+
         //
+        countForcePush = 0;
         findIntersections();
+
+        System.out.println("CountForcePush : " + countForcePush);
+        System.out.println("Size : " + arrangements.size());
 
         //
         return true;
@@ -619,8 +616,6 @@ public class SegmentIntersection extends AbstractAlgorithm {
         drawTopBottom(sweepline.iterator());
     }
 
-    private int count_drawTopBottom = 0;
-
     public void drawTopBottom(Iterator<Segment> ls_it) {
         drawTopBottom(ls_it, 0);
     }
@@ -679,6 +674,25 @@ public class SegmentIntersection extends AbstractAlgorithm {
         mutableVisitorForDebugging.getGraphicsContext().strokeLine(pMinToOrigin.x - 300, pMinToOrigin.y - (2 + 2 * flag), pMinToOrigin.x + 300, pMinToOrigin.y - (2 + 2 * flag));
         mutableVisitorForDebugging.getGraphicsContext().setStroke(lowerColor[flag]);
         mutableVisitorForDebugging.getGraphicsContext().strokeLine(pMaxToOrigin.x - 300, pMaxToOrigin.y + (2 + 2 * flag), pMaxToOrigin.x + 300, pMaxToOrigin.y + (2 + 2 * flag));
+
+        mutableVisitorForDebugging.getGraphicsContext().restore();
+    }
+
+    public void drawSquare(Point p, int flag) {
+        if (mutableVisitorForDebugging == null)
+            return;
+
+        final Point pToOrigin = new Point();
+
+        pToOrigin.set(p);
+        as.convertToStandard(pToOrigin);
+
+        mutableVisitorForDebugging.getGraphicsContext().restore();
+        mutableVisitorForDebugging.getGraphicsContext().setStroke(upperColor[flag]);
+        mutableVisitorForDebugging.getGraphicsContext().setFill(lowerColor[flag]);
+
+        mutableVisitorForDebugging.getGraphicsContext().strokeRect(pToOrigin.x - 5, pToOrigin.y - 5, 10, 10);
+        mutableVisitorForDebugging.getGraphicsContext().fillRect(pToOrigin.x - 5, pToOrigin.y - 5, 10, 10);
 
         mutableVisitorForDebugging.getGraphicsContext().restore();
     }
