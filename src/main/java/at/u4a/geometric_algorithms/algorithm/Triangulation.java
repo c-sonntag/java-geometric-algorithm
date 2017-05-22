@@ -367,7 +367,6 @@ public class Triangulation extends AbstractAlgorithm {
                     leftPoint = leftPoint_it.next();
                 fusionPoints.add(new PointTipped(leftPoint, Tip.Left));
                 leftPoint = null;
-
             } else
                 break;
         }

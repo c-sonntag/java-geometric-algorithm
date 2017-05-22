@@ -21,6 +21,7 @@ import at.u4a.geometric_algorithms.gui.layer.AbstractLayer;
 import at.u4a.geometric_algorithms.gui.layer.AlgorithmLayer;
 import at.u4a.geometric_algorithms.utils.Calc;
 import at.u4a.geometric_algorithms.utils.Collection;
+import javafx.scene.paint.Color;
 
 /**
  * Monotisation
@@ -139,7 +140,7 @@ public class Monotisation extends AbstractAlgorithm {
 
     /* ************** */
 
-    private static class StatusComparator implements Comparator<Segment> {
+    private static class OldStatusComparator implements Comparator<Segment> {
         @Override
         public int compare(Segment s1, Segment s2) {
             if (s1.a.equals(s2.a) && s2.b.equals(s2.b))
@@ -156,6 +157,30 @@ public class Monotisation extends AbstractAlgorithm {
         }
     };
 
+    private static class StatusComparator implements Comparator<Segment> {
+        @Override
+        public int compare(Segment s1, Segment s2) {
+            if (s1.a.equals(s2.a) && s2.b.equals(s2.b))
+                return 0;
+
+            final double wS1Decal = (s1.a.x + s1.b.x) / 2, wS2Decal = (s2.a.x + s2.b.x) / 2;
+            final double hS1Decal = (s1.a.y + s1.b.y) / 2, hS2Decal = (s2.a.y + s2.b.y) / 2;
+
+            final double hS1 = Math.abs(s1.a.y - s1.b.y), hS2 = Math.abs(s2.a.y - s2.b.y);
+            final double s1Top = Math.max(s1.a.y, s1.b.y), s1Bottom = Math.max(s1.a.y, s1.b.y);
+            final double s2Top = Math.max(s2.a.y, s2.b.y), s2Bottom = Math.max(s2.a.y, s2.b.y);
+
+            final boolean s2isGreaterRight = wS1Decal < wS2Decal;
+            final boolean s2isInHeightRange = (hS2 <= hS1) && (s1Top <= s2Top) && (s1Bottom >= s2Bottom);
+
+            if (s2isGreaterRight) {
+                return s2isInHeightRange ? 1 : -1;
+            } else {
+                return 1;
+            }
+        }
+    };
+
     /*
      * private static class VertexInformComparator implements
      * Comparator<VertexInform> { private Comparator<Point> comparator = new
@@ -167,53 +192,196 @@ public class Monotisation extends AbstractAlgorithm {
 
     /* ************** */
 
-    private final Set<Segment> status = new TreeSet<Segment>(new StatusComparator());
-    private final NavigableSet<Segment> statusNavigator = (NavigableSet<Segment>) status;
+    private final Set<Edge> status = new TreeSet<Edge>(new StatusComparator());
+    private final NavigableSet<Edge> statusNavigator = (NavigableSet<Edge>) status;
 
     // private final PriorityQueue<VertexInform> intersectionsQueue = new
     // PriorityQueue<VertexInform>();
     // private final PriorityQueue<VertexInform> intersectionsQueue = new
     // PriorityQueue<VertexInform>();
 
-    private final Set<VertexInform> vertexInform = new TreeSet<VertexInform>(new Point.PointUpLeftAlignementComparator());
+    private final Set<VertexInform> verticesInform = new TreeSet<VertexInform>(new Point.PointUpLeftAlignementComparator());
+    // private final Vector<VertexInform> vertices = new Vector<VertexInform>();
+
+    private VertexInform firstVertexInform = null;
+
+    private final Set<VertexInform> helper = new TreeSet<VertexInform>(new Point.PointUpLeftAlignementComparator());
+
+    private final Vector<Segment> bordersOfSubMonotones = new Vector<Segment>();
 
     /* ************** */
 
     static enum VertexType {
-        Unknown, Start, End, Regular, Split, Merge
+        Unknown, Start, End, Split, Merge, RegularLeft, RegularRight,
+    };
+
+    static enum VertexType_1 {
+        Unknown/* *****/(0b0000000), //
+        Start/* *******/(0b0000001), //
+        End/* *********/(0b0000010), //
+        Split/* *******/(0b0000100), //
+        Merge/* *******/(0b0001000), //
+        Regular/* *****/(0b0010000), //
+        RegularLeft/* */(0b0110000), //
+        RegularRight/**/(0b1010000); //
+
+        final int v;
+
+        VertexType_1(int v) {
+            this.v = v;
+        }
+    };
+
+    class Edge extends Segment {
+
+        public VertexInform helper = null;
+
+        public Edge(VertexInform a, VertexInform b) {
+            super(a, b);
+        }
     };
 
     class VertexInform extends Point {
         public VertexType type = VertexType.Unknown;
         public VertexInform back = null, next = null;
 
+        public VertexInform divergeTo = null, divergeFrom = null;
+
+        public Edge nextEdge = null;
+
         public VertexInform(Point p) {
             super(p);
+        }
+
+        public Edge getNextEdge() {
+            if (nextEdge == null)
+                nextEdge = new Edge(this, next);
+            return nextEdge;
         }
 
     };
 
     /* ************** */
 
-    private void handleStartVertex(Point v) {
-
+    private void attachBorder(VertexInform vi1, VertexInform vi2) {
+        vi1.divergeTo = vi2;
+        vi2.divergeFrom = vi1;
+        bordersOfSubMonotones.add(new Segment(vi1, vi2));
     }
+
+    /* ************** */
+
+    private void handleStartVertex(VertexInform vi) {
+        final Edge e = vi.getNextEdge();
+        e.helper = vi;
+        status.add(e);
+    }
+
+    private void handleEndVertex(VertexInform vi) {
+        final Edge eBack = vi.back.getNextEdge();
+        if (eBack.helper != null)
+            if (eBack.helper.type == VertexType.Merge)
+                attachBorder(vi, eBack.helper);
+        status.remove(eBack);
+    }
+
+    private void handleSplitVertex(VertexInform vi) {
+        final Edge viSearch = new Edge(vi, vi);
+        /** @todo check it */
+        final Edge eDirectLeftOfVi = statusNavigator.lower(viSearch);
+        if (eDirectLeftOfVi != null) {
+            if (eDirectLeftOfVi.helper != null) {
+                attachBorder(vi, eDirectLeftOfVi.helper);
+                eDirectLeftOfVi.helper = vi;
+            }
+        }
+
+        //
+        final Edge e = vi.getNextEdge();
+        e.helper = vi;
+        status.add(e);
+    }
+
+    private void handleMergeVertex(VertexInform vi) {
+        final Edge eBack = vi.back.getNextEdge();
+        if (eBack.helper != null)
+            if (eBack.helper.type == VertexType.Merge)
+                attachBorder(vi, eBack.helper);
+        status.remove(eBack);
+
+        //
+        final Edge viSearch = new Edge(vi, vi);
+        /** @todo check it */
+        final Edge eDirectLeftOfVi = statusNavigator.lower(viSearch);
+        if (eDirectLeftOfVi != null) {
+            if (eDirectLeftOfVi.helper != null) {
+                if (eDirectLeftOfVi.helper.type == VertexType.Merge)
+                    attachBorder(vi, eDirectLeftOfVi.helper);
+            }
+            eDirectLeftOfVi.helper = vi;
+        }
+    }
+
+    private void handleRegularVertex(VertexInform vi) {
+        if (vi.type == VertexType.RegularLeft) {
+            //
+            final Edge eBack = vi.back.getNextEdge();
+            if (eBack.helper != null)
+                if (eBack.helper.type == VertexType.Merge)
+                    attachBorder(vi, eBack.helper);
+            //
+            status.remove(eBack);
+            final Edge e = vi.getNextEdge();
+            e.helper = vi;
+            status.add(e);
+        } else {
+
+            final Edge viSearch = new Edge(vi, vi);
+            /** @todo check it */
+            final Edge eDirectLeftOfVi = statusNavigator.lower(viSearch);
+            if (eDirectLeftOfVi != null) {
+                if (eDirectLeftOfVi.helper != null) {
+                    if (eDirectLeftOfVi.helper.type == VertexType.Merge)
+                        attachBorder(vi, eDirectLeftOfVi.helper);
+                }
+                eDirectLeftOfVi.helper = vi;
+            }
+        }
+    }
+
+    /* ************** */
 
     private boolean partitionPolygon() {
 
-        for (VertexInform p : vertexInform) {
-            switch (p.type) {
+        bordersOfSubMonotones.clear();
+        status.clear();
+
+        int count = 0;
+
+        //
+        for (VertexInform vi : verticesInform) {
+            statusAddCounter();
+            
+            switch (vi.type) {
             case End:
+                handleEndVertex(vi);
                 break;
             case Merge:
+                handleMergeVertex(vi);
                 break;
-            case Regular:
+            case RegularLeft:
+            case RegularRight:
+                handleRegularVertex(vi);
                 break;
             case Split:
+                handleSplitVertex(vi);
                 break;
             case Start:
+                handleStartVertex(vi);
                 break;
             }
+
+            drawStatusTip(count++);
         }
         return true;
     }
@@ -221,35 +389,6 @@ public class Monotisation extends AbstractAlgorithm {
     /* ************** */
 
     private void markTypeOfVertexInform(VertexInform vi) {
-        //
-        /*
-         * final boolean isVerticalUpDown = ((vi.back.y < vi.y) && (vi.y <
-         * vi.next.y)); final boolean isVerticalDownUp = ((vi.back.y > vi.y) &&
-         * (vi.y > vi.next.y)); final boolean isHorizontalLeftRight =
-         * ((vi.back.x < vi.x) && (vi.x < vi.next.x)); final boolean
-         * isHorizontalRightLeft = ((vi.back.x > vi.x) && (vi.x > vi.next.x));
-         */
-
-        /*
-         * final boolean isVerticalUpDown = ((vi.back.y < vi.y) && (vi.y <
-         * vi.next.y)); final boolean isVerticalDownUp = ((vi.back.y > vi.y) &&
-         * (vi.y > vi.next.y)); final boolean isHorizontalLeftRight = (vi.back.x
-         * < vi.next.x); final boolean isHorizontalRightLeft = (vi.back.x >
-         * vi.next.x);
-         */
-
-        /*
-         * final boolean normalSens = isVerticalUpDown || isHorizontalLeftRight;
-         * final VertexInform leftOrUp = (normalSens) ? vi.back : vi.next; final
-         * VertexInform rightOrDown = (normalSens) ? vi.next : vi.back;
-         */
-
-        /*
-         * final VertexInform leftOrUp = (isVerticalUpDown ||
-         * isHorizontalLeftRight) ? vi.back : vi.next; final VertexInform
-         * rightOrDown = (isVerticalDownUp || isHorizontalRightLeft) ? vi.next :
-         * vi.back;
-         */
 
         final double produit = Calc.resumeProduitVectorielZ(vi.back, vi, vi.next);
 
@@ -263,48 +402,7 @@ public class Monotisation extends AbstractAlgorithm {
         else if (haveUpperNeighbour)
             vi.type = isLesserThanPi ? VertexType.End : VertexType.Merge;
         else
-            vi.type = VertexType.Regular;
-
-        drawAngle(String.valueOf(produit) + " " + (isLesserThanPi ? "1" : "0"), vi);
-        // drawAngle(String.valueOf(produit) + " " + (isLesserThanPi ? "1" :
-        // "0")+ " " + (normalSens ? "→" : "←"), vi);
-
-        /*
-         * if ((vi.y < left.y) && (vi.y < right.y)) // is : Start or Split
-         * vi.type = isLesserThanPi ? VertexType.Start : VertexType.Split; else
-         * if ((vi.y > left.y) && (vi.y > right.y)) // is : End or Merge vi.type
-         * = isLesserThanPi ? VertexType.End : VertexType.Merge; else vi.type =
-         * VertexType.Regular;
-         * 
-         * 
-         * 
-         * if(isVerticalUpDown || isVerticalDownUp) { // 1 voisin au-dessu et
-         * l'autre en-dessous } else if (isHorizontalLeftRight ||
-         * isHorizontalRightLeft) { // 2 voisin au-dessu ou en-dessous
-         * 
-         * } drawAngle(String.valueOf(produit) + " " + (isLesserThanPi ? "1" :
-         * "0"), vi);
-         * 
-         * /**
-         * 
-         * @todo find bug with resumeProduitVectorielZ /** @todo find the
-         * ambiguity with (Start or Split) and (End or Merge)
-         */
-
-        //
-        /*
-         * if ((vi.y < left.y) && (vi.y < right.y)) // is : Start or Split
-         * vi.type = isLesserThanPi ? VertexType.Start : VertexType.Split; else
-         * if ((vi.y > left.y) && (vi.y > right.y)) // is : End or Merge vi.type
-         * = isLesserThanPi ? VertexType.End : VertexType.Merge; else vi.type =
-         * VertexType.Regular;
-         * 
-         * // /* if ((vi.y < left.y) && (vi.y < right.y)) // is : Start or Split
-         * vi.type = VertexType.Split; else if ((vi.y > left.y) && (vi.y >
-         * right.y)) // is : End or Merge vi.type = VertexType.Merge; else
-         * vi.type = VertexType.Regular;
-         */
-
+            vi.type = (vi.back.y < vi.next.y) ? VertexType.RegularLeft : VertexType.RegularRight;
     }
 
     private boolean createVertexInform() {
@@ -312,7 +410,8 @@ public class Monotisation extends AbstractAlgorithm {
         if (points.size() < 3)
             return false;
 
-        vertexInform.clear();
+        verticesInform.clear();
+        firstVertexInform = null;
 
         //
         double sumVecZ = Calc.getClockwise(points);
@@ -328,6 +427,8 @@ public class Monotisation extends AbstractAlgorithm {
 
         //
         while (p_it.hasNext()) {
+            statusAddCounter();
+            
             newVI = new VertexInform(p_it.next());
             newVI.back = lastVI;
             lastVI.next = newVI;
@@ -338,7 +439,8 @@ public class Monotisation extends AbstractAlgorithm {
             }
 
             //
-            vertexInform.add(newVI);
+            verticesInform.add(newVI);
+            // vertices.add(newVI);
             lastLastVi = lastVI;
             lastVI = newVI;
         }
@@ -352,11 +454,73 @@ public class Monotisation extends AbstractAlgorithm {
         //
         firstVI.back = newVI;
         markTypeOfVertexInform(firstVI);
-        vertexInform.add(firstVI);
+        verticesInform.add(firstVI);
+        // vertices.add(firstVI);
+
+        firstVertexInform = firstVI;
 
         //
         /** @todo find if the polygon have colision */
         return true;
+    }
+
+    /* ************** */
+
+    private final MonotonePolygon createEmptyMonotonePolygon() {
+        final MonotonePolygon mp = new MonotonePolygon(as.origin, new Vector<Point>());
+        mp_v.add(mp);
+        return mp;
+    }
+
+    private boolean courseVertices(final MonotonePolygon mp, final VertexInform viStart, final VertexInform viToStopAndCloseMp) {
+        VertexInform vi = viStart;
+
+        while (vi != viToStopAndCloseMp) {
+            statusAddCounter();
+            
+            if (vi.divergeTo != null) {
+                final MonotonePolygon subMp = createEmptyMonotonePolygon();
+                subMp.addPoint(vi);
+                courseVertices(createEmptyMonotonePolygon(), vi.next, vi.divergeTo);
+                //
+                mp.addPoint(vi.divergeTo);
+                vi = vi.divergeTo;
+
+            } else {
+                mp.addPoint(vi);
+                vi = vi.next;
+            }
+            
+        }
+        mp.addPoint(vi);
+
+        drawPolygon(mp);
+
+        // sumOfVectorialZProd += resumeProduitVectorielZ(pA, pO, pB);
+
+        return true;
+    }
+
+    private boolean createSubMonotone() {
+        mp_v.clear();
+        if (firstVertexInform == null)
+            return false;
+
+        /*
+         * final ArrayDeque<>
+         * 
+         * Vector<Point> perimeter = new Vector<Point>();
+         * 
+         * Iterator<Point> p_it = pl.iterator(); Point pA = p_it.next(); Point
+         * pO = p_it.next(); while (p_it.hasNext()) { Point pB = p_it.next();
+         * sumOfVectorialZProd += resumeProduitVectorielZ(pA, pO, pB); } return
+         * sumOfVectorialZProd;
+         * 
+         * double sumOfVectorialZProd = 0;
+         */
+        // VertexInform viFirst = vertices.iterator().next();
+
+        return courseVertices(createEmptyMonotonePolygon(), firstVertexInform, firstVertexInform.back);
     }
 
     /* ************** */
@@ -374,10 +538,20 @@ public class Monotisation extends AbstractAlgorithm {
         if (!partitionPolygon())
             return false;
 
+        //
+        drawBordersOfSubMonotones();
+
+        //
+        if (!createSubMonotone())
+            return false;
+
+        //
         return true;
     }
 
-    /* ********* DEBUG ONLY ********* */
+    /*
+     * ****************************** DEBUG ONLY ******************************
+     */
 
     public void drawTextTip(String txt, Point p) {
         if (mutableVisitorForDebugging == null)
@@ -386,6 +560,15 @@ public class Monotisation extends AbstractAlgorithm {
         pToOrigin.set(p);
         as.convertToStandard(pToOrigin);
         mutableVisitorForDebugging.drawTip(txt, pToOrigin);
+    }
+
+    public void drawPolygon(Polygon p) {
+        if (mutableVisitorForDebugging == null)
+            return;
+        mutableVisitorForDebugging.getGraphicsContext().save();
+        mutableVisitorForDebugging.getGraphicsContext().setStroke(Color.HOTPINK);
+        mutableVisitorForDebugging.visit(p);
+        mutableVisitorForDebugging.getGraphicsContext().restore();
     }
 
     public void drawAngle(String txt, Point p) {
@@ -398,11 +581,30 @@ public class Monotisation extends AbstractAlgorithm {
         mutableVisitorForDebugging.drawTip(txt, pToOrigin);
     }
 
+    public void drawBordersOfSubMonotones() {
+        if (mutableVisitorForDebugging == null)
+            return;
+
+        mutableVisitorForDebugging.getGraphicsContext().save();
+        mutableVisitorForDebugging.getGraphicsContext().setStroke(Color.RED);
+
+        final Segment sToOrigin = new Segment();
+
+        for (Segment s : bordersOfSubMonotones) {
+            sToOrigin.set(s);
+            as.convertToStandard(sToOrigin.a);
+            as.convertToStandard(sToOrigin.b);
+            mutableVisitorForDebugging.visit_unit(sToOrigin);
+        }
+
+        mutableVisitorForDebugging.getGraphicsContext().restore();
+    }
+
     public void drawVertexInformType() {
         if (mutableVisitorForDebugging == null)
             return;
 
-        for (VertexInform vi : vertexInform) {
+        for (VertexInform vi : verticesInform) {
 
             final Point pToOrigin = new Point();
             pToOrigin.set(vi);
@@ -417,8 +619,11 @@ public class Monotisation extends AbstractAlgorithm {
             case Merge:
                 type = "▼";
                 break;
-            case Regular:
-                type = "●";
+            case RegularLeft:
+                type = "←●";
+                break;
+            case RegularRight:
+                type = "●→";
                 break;
             case Split:
                 type = "▲";
@@ -431,6 +636,26 @@ public class Monotisation extends AbstractAlgorithm {
             pToOrigin.y -= 5;
 
             mutableVisitorForDebugging.drawTip(type, pToOrigin);
+        }
+    }
+
+    public void drawStatusTip(int l) {
+        int counter = 0;
+        final Point pCenter = new Point();
+
+        for (Edge e : status) {
+
+            pCenter.x = (e.a.x + e.b.x) / 2 + (l % 2) * 30;
+            pCenter.y = (e.a.y + e.b.y) / 2 + (l / 2) * 12;
+            drawTextTip("(" + l + "," + counter + ")", pCenter);
+
+            /*
+             * switch (e.type) { case Upper: drawTextTip("Up(" + counterU + ")("
+             * + counter + ")[" + e.p.toString() + "]", e.p); counterU++; break;
+             * case Lower: drawTextTip("Low(" + counterL + ")(" + counter + ")["
+             * + e.p.toString() + "]", e.p); counterL++; break; }
+             */
+            counter++;
         }
     }
 

@@ -40,6 +40,7 @@ public class GraphToTests {
         //Random rnd = new Random(1123581321345589L);
         Random rnd = new Random();
         
+        lm.addLayer(monotisation(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, false)));
         lm.addLayer(monotisation(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, true)));
         
         //

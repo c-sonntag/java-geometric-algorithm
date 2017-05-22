@@ -6,7 +6,6 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.NavigableSet;
-import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
@@ -21,7 +20,6 @@ import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGraphicVisitor;
 import at.u4a.geometric_algorithms.gui.layer.AbstractLayer;
 import at.u4a.geometric_algorithms.gui.layer.AlgorithmLayer;
 import at.u4a.geometric_algorithms.utils.Calc;
-import javafx.scene.input.SwipeEvent;
 import javafx.scene.paint.Color;
 
 /**
@@ -473,7 +471,7 @@ public class SegmentIntersection extends AbstractAlgorithm {
         return true;
     }
 
-    /* ********* DEBUG ONLY ********* */
+    /* ****************************** DEBUG ONLY ****************************** */
 
     public void drawTextTip(String txt, Point p) {
         if (mutableVisitorForDebugging == null)
