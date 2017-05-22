@@ -354,7 +354,7 @@ public class Monotisation extends AbstractAlgorithm {
             final Edge e = vi.getNextEdge();
             e.helper = vi;
             status.add(e);
-            
+
         } else {
             final Edge eDirectLeftOfVi = getDirectLeft(vi);
             if (eDirectLeftOfVi.helper != null) {
@@ -370,8 +370,6 @@ public class Monotisation extends AbstractAlgorithm {
 
         bordersOfSubMonotones.clear();
         status.clear();
-
-        int count = 0;
 
         //
         try {
@@ -510,11 +508,10 @@ public class Monotisation extends AbstractAlgorithm {
 
             if (vi.divergeTo != null) {
 
-                /*
-                 * drawTextTipPosDecal("100", vi.back, 1);
-                 * drawTextTipPosDecal("000", vi, 1); drawTextTipPosDecal("001",
-                 * vi.next, 1); drawTextTipPosDecal("♦", vi.divergeTo, 1);
-                 */
+                drawTextTipPosDecal("100", vi.back, 1);
+                drawTextTipPosDecal("000", vi, 1);
+                drawTextTipPosDecal("001", vi.next, 1);
+                drawTextTipPosDecal("♦", vi.divergeTo, 1);
 
                 drawTextTipPosDecal(String.valueOf(System.identityHashCode(vi.divergeTo)), vi.divergeTo, 3);
 
@@ -565,8 +562,6 @@ public class Monotisation extends AbstractAlgorithm {
 
     private boolean buildMonotisation() {
 
-        System.out.println();
-
         //
         if (!createVertexInform())
             return false;
@@ -582,8 +577,8 @@ public class Monotisation extends AbstractAlgorithm {
         drawBordersOfSubMonotones();
 
         //
-        // if (!createSubMonotone())
-        // return false;
+        if (!createSubMonotone())
+            return false;
 
         //
         return true;
@@ -697,10 +692,14 @@ public class Monotisation extends AbstractAlgorithm {
             pToOrigin.y -= 5;
 
             mutableVisitorForDebugging.drawTip(type, pToOrigin);
-            pToOrigin.y -= 10;
-            mutableVisitorForDebugging.drawTip(vi.toString(), pToOrigin);
-            pToOrigin.y -= 10;
-            mutableVisitorForDebugging.drawTip(String.valueOf(counter++), pToOrigin);
+
+            /*
+             * pToOrigin.y -= 10;
+             * mutableVisitorForDebugging.drawTip(vi.toString(), pToOrigin);
+             * pToOrigin.y -= 10;
+             * mutableVisitorForDebugging.drawTip(String.valueOf(counter++),
+             * pToOrigin);
+             */
 
             /*
              * drawTextTipPosDecal( //
