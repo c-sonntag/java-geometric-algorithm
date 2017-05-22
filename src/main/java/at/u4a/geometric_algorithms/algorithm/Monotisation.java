@@ -1,11 +1,9 @@
 package at.u4a.geometric_algorithms.algorithm;
 
 import java.util.AbstractList;
-import java.util.ArrayDeque;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.NavigableSet;
-import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
@@ -82,7 +80,7 @@ public class Monotisation extends AbstractAlgorithm {
     @Override
     public void accept(Vector<AbstractLayer> v, InterfaceGraphicVisitor visitor) {
 
-        mutableVisitorForDebugging = vistor;
+        mutableVisitorForDebugging = visitor;
 
         makeMonotisation();
         if (haveMake) {
@@ -163,8 +161,7 @@ public class Monotisation extends AbstractAlgorithm {
      * public int compare(VertexInform vi1, VertexInform vi2) { return
      * comparator.compare(vi1, vi2); } };
      */
-    
-    
+
     /* ************** */
 
     private final Set<Segment> status = new TreeSet<Segment>(new StatusComparator());
@@ -222,20 +219,70 @@ public class Monotisation extends AbstractAlgorithm {
 
     private void markTypeOfVertexInform(VertexInform vi) {
         //
-        final boolean normalSens = vi.back.x <= vi.next.x;
-        final VertexInform left = normalSens ? vi.back : vi.next;
-        final VertexInform right = normalSens ? vi.next : vi.back;
-        final double produit = Calc.resumeProduitVectorielZ(left, vi, right);
+        final boolean isVerticalUpDown = ((vi.back.y < vi.y) && (vi.y < vi.next.y));
+        // final boolean isVerticalDownUp = ((vi.back.y > vi.y) && (vi.y >
+        // vi.next.y));
+        final boolean isHorizontalLeftRight = ((vi.back.x < vi.x) && (vi.x < vi.next.x));
+        // final boolean isHorizontalRightLeft = ((vi.back.x > vi.x) && (vi.x >
+        // vi.next.x));
 
-        /** @todo find the ambiguity with (Start or Split) and (End or Merge) */
+        final boolean normalSens = isVerticalUpDown || isHorizontalLeftRight;
+
+        final VertexInform leftOrUp = (normalSens) ? vi.back : vi.next;
+        final VertexInform rightOrDown = (normalSens) ? vi.next : vi.back;
+
+        final double produit = Calc.resumeProduitVectorielZ(leftOrUp, vi, rightOrDown);
+
+        final boolean haveUpperNeighbour = (vi.y > leftOrUp.y) && (vi.y > rightOrDown.y);
+        final boolean haveLowerNeighbour = (vi.y < leftOrUp.y) && (vi.y < rightOrDown.y);
+
+        final boolean isLesserThanPi = produit < 0;
+
+        if (haveLowerNeighbour)
+            vi.type = isLesserThanPi ? VertexType.Start : VertexType.Split;
+        else if (haveUpperNeighbour)
+            vi.type = isLesserThanPi ? VertexType.End : VertexType.Merge;
+        else
+            vi.type = VertexType.Regular;
+
+        drawAngle(String.valueOf(produit) + " " + (isLesserThanPi ? "1" : "0"), vi);
+
+        /*
+         * if ((vi.y < left.y) && (vi.y < right.y)) // is : Start or Split
+         * vi.type = isLesserThanPi ? VertexType.Start : VertexType.Split; else
+         * if ((vi.y > left.y) && (vi.y > right.y)) // is : End or Merge vi.type
+         * = isLesserThanPi ? VertexType.End : VertexType.Merge; else vi.type =
+         * VertexType.Regular;
+         * 
+         * 
+         * 
+         * if(isVerticalUpDown || isVerticalDownUp) { // 1 voisin au-dessu et
+         * l'autre en-dessous } else if (isHorizontalLeftRight ||
+         * isHorizontalRightLeft) { // 2 voisin au-dessu ou en-dessous
+         * 
+         * } drawAngle(String.valueOf(produit) + " " + (isLesserThanPi ? "1" :
+         * "0"), vi);
+         * 
+         * /**
+         * 
+         * @todo find bug with resumeProduitVectorielZ /** @todo find the
+         * ambiguity with (Start or Split) and (End or Merge)
+         */
 
         //
-        if ((vi.y > left.y) && (vi.y > right.y)) // is : Start or Split
-            vi.type = VertexType.Split;
-        else if ((vi.y < left.y) && (vi.y < right.y)) // is : End or Merge
-            vi.type = VertexType.Merge;
-        else if ((vi.y < left.y) && (vi.y < right.y)) // is : regular
-            vi.type = VertexType.Regular;
+        /*
+         * if ((vi.y < left.y) && (vi.y < right.y)) // is : Start or Split
+         * vi.type = isLesserThanPi ? VertexType.Start : VertexType.Split; else
+         * if ((vi.y > left.y) && (vi.y > right.y)) // is : End or Merge vi.type
+         * = isLesserThanPi ? VertexType.End : VertexType.Merge; else vi.type =
+         * VertexType.Regular;
+         * 
+         * // /* if ((vi.y < left.y) && (vi.y < right.y)) // is : Start or Split
+         * vi.type = VertexType.Split; else if ((vi.y > left.y) && (vi.y >
+         * right.y)) // is : End or Merge vi.type = VertexType.Merge; else
+         * vi.type = VertexType.Regular;
+         */
+
     }
 
     private boolean createVertexInform() {
@@ -247,8 +294,10 @@ public class Monotisation extends AbstractAlgorithm {
 
         //
         Iterator<Point> p_it = points.iterator();
+
+        //
         final VertexInform firstVI = new VertexInform(p_it.next());
-        VertexInform lastVI = firstVI, newVI = null;
+        VertexInform lastVI = firstVI, newVI = null, lastLastVi = null;
 
         //
         while (p_it.hasNext()) {
@@ -262,18 +311,25 @@ public class Monotisation extends AbstractAlgorithm {
             }
 
             //
-            lastVI = newVI;
             vertexInform.add(newVI);
+            lastLastVi = lastVI;
+            lastVI = newVI;
         }
+
+        //
+        lastLastVi.next = newVI;
+        newVI.back = lastLastVi;
+        newVI.next = firstVI;
+        markTypeOfVertexInform(newVI);
 
         //
         firstVI.back = newVI;
         markTypeOfVertexInform(firstVI);
         vertexInform.add(firstVI);
-        
+
         //
         /** @todo find if the polygon have colision */
-        return true;         
+        return true;
     }
 
     /* ************** */
@@ -283,6 +339,9 @@ public class Monotisation extends AbstractAlgorithm {
         //
         if (!createVertexInform())
             return false;
+
+        //
+        drawVertexInformType();
 
         //
         if (!partitionPolygon())
@@ -300,6 +359,52 @@ public class Monotisation extends AbstractAlgorithm {
         pToOrigin.set(p);
         as.convertToStandard(pToOrigin);
         mutableVisitorForDebugging.drawTip(txt, pToOrigin);
+    }
+
+    public void drawAngle(String txt, Point p) {
+        if (mutableVisitorForDebugging == null)
+            return;
+        final Point pToOrigin = new Point();
+        pToOrigin.set(p);
+        pToOrigin.y -= 20;
+        as.convertToStandard(pToOrigin);
+        mutableVisitorForDebugging.drawTip(txt, pToOrigin);
+    }
+
+    public void drawVertexInformType() {
+        if (mutableVisitorForDebugging == null)
+            return;
+
+        for (VertexInform vi : vertexInform) {
+
+            final Point pToOrigin = new Point();
+            pToOrigin.set(vi);
+            as.convertToStandard(pToOrigin);
+
+            String type = "☺";
+
+            switch (vi.type) {
+            case End:
+                type = "■";
+                break;
+            case Merge:
+                type = "▼";
+                break;
+            case Regular:
+                type = "●";
+                break;
+            case Split:
+                type = "▲";
+                break;
+            case Start:
+                type = "□";
+                break;
+            }
+
+            pToOrigin.y -= 5;
+
+            mutableVisitorForDebugging.drawTip(type, pToOrigin);
+        }
     }
 
 };

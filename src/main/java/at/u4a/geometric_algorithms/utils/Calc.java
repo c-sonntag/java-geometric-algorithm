@@ -21,6 +21,25 @@ public class Calc {
         return pAx * pBy - pAy * pBx;
     }
 
+    /*
+     * public static double resumeProduitVectorielZWithoutXTorque(Point pA,
+     * Point pOrigine, Point pB) {
+     * 
+     * double pAx = pA.x - pOrigine.x; double pAy = pA.y - pOrigine.y; double
+     * pBx = pB.x - pOrigine.x; double pBy = pB.y - pOrigine.y;
+     * 
+     * if(((pAx > 0) && (pBx > 0)) || ((pAx < 0) && (pBx < 0))) pAx = pBx;
+     * System.out.print("pAx("+pAx+") pAy("+pAy+") pBx("+pBx+") pBy("+pBy+") ");
+     * 
+     * /*if((pAx > 0) && (pBx > 0)) pAx = pBx = Math.max(pAx, pBx); else if
+     * ((pAx < 0) && (pBx < 0)) pAx = pBx = Math.min(pAx, pBx); if((pAy >
+     * pOrigine.y) && (pBy > pOrigine.y)) pAy = pBy = Math.max(pAy, pBy); else
+     * if ((pAy < pOrigine.y) && (pBy < pOrigine.y)) pAy = pBy = Math.min(pAy,
+     * pBy);
+     * 
+     * return pAx * pBy - pAy * pBx; }
+     */
+
     /**
      * Renvoi l'intersection entre 2 segments.
      * 

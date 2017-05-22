@@ -28,7 +28,7 @@ public class GraphToTests {
     static double Square_FACTOR = 5;
 
     static int Polygon_SIDE_NB = 8;
-    static double Polygon_FACTOR = 5;
+    static double Polygon_FACTOR = 4;
 
     static int Cloud_of_Points_NB = 6;
     static double Cloud_of_Points_FACTOR = 2;
@@ -37,14 +37,16 @@ public class GraphToTests {
     static double Cloud_of_Segments_FACTOR = 3;
 
     public static void defaultGraph(LayerManager lm) {
-        Random rnd = new Random(1123581321345589L);
+        //Random rnd = new Random(1123581321345589L);
+        Random rnd = new Random();
         
-        lm.addLayer(segment_intersection(cloud_of_segments(rnd.nextLong(), Cloud_of_Segments_NB, Cloud_of_Segments_FACTOR)));
+        lm.addLayer(monotisation(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, true)));
         
         //
         if (activeDefault) {
             lm.addLayer(rectangle(rnd.nextLong(), Square_FACTOR));
             lm.addLayer(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, false));
+            lm.addLayer(segment_intersection(cloud_of_segments(rnd.nextLong(), Cloud_of_Segments_NB, Cloud_of_Segments_FACTOR)));
             lm.addLayer(triangulation(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, false)));
             lm.addLayer(triangulation(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, true)));
             lm.addLayer(cloud_of_points(rnd.nextLong(), Cloud_of_Points_NB, Cloud_of_Points_FACTOR));
@@ -70,6 +72,12 @@ public class GraphToTests {
         SegmentIntersection.Builder si = new SegmentIntersection.Builder();
         layer.getAuthorized().clear();
         return si.builder(layer);
+    }
+    
+    static AbstractLayer monotisation(AbstractLayer layer) {
+        Monotisation.Builder m = new Monotisation.Builder();
+        layer.getAuthorized().clear();
+        return m.builder(layer);
     }
 
     /* ****** SHAPE LAYER ****** */
