@@ -219,24 +219,33 @@ public class Monotisation extends AbstractAlgorithm {
 
     private void markTypeOfVertexInform(VertexInform vi) {
         //
-        final boolean isVerticalUpDown = ((vi.back.y < vi.y) && (vi.y < vi.next.y));
-        // final boolean isVerticalDownUp = ((vi.back.y > vi.y) && (vi.y >
-        // vi.next.y));
+        /*final boolean isVerticalUpDown = ((vi.back.y < vi.y) && (vi.y < vi.next.y));
+        final boolean isVerticalDownUp = ((vi.back.y > vi.y) && (vi.y > vi.next.y));
         final boolean isHorizontalLeftRight = ((vi.back.x < vi.x) && (vi.x < vi.next.x));
-        // final boolean isHorizontalRightLeft = ((vi.back.x > vi.x) && (vi.x >
-        // vi.next.x));
+        final boolean isHorizontalRightLeft = ((vi.back.x > vi.x) && (vi.x > vi.next.x));*/
+        
+        final boolean isVerticalUpDown = ((vi.back.y < vi.y) && (vi.y < vi.next.y));
+        final boolean isVerticalDownUp = ((vi.back.y > vi.y) && (vi.y > vi.next.y));
+        final boolean isHorizontalLeftRight = (vi.back.x < vi.next.x);
+        final boolean isHorizontalRightLeft = (vi.back.x > vi.next.x);
 
-        final boolean normalSens = isVerticalUpDown || isHorizontalLeftRight;
-
+        /*final boolean normalSens = isVerticalUpDown || isHorizontalLeftRight;
         final VertexInform leftOrUp = (normalSens) ? vi.back : vi.next;
-        final VertexInform rightOrDown = (normalSens) ? vi.next : vi.back;
+        final VertexInform rightOrDown = (normalSens) ? vi.next : vi.back;*/
 
-        final double produit = Calc.resumeProduitVectorielZ(leftOrUp, vi, rightOrDown);
+        /*
+         * final VertexInform leftOrUp = (isVerticalUpDown ||
+         * isHorizontalLeftRight) ? vi.back : vi.next; final VertexInform
+         * rightOrDown = (isVerticalDownUp || isHorizontalRightLeft) ? vi.next :
+         * vi.back;
+         */
 
-        final boolean haveUpperNeighbour = (vi.y > leftOrUp.y) && (vi.y > rightOrDown.y);
-        final boolean haveLowerNeighbour = (vi.y < leftOrUp.y) && (vi.y < rightOrDown.y);
+        final double produit = Calc.resumeProduitVectorielZ(vi.back, vi, vi.next);
 
-        final boolean isLesserThanPi = produit < 0;
+        final boolean haveUpperNeighbour = (vi.y > back.y) && (vi.y > next.y);
+        final boolean haveLowerNeighbour = (vi.y < back.y) && (vi.y < next.y);
+
+        final boolean isLesserThanPi = produit > 0;
 
         if (haveLowerNeighbour)
             vi.type = isLesserThanPi ? VertexType.Start : VertexType.Split;
@@ -245,7 +254,7 @@ public class Monotisation extends AbstractAlgorithm {
         else
             vi.type = VertexType.Regular;
 
-        drawAngle(String.valueOf(produit) + " " + (isLesserThanPi ? "1" : "0"), vi);
+        drawAngle(String.valueOf(produit) + " " + (isLesserThanPi ? "1" : "0")+ " " + (normalSens ? "→" : "←"), vi);
 
         /*
          * if ((vi.y < left.y) && (vi.y < right.y)) // is : Start or Split
