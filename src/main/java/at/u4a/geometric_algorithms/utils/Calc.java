@@ -35,15 +35,22 @@ public class Calc {
             return 0;
 
         Iterator<Point> p_it = pl.iterator();
-        Point pA = p_it.next();
-        Point pO = p_it.next();
+        final Point pFirst = p_it.next(), pSecond = p_it.next();
+        Point pA = pFirst, pO = pSecond;
 
         double sumOfVectorialZProd = 0;
 
+        Point pB = null;
+
         while (p_it.hasNext()) {
-            Point pB = p_it.next();
+            pB = p_it.next();
             sumOfVectorialZProd += resumeProduitVectorielZ(pA, pO, pB);
+            pA = pO;
+            pO = pB;
         }
+
+        sumOfVectorialZProd += resumeProduitVectorielZ(pO, pB, pFirst);
+        sumOfVectorialZProd += resumeProduitVectorielZ(pB, pFirst, pSecond);
 
         return sumOfVectorialZProd;
     }

@@ -183,16 +183,29 @@ public class Monotisation extends AbstractAlgorithm {
     };
 
     private static class StatusComparator implements Comparator<Segment> {
+
         @Override
         public int compare(Segment s1, Segment s2) {
-            if (s1.a.equals(s2.a) && s2.b.equals(s2.b))
+
+            if (s1.a.equals(s2.a) && s1.b.equals(s2.b))
                 return 0;
 
-            final double wS1Decal = (s1.a.x + s1.b.x) / 2, wS2Decal = (s2.a.x + s2.b.x) / 2;
-            //final boolean s2isGreaterRight = wS1Decal < wS2Decal;
-            final boolean s2isGreaterRight = Math.min(s1.a.x, s1.b.x) < Math.min(s2.a.x, s2.b.x);
+            final double s1x = Math.min(s1.a.x, s1.b.x), s2x = Math.min(s2.a.x, s2.b.x);
+            final double s1y = Math.min(s1.a.y, s1.b.y), s2y = Math.min(s2.a.y, s2.b.y);
 
-            return (s2isGreaterRight) ? 1 : -1;
+            return (s1x != s2x) ? ((s1x < s2x) ? -1 : 1) : ((s1y <= s2y) ? -1 : 1);
+
+            // final double wS1Decal = (s1.a.x + s1.b.x) / 2, wS2Decal = (s2.a.x
+            // + s2.b.x) / 2;
+            // final boolean s2isGreaterRight = wS1Decal < wS2Decal;
+
+            // double s1X = Math.min(s1.a.x, s1.b.x);
+            // double s2X = Math.min(s2.a.x, s2.b.x);
+
+            // final boolean s2isGreaterRight = Math.min(s1.a.x, s1.b.x) <=
+            // Math.min(s2.a.x, s2.b.x);
+
+            // return (s2isGreaterRight) ? 1 : -1;
         }
     };
 
@@ -271,22 +284,39 @@ public class Monotisation extends AbstractAlgorithm {
         bordersOfSubMonotones.add(new Segment(vi1, vi2));
     }
 
+    static int debugDirectLeftCounter = 0;
+
+    StatusComparator sc = new StatusComparator();
+
     /** @todo check it */
     private final Edge getDirectLeft(VertexInform vi) {
         final Edge viSearch = new Edge(vi, vi);
-        
-        drawTextTipPosDecal("║", vi, 1);
-        
-        final Edge eDirectLeftOfVi = statusNavigator.lower(viSearch);
+
+        drawTextTipPosDecal("║" + debugDirectLeftCounter, vi, 1);
+        drawStatusTip(debugDirectLeftCounter);
+
+        debugDirectLeftCounter++;
+
+        final Edge eDirectLeftOfVi = statusNavigator.floor(viSearch);
         if (eDirectLeftOfVi != null) {
-            
+
             drawTextEdge(eDirectLeftOfVi);
-            
+
             return eDirectLeftOfVi;
-        }
-        else {
-            System.out.println("not find eDirectLeftOfVi for :" + vi.toString());
-            //return statusNavigator.higher(viSearch);
+        } else {
+
+            System.out.print("notfind eDirect(" + vi.toString() + ") test:");
+
+            int count = 0;
+            for (Edge e : status) {
+                int testLeft = sc.compare(e, viSearch);
+                int testRight = sc.compare(viSearch, e);
+                System.out.print("e(" + (count++) + e.toString() + ":" + testLeft + "/" + testRight + ")");
+            }
+
+            System.out.println();
+
+            // return statusNavigator.higher(viSearch);
             return null;
             // if (eDirectLeftOfVi != null)
             // return eDirectLeftOfVi;
@@ -374,32 +404,38 @@ public class Monotisation extends AbstractAlgorithm {
         status.clear();
 
         int count = 0;
+        debugDirectLeftCounter = 0;
 
         //
-        for (VertexInform vi : verticesInform) {
-            statusAddCounter();
+        try {
 
-            switch (vi.type) {
-            case End:
-                handleEndVertex(vi);
-                break;
-            case Merge:
-                handleMergeVertex(vi);
-                break;
-            case RegularLeft:
-            case RegularRight:
-                handleRegularVertex(vi);
-                break;
-            case Split:
-                handleSplitVertex(vi);
-                break;
-            case Start:
-                handleStartVertex(vi);
-                break;
+            for (VertexInform vi : verticesInform) {
+                statusAddCounter();
+
+                switch (vi.type) {
+                case End:
+                    handleEndVertex(vi);
+                    break;
+                case Merge:
+                    handleMergeVertex(vi);
+                    break;
+                case RegularLeft:
+                case RegularRight:
+                    handleRegularVertex(vi);
+                    break;
+                case Split:
+                    handleSplitVertex(vi);
+                    break;
+                case Start:
+                    handleStartVertex(vi);
+                    break;
+                }
             }
 
-            //drawStatusTip(count++);
+        } catch (Exception useless) {
+            return false;
         }
+        
         return true;
     }
 
@@ -562,6 +598,8 @@ public class Monotisation extends AbstractAlgorithm {
 
     private boolean buildMonotisation() {
 
+        System.out.println();
+
         //
         if (!createVertexInform())
             return false;
@@ -597,12 +635,12 @@ public class Monotisation extends AbstractAlgorithm {
         as.convertToStandard(pToOrigin);
         mutableVisitorForDebugging.drawTip(txt, pToOrigin);
     }
-    
+
     public void drawTextEdge(Edge e) {
         final Point pCenter = new Point();
-        pCenter.x = (e.a.x + e.b.x)/2;
-        pCenter.y = (e.a.y + e.b.y)/2;
-        drawTextTipPosDecal(  Integer.toHexString(System.identityHashCode(e)), pCenter, -1); 
+        pCenter.x = (e.a.x + e.b.x) / 2;
+        pCenter.y = (e.a.y + e.b.y) / 2;
+        drawTextTipPosDecal(Integer.toHexString(System.identityHashCode(e)), pCenter, -1);
     }
 
     public void drawTextTipPosDecal(String txt, Point p, int pos) {

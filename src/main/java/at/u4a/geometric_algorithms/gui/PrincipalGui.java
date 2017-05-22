@@ -62,6 +62,8 @@ public class PrincipalGui extends JFrame {
 
     private final DrawerScene ds = new DrawerScene(da, la);
     private final LayerTree treeLayer = new LayerTree(ds);
+    
+    private static final int WINDOW_WIDTH = 1000, WINDOW_HEIGHT = 800;
 
     /**
      * Launch the application.
@@ -115,7 +117,7 @@ public class PrincipalGui extends JFrame {
      * Initialize the frame.
      */
     private void initializeFrame() {
-        setBounds(100, 100, 800, 600);
+        setBounds(100, 100, WINDOW_WIDTH,WINDOW_HEIGHT);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setMinimumSize(new Dimension(800, 600));
     }

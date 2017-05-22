@@ -151,7 +151,7 @@ public class SegmentIntersection extends AbstractAlgorithm {
     private static class SweepLineComparator implements Comparator<Segment> {
         @Override
         public int compare(Segment s1, Segment s2) {
-            if (s1.a.equals(s2.a) && s2.b.equals(s2.b))
+            if (s1.a.equals(s2.a) && s1.b.equals(s2.b))
                 return 0;
             final double wS1Decal = (s1.a.x + s1.b.x) / 2, wS2Decal = (s2.a.x + s2.b.x) / 2;
             return ((wS1Decal == wS2Decal) ? //
