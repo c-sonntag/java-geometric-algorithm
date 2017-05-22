@@ -1,5 +1,8 @@
 package at.u4a.geometric_algorithms.utils;
 
+import java.util.AbstractList;
+import java.util.Iterator;
+
 import at.u4a.geometric_algorithms.geometric.Line;
 import at.u4a.geometric_algorithms.geometric.Point;
 import at.u4a.geometric_algorithms.geometric.Segment;
@@ -19,6 +22,30 @@ public class Calc {
         final double pBy = pB.y - pOrigine.y;
 
         return pAx * pBy - pAy * pBx;
+    }
+
+    /**
+     * Permet de connaître le sens d'écriture d'un polygon
+     * 
+     * @return - sumOfVectorialZProd>0 : sens horaire, - sumOfVectorialZProd<0 :
+     *         sens anti-horaire, - sumOfVectorialZProd==0 : aucun sens
+     */
+    public static double getClockwise(AbstractList<Point> pl) {
+        if (pl.size() < 2)
+            return 0;
+
+        Iterator<Point> p_it = pl.iterator();
+        Point pA = p_it.next();
+        Point pO = p_it.next();
+
+        double sumOfVectorialZProd = 0;
+
+        while (p_it.hasNext()) {
+            Point pB = p_it.next();
+            sumOfVectorialZProd += resumeProduitVectorielZ(pA, pO, pB);
+        }
+
+        return sumOfVectorialZProd;
     }
 
     /*

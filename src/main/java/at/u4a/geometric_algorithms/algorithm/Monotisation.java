@@ -3,6 +3,8 @@ package at.u4a.geometric_algorithms.algorithm;
 import java.util.AbstractList;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeSet;
@@ -18,6 +20,7 @@ import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGraphicVisitor;
 import at.u4a.geometric_algorithms.gui.layer.AbstractLayer;
 import at.u4a.geometric_algorithms.gui.layer.AlgorithmLayer;
 import at.u4a.geometric_algorithms.utils.Calc;
+import at.u4a.geometric_algorithms.utils.Collection;
 
 /**
  * Monotisation
@@ -219,19 +222,27 @@ public class Monotisation extends AbstractAlgorithm {
 
     private void markTypeOfVertexInform(VertexInform vi) {
         //
-        /*final boolean isVerticalUpDown = ((vi.back.y < vi.y) && (vi.y < vi.next.y));
-        final boolean isVerticalDownUp = ((vi.back.y > vi.y) && (vi.y > vi.next.y));
-        final boolean isHorizontalLeftRight = ((vi.back.x < vi.x) && (vi.x < vi.next.x));
-        final boolean isHorizontalRightLeft = ((vi.back.x > vi.x) && (vi.x > vi.next.x));*/
-        
-        final boolean isVerticalUpDown = ((vi.back.y < vi.y) && (vi.y < vi.next.y));
-        final boolean isVerticalDownUp = ((vi.back.y > vi.y) && (vi.y > vi.next.y));
-        final boolean isHorizontalLeftRight = (vi.back.x < vi.next.x);
-        final boolean isHorizontalRightLeft = (vi.back.x > vi.next.x);
+        /*
+         * final boolean isVerticalUpDown = ((vi.back.y < vi.y) && (vi.y <
+         * vi.next.y)); final boolean isVerticalDownUp = ((vi.back.y > vi.y) &&
+         * (vi.y > vi.next.y)); final boolean isHorizontalLeftRight =
+         * ((vi.back.x < vi.x) && (vi.x < vi.next.x)); final boolean
+         * isHorizontalRightLeft = ((vi.back.x > vi.x) && (vi.x > vi.next.x));
+         */
 
-        /*final boolean normalSens = isVerticalUpDown || isHorizontalLeftRight;
-        final VertexInform leftOrUp = (normalSens) ? vi.back : vi.next;
-        final VertexInform rightOrDown = (normalSens) ? vi.next : vi.back;*/
+        /*
+         * final boolean isVerticalUpDown = ((vi.back.y < vi.y) && (vi.y <
+         * vi.next.y)); final boolean isVerticalDownUp = ((vi.back.y > vi.y) &&
+         * (vi.y > vi.next.y)); final boolean isHorizontalLeftRight = (vi.back.x
+         * < vi.next.x); final boolean isHorizontalRightLeft = (vi.back.x >
+         * vi.next.x);
+         */
+
+        /*
+         * final boolean normalSens = isVerticalUpDown || isHorizontalLeftRight;
+         * final VertexInform leftOrUp = (normalSens) ? vi.back : vi.next; final
+         * VertexInform rightOrDown = (normalSens) ? vi.next : vi.back;
+         */
 
         /*
          * final VertexInform leftOrUp = (isVerticalUpDown ||
@@ -242,8 +253,8 @@ public class Monotisation extends AbstractAlgorithm {
 
         final double produit = Calc.resumeProduitVectorielZ(vi.back, vi, vi.next);
 
-        final boolean haveUpperNeighbour = (vi.y > back.y) && (vi.y > next.y);
-        final boolean haveLowerNeighbour = (vi.y < back.y) && (vi.y < next.y);
+        final boolean haveUpperNeighbour = (vi.y > vi.back.y) && (vi.y > vi.next.y);
+        final boolean haveLowerNeighbour = (vi.y < vi.back.y) && (vi.y < vi.next.y);
 
         final boolean isLesserThanPi = produit > 0;
 
@@ -254,7 +265,9 @@ public class Monotisation extends AbstractAlgorithm {
         else
             vi.type = VertexType.Regular;
 
-        drawAngle(String.valueOf(produit) + " " + (isLesserThanPi ? "1" : "0")+ " " + (normalSens ? "→" : "←"), vi);
+        drawAngle(String.valueOf(produit) + " " + (isLesserThanPi ? "1" : "0"), vi);
+        // drawAngle(String.valueOf(produit) + " " + (isLesserThanPi ? "1" :
+        // "0")+ " " + (normalSens ? "→" : "←"), vi);
 
         /*
          * if ((vi.y < left.y) && (vi.y < right.y)) // is : Start or Split
@@ -302,7 +315,12 @@ public class Monotisation extends AbstractAlgorithm {
         vertexInform.clear();
 
         //
-        Iterator<Point> p_it = points.iterator();
+        double sumVecZ = Calc.getClockwise(points);
+        if (sumVecZ == 0)
+            return false;
+
+        //
+        final Iterator<Point> p_it = sumVecZ > 0 ? points.iterator() : new Collection.ReverseIterable<Point>(points).iterator();
 
         //
         final VertexInform firstVI = new VertexInform(p_it.next());
