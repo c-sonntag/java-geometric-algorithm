@@ -381,7 +381,7 @@ public class Monotisation extends AbstractAlgorithm {
                 break;
             }
 
-            drawStatusTip(count++);
+            //drawStatusTip(count++);
         }
         return true;
     }
@@ -472,25 +472,37 @@ public class Monotisation extends AbstractAlgorithm {
         return mp;
     }
 
+    private int mutableDebugLotsLoop = 0;
+    
     private boolean courseVertices(final MonotonePolygon mp, final VertexInform viStart, final VertexInform viToStopAndCloseMp) {
         VertexInform vi = viStart;
 
         while (vi != viToStopAndCloseMp) {
+            
+            if(mutableDebugLotsLoop > 300)
+                break; 
+            
+            mutableDebugLotsLoop++;
+            
             statusAddCounter();
+            mp.addPoint(vi);
             
             if (vi.divergeTo != null) {
+                
+                drawTextTip("100", vi.back);
+                drawTextTip("000", vi);
+                drawTextTip("001", vi.next);
+                drawTextTip("♦", vi.divergeTo);
+                
                 final MonotonePolygon subMp = createEmptyMonotonePolygon();
                 subMp.addPoint(vi);
-                courseVertices(createEmptyMonotonePolygon(), vi.next, vi.divergeTo);
+                courseVertices(subMp, vi.next, vi.divergeTo);
                 //
-                mp.addPoint(vi.divergeTo);
+                //mp.addPoint(vi.divergeTo);
                 vi = vi.divergeTo;
-
             } else {
-                mp.addPoint(vi);
                 vi = vi.next;
             }
-            
         }
         mp.addPoint(vi);
 
@@ -506,6 +518,8 @@ public class Monotisation extends AbstractAlgorithm {
         if (firstVertexInform == null)
             return false;
 
+        mutableDebugLotsLoop = 0;
+        
         /*
          * final ArrayDeque<>
          * 
@@ -558,6 +572,17 @@ public class Monotisation extends AbstractAlgorithm {
             return;
         final Point pToOrigin = new Point();
         pToOrigin.set(p);
+        pToOrigin.y += 20;
+        as.convertToStandard(pToOrigin);
+        mutableVisitorForDebugging.drawTip(txt, pToOrigin);
+    }
+    
+    public void drawTextTipPosDecal(String txt, Point p, int pos) {
+        if (mutableVisitorForDebugging == null)
+            return;
+        final Point pToOrigin = new Point();
+        pToOrigin.set(p);
+        pToOrigin.y += 20 + pos * 20;
         as.convertToStandard(pToOrigin);
         mutableVisitorForDebugging.drawTip(txt, pToOrigin);
     }
@@ -586,6 +611,7 @@ public class Monotisation extends AbstractAlgorithm {
             return;
 
         mutableVisitorForDebugging.getGraphicsContext().save();
+        mutableVisitorForDebugging.getGraphicsContext().setLineWidth(5);
         mutableVisitorForDebugging.getGraphicsContext().setStroke(Color.RED);
 
         final Segment sToOrigin = new Segment();

@@ -37,8 +37,8 @@ public class GraphToTests {
     static double Cloud_of_Segments_FACTOR = 3;
 
     public static void defaultGraph(LayerManager lm) {
-        //Random rnd = new Random(1123581321345589L);
-        Random rnd = new Random();
+        Random rnd = new Random(1123581321345589L);
+        //Random rnd = new Random();
         
         lm.addLayer(monotisation(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, false)));
         lm.addLayer(monotisation(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, true)));
