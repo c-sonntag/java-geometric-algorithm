@@ -279,6 +279,7 @@ public class Monotisation extends AbstractAlgorithm {
     /* ************** */
 
     class NotDirectLeftFindException extends Exception {
+        private static final long serialVersionUID = -1665815895025535555L;
     }
 
     private void attachBorder(VertexInform vi1, VertexInform vi2) {
@@ -307,9 +308,10 @@ public class Monotisation extends AbstractAlgorithm {
 
     private void handleEndVertex(VertexInform vi) {
         final Edge eBack = vi.back.getNextEdge();
-        if (eBack.helper != null)
+        if (eBack.helper != null) {
             if (eBack.helper.type == VertexType.Merge)
                 attachBorder(vi, eBack.helper);
+        }
         status.remove(eBack);
     }
 
@@ -327,9 +329,10 @@ public class Monotisation extends AbstractAlgorithm {
 
     private void handleMergeVertex(VertexInform vi) throws NotDirectLeftFindException {
         final Edge eBack = vi.back.getNextEdge();
-        if (eBack.helper != null)
+        if (eBack.helper != null) {
             if (eBack.helper.type == VertexType.Merge)
                 attachBorder(vi, eBack.helper);
+        }
         status.remove(eBack);
 
         //
@@ -339,16 +342,17 @@ public class Monotisation extends AbstractAlgorithm {
                 attachBorder(vi, eDirectLeftOfVi.helper);
         }
         eDirectLeftOfVi.helper = vi;
-
     }
 
     private void handleRegularVertex(VertexInform vi) throws NotDirectLeftFindException {
         if (vi.type == VertexType.RegularLeft) {
             //
             final Edge eBack = vi.back.getNextEdge();
-            if (eBack.helper != null)
+            if (eBack.helper != null) {
                 if (eBack.helper.type == VertexType.Merge)
                     attachBorder(vi, eBack.helper);
+            }
+
             //
             status.remove(eBack);
             final Edge e = vi.getNextEdge();
@@ -397,7 +401,7 @@ public class Monotisation extends AbstractAlgorithm {
                 }
             }
 
-        } catch (Exception useless) {
+        } catch (NotDirectLeftFindException useless) {
             return false;
         }
 
@@ -436,8 +440,10 @@ public class Monotisation extends AbstractAlgorithm {
         if (sumVecZ == 0)
             return false;
 
+        System.out.println("sumVecZ=" + sumVecZ);
+
         //
-        final Iterator<Point> p_it = (sumVecZ > 0) ? points.iterator() : new Collection.ReverseIterable<Point>(points).iterator();
+        final Iterator<Point> p_it = (sumVecZ < 0) ? points.iterator() : new Collection.ReverseIterable<Point>(points).iterator();
 
         //
         final VertexInform firstVI = new VertexInform(p_it.next());
@@ -476,11 +482,14 @@ public class Monotisation extends AbstractAlgorithm {
         firstVertexInform = firstVI;
 
         //
-        /** @todo find if the polygon have colision */
         return true;
     }
 
     /* ************** */
+
+    class NotComputeVecZException extends Exception {
+        private static final long serialVersionUID = -959335325844810586L;
+    }
 
     private final MonotonePolygon createEmptyMonotonePolygon() {
         final MonotonePolygon mp = new MonotonePolygon(as.origin, new Vector<Point>());
@@ -490,10 +499,16 @@ public class Monotisation extends AbstractAlgorithm {
 
     private int mutableDebugLotsLoop = 0;
 
-    private boolean courseVertices(final MonotonePolygon mp, final VertexInform viStart, final VertexInform viToStopAndCloseMp) {
+    private boolean seeParcours = false;
+    private int parcoursCount = 0;
+
+    private void courseVertices(final MonotonePolygon mp, final VertexInform viStart, final VertexInform viToStopAndCloseMp) throws NotComputeVecZException {
         VertexInform vi = viStart;
 
         while (vi != viToStopAndCloseMp) {
+
+            if (seeParcours)
+                drawTextTipPosDecal("●" + (parcoursCount++), vi, -3);
 
             if (mutableDebugLotsLoop > 90)
                 break;
@@ -501,37 +516,56 @@ public class Monotisation extends AbstractAlgorithm {
             mutableDebugLotsLoop++;
 
             statusAddCounter();
+            
             mp.addPoint(vi);
 
-            // drawTextTipPosDecal(String.valueOf(System.identityHashCode(vi)),
-            // vi, 0);
-
-            if (vi.divergeTo != null) {
+            if ((vi.divergeTo != null) || (vi.divergeFrom != null)) {
 
                 drawTextTipPosDecal("100", vi.back, 1);
                 drawTextTipPosDecal("000", vi, 1);
                 drawTextTipPosDecal("001", vi.next, 1);
-                drawTextTipPosDecal("♦", vi.divergeTo, 1);
 
-                drawTextTipPosDecal(String.valueOf(System.identityHashCode(vi.divergeTo)), vi.divergeTo, 3);
+                if (vi.divergeTo != null)
+                    drawTextTipPosDecal("├", vi.divergeTo, 2);
+                if (vi.divergeFrom != null)
+                    drawTextTipPosDecal("┤", vi.divergeFrom, 2);
+
+                VertexInform subViEnd = (vi.divergeTo != null) ? vi.divergeTo : vi.divergeFrom;
 
                 final MonotonePolygon subMp = createEmptyMonotonePolygon();
                 subMp.addPoint(vi);
-                courseVertices(subMp, vi.next, vi.divergeTo);
+
                 //
-                // mp.addPoint(vi.divergeTo);
-                vi = vi.divergeTo;
+                seeParcours = true;
+                courseVertices(subMp, vi.next, subViEnd);
+                parcoursCount = 0;
+                seeParcours = false;
+
+                //
+                vi = subViEnd;
+
+                // drawTextTipPosDecal(String.valueOf(System.identityHashCode(vi.divergeTo)),
+                // vi.divergeTo, -1);
+                /*
+                 * final MonotonePolygon subMp = createEmptyMonotonePolygon();
+                 * subMp.addPoint(vi); courseVertices(subMp, vi.next,
+                 * vi.divergeTo);
+                 * 
+                 * // // mp.addPoint(vi.divergeTo); vi = vi.divergeTo;
+                 */
             } else {
                 vi = vi.next;
             }
         }
+
+        if (seeParcours)
+            drawTextTipPosDecal((parcoursCount++)+ "∆", vi, -3);
+
         mp.addPoint(vi);
 
         drawPolygon(mp);
 
         // sumOfVectorialZProd += resumeProduitVectorielZ(pA, pO, pB);
-
-        return true;
     }
 
     private boolean createSubMonotone() {
@@ -555,12 +589,21 @@ public class Monotisation extends AbstractAlgorithm {
          */
         // VertexInform viFirst = vertices.iterator().next();
 
-        return courseVertices(createEmptyMonotonePolygon(), firstVertexInform, firstVertexInform.back);
+        try {
+            courseVertices(createEmptyMonotonePolygon(), firstVertexInform, firstVertexInform.back);
+
+        } catch (NotComputeVecZException useless) {
+            return false;
+        }
+
+        return true;
     }
 
     /* ************** */
 
     private boolean buildMonotisation() {
+
+        /** @todo find if the polygon have colision */
 
         //
         if (!createVertexInform())
@@ -619,6 +662,7 @@ public class Monotisation extends AbstractAlgorithm {
         if (mutableVisitorForDebugging == null)
             return;
         mutableVisitorForDebugging.getGraphicsContext().save();
+        mutableVisitorForDebugging.getGraphicsContext().setLineWidth(2);
         mutableVisitorForDebugging.getGraphicsContext().setStroke(Color.HOTPINK);
         mutableVisitorForDebugging.visit(p);
         mutableVisitorForDebugging.getGraphicsContext().restore();

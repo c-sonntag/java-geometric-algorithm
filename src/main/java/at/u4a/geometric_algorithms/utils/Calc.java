@@ -15,45 +15,44 @@ public class Calc {
      * = 0 z = a.x*b.y - a.y*b.x
      */
     public static double resumeProduitVectorielZ(Point pA, Point pOrigine, Point pB) {
-
         final double pAx = pA.x - pOrigine.x;
         final double pAy = pA.y - pOrigine.y;
         final double pBx = pB.x - pOrigine.x;
         final double pBy = pB.y - pOrigine.y;
-
         return pAx * pBy - pAy * pBx;
     }
+    
+    public static double resumeProduitVectorielZ(Point pA, Point pB) {
+        return pA.x * pB.y - pA.y * pB.x;
+    }
+
 
     /**
      * Permet de connaître le sens d'écriture d'un polygon
      * 
-     * @return - sumOfVectorialZProd<0 : sens horaire, - sumOfVectorialZProd>0 :
+     * @return - sumOfVectorialZProd<>0 : sens horaire, - sumOfVectorialZProd<0 :
      *         sens anti-horaire, - sumOfVectorialZProd==0 : aucun sens
      */
     public static double getClockwise(AbstractList<Point> pl) {
         if (pl.size() < 2)
             return 0;
-
+        
         Iterator<Point> p_it = pl.iterator();
-        final Point pFirst = p_it.next(), pSecond = p_it.next();
-        Point pA = pFirst, pO = pSecond;
-
+        final Point pFirst = p_it.next();
+        Point pA = pFirst, pB = null;
+        
         double sumOfVectorialZProd = 0;
-
-        Point pB = null;
-
+        
         while (p_it.hasNext()) {
             pB = p_it.next();
-            sumOfVectorialZProd += resumeProduitVectorielZ(pA, pO, pB);
-            pA = pO;
-            pO = pB;
+            sumOfVectorialZProd += resumeProduitVectorielZ(pA, pB);
+            pA = pB;
         }
-
-        sumOfVectorialZProd += resumeProduitVectorielZ(pO, pB, pFirst);
-        sumOfVectorialZProd += resumeProduitVectorielZ(pB, pFirst, pSecond);
-
+        sumOfVectorialZProd += resumeProduitVectorielZ(pB, pFirst);
+        
         return sumOfVectorialZProd;
     }
+    
 
     /*
      * public static double resumeProduitVectorielZWithoutXTorque(Point pA,
