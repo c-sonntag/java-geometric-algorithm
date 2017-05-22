@@ -140,7 +140,7 @@ public class Monotisation extends AbstractAlgorithm {
 
     /* ************** */
 
-    private static class OldStatusComparator implements Comparator<Segment> {
+    private static class StatusComparator_1 implements Comparator<Segment> {
         @Override
         public int compare(Segment s1, Segment s2) {
             if (s1.a.equals(s2.a) && s2.b.equals(s2.b))
@@ -157,7 +157,7 @@ public class Monotisation extends AbstractAlgorithm {
         }
     };
 
-    private static class StatusComparator implements Comparator<Segment> {
+    private static class StatusComparator_2 implements Comparator<Segment> {
         @Override
         public int compare(Segment s1, Segment s2) {
             if (s1.a.equals(s2.a) && s2.b.equals(s2.b))
@@ -179,6 +179,20 @@ public class Monotisation extends AbstractAlgorithm {
             } else {
                 return 1;
             }
+        }
+    };
+
+    private static class StatusComparator implements Comparator<Segment> {
+        @Override
+        public int compare(Segment s1, Segment s2) {
+            if (s1.a.equals(s2.a) && s2.b.equals(s2.b))
+                return 0;
+
+            final double wS1Decal = (s1.a.x + s1.b.x) / 2, wS2Decal = (s2.a.x + s2.b.x) / 2;
+            //final boolean s2isGreaterRight = wS1Decal < wS2Decal;
+            final boolean s2isGreaterRight = Math.min(s1.a.x, s1.b.x) < Math.min(s2.a.x, s2.b.x);
+
+            return (s2isGreaterRight) ? 1 : -1;
         }
     };
 
@@ -260,12 +274,20 @@ public class Monotisation extends AbstractAlgorithm {
     /** @todo check it */
     private final Edge getDirectLeft(VertexInform vi) {
         final Edge viSearch = new Edge(vi, vi);
+        
+        drawTextTipPosDecal("║", vi, 1);
+        
         final Edge eDirectLeftOfVi = statusNavigator.lower(viSearch);
-        if (eDirectLeftOfVi != null)
+        if (eDirectLeftOfVi != null) {
+            
+            drawTextEdge(eDirectLeftOfVi);
+            
             return eDirectLeftOfVi;
+        }
         else {
             System.out.println("not find eDirectLeftOfVi for :" + vi.toString());
-            return statusNavigator.higher(viSearch);
+            //return statusNavigator.higher(viSearch);
+            return null;
             // if (eDirectLeftOfVi != null)
             // return eDirectLeftOfVi;
         }
@@ -290,9 +312,11 @@ public class Monotisation extends AbstractAlgorithm {
 
     private void handleSplitVertex(VertexInform vi) {
         final Edge eDirectLeftOfVi = getDirectLeft(vi);
-        if (eDirectLeftOfVi.helper != null) {
-            attachBorder(vi, eDirectLeftOfVi.helper);
-            eDirectLeftOfVi.helper = vi;
+        if (eDirectLeftOfVi != null) {
+            if (eDirectLeftOfVi.helper != null) {
+                attachBorder(vi, eDirectLeftOfVi.helper);
+                eDirectLeftOfVi.helper = vi;
+            }
         }
 
         //
@@ -310,11 +334,13 @@ public class Monotisation extends AbstractAlgorithm {
 
         //
         final Edge eDirectLeftOfVi = getDirectLeft(vi);
-        if (eDirectLeftOfVi.helper != null) {
-            if (eDirectLeftOfVi.helper.type == VertexType.Merge)
-                attachBorder(vi, eDirectLeftOfVi.helper);
+        if (eDirectLeftOfVi != null) {
+            if (eDirectLeftOfVi.helper != null) {
+                if (eDirectLeftOfVi.helper.type == VertexType.Merge)
+                    attachBorder(vi, eDirectLeftOfVi.helper);
+            }
+            eDirectLeftOfVi.helper = vi;
         }
-        eDirectLeftOfVi.helper = vi;
     }
 
     private void handleRegularVertex(VertexInform vi) {
@@ -331,9 +357,11 @@ public class Monotisation extends AbstractAlgorithm {
             status.add(e);
         } else {
             final Edge eDirectLeftOfVi = getDirectLeft(vi);
-            if (eDirectLeftOfVi.helper != null) {
-                if (eDirectLeftOfVi.helper.type == VertexType.Merge)
-                    attachBorder(vi, eDirectLeftOfVi.helper);
+            if (eDirectLeftOfVi != null) {
+                if (eDirectLeftOfVi.helper != null) {
+                    if (eDirectLeftOfVi.helper.type == VertexType.Merge)
+                        attachBorder(vi, eDirectLeftOfVi.helper);
+                }
             }
         }
     }
@@ -370,7 +398,7 @@ public class Monotisation extends AbstractAlgorithm {
                 break;
             }
 
-            drawStatusTip(count++);
+            //drawStatusTip(count++);
         }
         return true;
     }
@@ -391,7 +419,7 @@ public class Monotisation extends AbstractAlgorithm {
         else if (haveUpperNeighbour)
             vi.type = isLesserThanPi ? VertexType.End : VertexType.Merge;
         else
-            vi.type = (vi.next.y < vi.back.y) ? VertexType.RegularLeft : VertexType.RegularRight;
+            vi.type = (vi.back.y < vi.next.y) ? VertexType.RegularLeft : VertexType.RegularRight;
     }
 
     private boolean createVertexInform() {
@@ -569,6 +597,13 @@ public class Monotisation extends AbstractAlgorithm {
         as.convertToStandard(pToOrigin);
         mutableVisitorForDebugging.drawTip(txt, pToOrigin);
     }
+    
+    public void drawTextEdge(Edge e) {
+        final Point pCenter = new Point();
+        pCenter.x = (e.a.x + e.b.x)/2;
+        pCenter.y = (e.a.y + e.b.y)/2;
+        drawTextTipPosDecal(  Integer.toHexString(System.identityHashCode(e)), pCenter, -1); 
+    }
 
     public void drawTextTipPosDecal(String txt, Point p, int pos) {
         if (mutableVisitorForDebugging == null)
@@ -623,6 +658,8 @@ public class Monotisation extends AbstractAlgorithm {
         if (mutableVisitorForDebugging == null)
             return;
 
+        int counter = 0;
+
         for (VertexInform vi : verticesInform) {
 
             final Point pToOrigin = new Point();
@@ -657,6 +694,8 @@ public class Monotisation extends AbstractAlgorithm {
             mutableVisitorForDebugging.drawTip(type, pToOrigin);
             pToOrigin.y -= 10;
             mutableVisitorForDebugging.drawTip(vi.toString(), pToOrigin);
+            pToOrigin.y -= 10;
+            mutableVisitorForDebugging.drawTip(String.valueOf(counter++), pToOrigin);
 
             /*
              * drawTextTipPosDecal( //
