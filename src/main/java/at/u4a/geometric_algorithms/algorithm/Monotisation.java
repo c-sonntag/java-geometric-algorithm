@@ -278,50 +278,23 @@ public class Monotisation extends AbstractAlgorithm {
 
     /* ************** */
 
+    class NotDirectLeftFindException extends Exception {
+    }
+
     private void attachBorder(VertexInform vi1, VertexInform vi2) {
         vi1.divergeTo = vi2;
         vi2.divergeFrom = vi1;
         bordersOfSubMonotones.add(new Segment(vi1, vi2));
     }
 
-    static int debugDirectLeftCounter = 0;
-
-    StatusComparator sc = new StatusComparator();
-
-    /** @todo check it */
-    private final Edge getDirectLeft(VertexInform vi) {
+    private final Edge getDirectLeft(VertexInform vi) throws NotDirectLeftFindException {
         final Edge viSearch = new Edge(vi, vi);
-
-        drawTextTipPosDecal("║" + debugDirectLeftCounter, vi, 1);
-        drawStatusTip(debugDirectLeftCounter);
-
-        debugDirectLeftCounter++;
-
         final Edge eDirectLeftOfVi = statusNavigator.floor(viSearch);
-        if (eDirectLeftOfVi != null) {
-
-            drawTextEdge(eDirectLeftOfVi);
-
+        //
+        if (eDirectLeftOfVi != null)
             return eDirectLeftOfVi;
-        } else {
-
-            System.out.print("notfind eDirect(" + vi.toString() + ") test:");
-
-            int count = 0;
-            for (Edge e : status) {
-                int testLeft = sc.compare(e, viSearch);
-                int testRight = sc.compare(viSearch, e);
-                System.out.print("e(" + (count++) + e.toString() + ":" + testLeft + "/" + testRight + ")");
-            }
-
-            System.out.println();
-
-            // return statusNavigator.higher(viSearch);
-            return null;
-            // if (eDirectLeftOfVi != null)
-            // return eDirectLeftOfVi;
-        }
-
+        else
+            throw new NotDirectLeftFindException();
     }
 
     /* ************** */
@@ -340,14 +313,11 @@ public class Monotisation extends AbstractAlgorithm {
         status.remove(eBack);
     }
 
-    private void handleSplitVertex(VertexInform vi) {
+    private void handleSplitVertex(VertexInform vi) throws NotDirectLeftFindException {
         final Edge eDirectLeftOfVi = getDirectLeft(vi);
-        if (eDirectLeftOfVi != null) {
-            if (eDirectLeftOfVi.helper != null) {
-                attachBorder(vi, eDirectLeftOfVi.helper);
-                eDirectLeftOfVi.helper = vi;
-            }
-        }
+        if (eDirectLeftOfVi.helper != null)
+            attachBorder(vi, eDirectLeftOfVi.helper);
+        eDirectLeftOfVi.helper = vi;
 
         //
         final Edge e = vi.getNextEdge();
@@ -355,7 +325,7 @@ public class Monotisation extends AbstractAlgorithm {
         status.add(e);
     }
 
-    private void handleMergeVertex(VertexInform vi) {
+    private void handleMergeVertex(VertexInform vi) throws NotDirectLeftFindException {
         final Edge eBack = vi.back.getNextEdge();
         if (eBack.helper != null)
             if (eBack.helper.type == VertexType.Merge)
@@ -364,16 +334,15 @@ public class Monotisation extends AbstractAlgorithm {
 
         //
         final Edge eDirectLeftOfVi = getDirectLeft(vi);
-        if (eDirectLeftOfVi != null) {
-            if (eDirectLeftOfVi.helper != null) {
-                if (eDirectLeftOfVi.helper.type == VertexType.Merge)
-                    attachBorder(vi, eDirectLeftOfVi.helper);
-            }
-            eDirectLeftOfVi.helper = vi;
+        if (eDirectLeftOfVi.helper != null) {
+            if (eDirectLeftOfVi.helper.type == VertexType.Merge)
+                attachBorder(vi, eDirectLeftOfVi.helper);
         }
+        eDirectLeftOfVi.helper = vi;
+
     }
 
-    private void handleRegularVertex(VertexInform vi) {
+    private void handleRegularVertex(VertexInform vi) throws NotDirectLeftFindException {
         if (vi.type == VertexType.RegularLeft) {
             //
             final Edge eBack = vi.back.getNextEdge();
@@ -385,13 +354,12 @@ public class Monotisation extends AbstractAlgorithm {
             final Edge e = vi.getNextEdge();
             e.helper = vi;
             status.add(e);
+            
         } else {
             final Edge eDirectLeftOfVi = getDirectLeft(vi);
-            if (eDirectLeftOfVi != null) {
-                if (eDirectLeftOfVi.helper != null) {
-                    if (eDirectLeftOfVi.helper.type == VertexType.Merge)
-                        attachBorder(vi, eDirectLeftOfVi.helper);
-                }
+            if (eDirectLeftOfVi.helper != null) {
+                if (eDirectLeftOfVi.helper.type == VertexType.Merge)
+                    attachBorder(vi, eDirectLeftOfVi.helper);
             }
         }
     }
@@ -404,7 +372,6 @@ public class Monotisation extends AbstractAlgorithm {
         status.clear();
 
         int count = 0;
-        debugDirectLeftCounter = 0;
 
         //
         try {
@@ -435,7 +402,7 @@ public class Monotisation extends AbstractAlgorithm {
         } catch (Exception useless) {
             return false;
         }
-        
+
         return true;
     }
 
