@@ -27,7 +27,7 @@ public class Calc {
     /**
      * Permet de connaître le sens d'écriture d'un polygon
      * 
-     * @return - sumOfVectorialZProd>0 : sens horaire, - sumOfVectorialZProd<0 :
+     * @return - sumOfVectorialZProd<0 : sens horaire, - sumOfVectorialZProd>0 :
      *         sens anti-horaire, - sumOfVectorialZProd==0 : aucun sens
      */
     public static double getClockwise(AbstractList<Point> pl) {
