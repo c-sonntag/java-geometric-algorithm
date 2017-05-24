@@ -15,12 +15,10 @@ import at.u4a.geometric_algorithms.geometric.mapper.InterfaceMapper;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.effect.DropShadow;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontSmoothingType;
-import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
 public class GraphicPainter implements InterfaceGraphicVisitor {
@@ -148,6 +146,7 @@ public class GraphicPainter implements InterfaceGraphicVisitor {
         //
         gc.setFill(stroke);
         gc.setStroke(Color.BLACK);
+        gc.setLineWidth(1);
         //
         gc.fillOval((int) (p.x - 2 * Point.POINT_RAYON), (int) (p.y - 2 * Point.POINT_RAYON), 2 * 2 * Point.POINT_RAYON, 2 * 2 * Point.POINT_RAYON);
         gc.strokeOval((int) (p.x - 2 * Point.POINT_RAYON), (int) (p.y - 2 * Point.POINT_RAYON), 2 * 2 * Point.POINT_RAYON, 2 * 2 * Point.POINT_RAYON);

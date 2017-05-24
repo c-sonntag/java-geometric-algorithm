@@ -88,7 +88,7 @@ public class Monotisation extends AbstractAlgorithm {
 
     private int countStroboscope = 0;
 
-    private Color colorStrop[] = { Color.CORAL, Color.CRIMSON, Color.AQUA, Color.AQUAMARINE, Color.AZURE, Color.BEIGE, Color.BISQUE };
+    private Color colorStrop[] = { Color.CORAL, Color.BLUEVIOLET, Color.MEDIUMSPRINGGREEN, Color.HOTPINK, Color.YELLOWGREEN, Color.FIREBRICK, Color.GREEN };
 
     @Override
     public void accept(Vector<AbstractLayer> v, InterfaceGraphicVisitor visitor) {
@@ -100,11 +100,14 @@ public class Monotisation extends AbstractAlgorithm {
         makeMonotisation();
 
         mutableVisitorForDebugging.getGraphicsContext().save();
+        mutableVisitorForDebugging.getGraphicsContext().setLineWidth(10);
 
         if (haveMake) {
             for (MonotonePolygon mp : mp_v) {
 
-                mutableVisitorForDebugging.getGraphicsContext().setStroke(colorStrop[countStroboscope]);
+                Color sC = colorStrop[countStroboscope];
+
+                mutableVisitorForDebugging.getGraphicsContext().setStroke(Color.color(sC.getRed(), sC.getGreen(), sC.getBlue(), 0.2));
 
                 visitor.visit(mp);
 
@@ -407,8 +410,7 @@ public class Monotisation extends AbstractAlgorithm {
 
             System.out.println("Not find eDirectLeft Of vi(" + vi.toString() + "), eDirectRightOfVi(" + eDirectRightOfVi + ") sc(" + sc.compare(viSearch, eDirectRightOfVi) + ")");
             final Edge eDirectLeftOfViBis = statusNavigator.floor(viSearch);
-            
-            
+
             throw new NotDirectLeftFindException();
         }
     }
@@ -637,51 +639,80 @@ public class Monotisation extends AbstractAlgorithm {
         ArrayDeque<CourseEntry> queue = new ArrayDeque<CourseEntry>();
 
         //
-        CourseEntry curentCourse = new CourseEntry(firstVertexInform);
+        CourseEntry curentCourse = new CourseEntry(null);
         VertexInform vi = firstVertexInform;
         VertexInform viToStopAndCloseMp = firstVertexInform.back;
 
-        //
-        queue.push(curentCourse);
+        int counter = 0;
+
+        final Point pToOrigin = new Point();
 
         //
-        while (vi != viToStopAndCloseMp) {
+        // queue.push(curentCourse);
+
+        //
+        while (true) {
             curentCourse.mp.addPoint(vi);
+
+            drawTextTipPosDecal(String.valueOf(counter++), vi, -3);
 
             //
             final HashSet<VertexInform> borders = bordersMap.get(vi);
             if (borders != null) {
 
-                System.out.print("(" + queue.size() + ") ");
-
+                System.out.print("  (" + queue.size() + ") ");
+                boolean haveRemove;
+                
                 //
-                final VertexInform oppositeBorder = curentCourse.start;
-                if (borders.contains(oppositeBorder)) {
+                do {
+                    //
+                    final VertexInform oppositeBorder = curentCourse.start;
+                    haveRemove = false;
 
-                    System.out.print(vi.toString() + "|- ");
+                    //
+                    if (oppositeBorder != null) {
+                        System.out.print("[start:" + oppositeBorder.toString() + "] ");
+                    }
 
-                    curentCourse = queue.pop();
-                    curentCourse.mp.addPoint(vi);
-                }
+                    //
+                    if (borders.contains(oppositeBorder)) {
+
+                        System.out.print(vi.toString() + "|- ");
+                        borders.remove(oppositeBorder);
+
+                        curentCourse = queue.pop();
+                        curentCourse.mp.addPoint(vi);
+                        haveRemove = true;
+                    }
+
+                } while (haveRemove);
 
                 //
                 for (VertexInform borderVi : borders) {
-                    if (borderVi != oppositeBorder) {
+                    // if (borderVi != oppositeBorder) {
 
-                        System.out.print(vi.toString() + "|+ ");
+                    System.out.print(vi.toString() + "|+ ");
 
-                        curentCourse = new CourseEntry(vi);
-                        curentCourse.mp.addPoint(vi);
-                        queue.push(curentCourse);
+                    queue.push(curentCourse);
 
-                    }
+                    curentCourse = new CourseEntry(vi);
+                    curentCourse.mp.addPoint(vi);
+                    // queue.push(curentCourse);
+
+                    // }
                 }
             }
 
-            vi = vi.next;
+            //
+            if (vi == viToStopAndCloseMp)
+                break;
+            else
+                vi = vi.next;
         }
 
-        curentCourse.mp.addPoint(vi);
+        // curentCourse.mp.addPoint(vi);
+
+        // drawTextTipPosDecal(String.valueOf(counter++), vi, -3);
 
         System.out.println();
 
@@ -878,7 +909,7 @@ public class Monotisation extends AbstractAlgorithm {
         if (mutableVisitorForDebugging == null)
             return;
 
-        int counter = 0;
+        // int counter = 0;
 
         for (VertexInform vi : verticesInform) {
 
@@ -921,8 +952,12 @@ public class Monotisation extends AbstractAlgorithm {
 
             pToOrigin.y -= 10;
             mutableVisitorForDebugging.drawTip(vi.toString(), pToOrigin);
-            pToOrigin.y -= 10;
-            mutableVisitorForDebugging.drawTip(String.valueOf(counter++), pToOrigin);
+
+            /*
+             * pToOrigin.y -= 10;
+             * mutableVisitorForDebugging.drawTip(String.valueOf(counter++),
+             * pToOrigin);
+             */
 
             /*
              * drawTextTipPosDecal( //
