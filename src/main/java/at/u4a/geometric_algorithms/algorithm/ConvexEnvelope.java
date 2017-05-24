@@ -67,6 +67,7 @@ public class ConvexEnvelope extends AbstractAlgorithm {
     private final AbstractShape as;
 
     public ConvexEnvelope(Vector<Point> points, AbstractShape as) {
+        super("iteration");
         this.points = points;
         this.as = as;
         this.convexPoly = new ConvexPolygon(as.origin);
@@ -79,14 +80,14 @@ public class ConvexEnvelope extends AbstractAlgorithm {
         makeConvexEnveloppe();
         visitor.visit(convexPoly);
     }
-    
+
     @Override
     public int hashCode() {
         return as.hashCode();
     }
 
     InterfaceGraphicVisitor mutableVisitorForDebugging = null;
-    
+
     public void acceptDebug(Vector<AbstractLayer> v, InterfaceGraphicVisitor visitor) {
         mutableVisitorForDebugging = visitor;
         makeConvexEnveloppe();
@@ -149,6 +150,7 @@ public class ConvexEnvelope extends AbstractAlgorithm {
                 return false;
             }
         } catch (StackOverflowError e) {
+            statusAddCause("StackOverflowError");
             System.out.println("Can't make ConvexeEnvelope due of error : StackOverflowError");
             return false;
         } catch (Exception e) {
@@ -267,6 +269,7 @@ public class ConvexEnvelope extends AbstractAlgorithm {
         Point B = sens ? linePointRight : linePointLeft;
 
         double v = Calc.resumeProduitVectorielZ(A, P, B);
+        // double v = Calc.resumeProduitVectorielZ(A, B);
 
         // double v = (B.x - A.x) * (B.y - A.y) - (P.x - A.x) * (P.y - A.y);
         drawLine(new Line(A, B), Color.YELLOW);
@@ -439,7 +442,7 @@ public class ConvexEnvelope extends AbstractAlgorithm {
                 Point p1 = poly.get(1);
                 if (polySize == 3) {
                     Point p2 = poly.get(2);
-                    
+
                     // set Clock wise
                     if (Calc.resumeProduitVectorielZ(p0, p1, p2) > 0) {
                         poly.clear();
@@ -460,6 +463,10 @@ public class ConvexEnvelope extends AbstractAlgorithm {
 
         //
         SideTuple sides = new SideTuple(poly);
+
+        // MultiplePoint on same point
+        if (sides.pointsRight.isEmpty())
+            return sides.pointsLeft;
 
         //
         Vector<Point> polyLeft = devideToRing(sides.pointsLeft, deph + 1);
