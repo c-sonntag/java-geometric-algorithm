@@ -77,15 +77,9 @@ public class TriangulationForMonotisation extends AbstractAlgorithm {
 
             for (Triangulation triangulation : triangulations) {
 
-                MonotonePolygon mp = triangulation.getPolygon();
-
+                //MonotonePolygon mp = triangulation.getPolygon();
+                
                 System.out.print(countStroboscope + " : ");
-
-                for (Point p : mp.perimeter) {
-                    System.out.print(p.toString() + " ");
-                }
-
-                System.out.println();
 
                 Color sC = colorStrop[countStroboscope];
 

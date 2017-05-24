@@ -126,7 +126,7 @@ public class Monotisation extends AbstractAlgorithm {
             visitor.getGraphicsContext().setLineWidth(10);
             for (MonotonePolygon mp : mp_v) {
                 Color sC = colorStrop[countStroboscope];
-                mutableVisitorForDebugging.getGraphicsContext().setStroke(Color.color(sC.getRed(), sC.getGreen(), sC.getBlue(), 0.2));
+                visitor.getGraphicsContext().setStroke(Color.color(sC.getRed(), sC.getGreen(), sC.getBlue(), 0.2));
                 visitor.visit(mp);
                 countStroboscope = (countStroboscope + 1) % colorStrop.length;
             }
@@ -147,9 +147,17 @@ public class Monotisation extends AbstractAlgorithm {
         makeMonotisation();
         return haveMake;
     }
-
+ 
+    
     public Vector<MonotonePolygon> getMonotonesPolygon() {
         makeMonotisation();
+        
+        if(bordersBySegment.isEmpty() && haveMake) {
+            Vector<MonotonePolygon> mp_v_once = new Vector<MonotonePolygon>();
+            mp_v_once.add(new MonotonePolygon(as.origin, (Vector<Point>) points));
+            return mp_v_once;
+        }
+        
         return (haveMake) ? mp_v : null;
     }
 
@@ -301,6 +309,7 @@ public class Monotisation extends AbstractAlgorithm {
              * eDirectLeftOfViBis = statusNavigator.floor(viSearch);
              */
 
+            statusAddCause("Can't find direct left segment");
             throw new NotDirectLeftFindException();
         }
     }

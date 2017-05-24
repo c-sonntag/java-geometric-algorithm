@@ -15,6 +15,7 @@ public abstract class AbstractAlgorithm {
     private final String actionName, algoritmName;
 
     private long mutableStartChrono = 0, mutableStopChrono = 0, mutableTotalTimeChrono = 0;
+    private String interruptionInfo = null;
 
     AbstractAlgorithm(String actionName) {
         this.actionName = actionName;
@@ -36,11 +37,12 @@ public abstract class AbstractAlgorithm {
     }
 
     private String getDuarationChrono() {
-        return "(duration:"+mutableTotalTimeChrono+" ms)";
+        return "(duration:" + mutableTotalTimeChrono + " ms)";
     }
 
     protected void statusStartBuild() {
         StatusBar.setActiveMessage(algoritmName + " building ...");
+        interruptionInfo = null;
         mutableStatusCounter = 0;
         startChrono();
     }
@@ -52,7 +54,16 @@ public abstract class AbstractAlgorithm {
 
     protected void statusInteruptBuild() {
         stopChrono();
-        StatusBar.setActiveMessage(algoritmName + " interupted after : " + mutableStatusCounter + " " + actionName + " " + getDuarationChrono());
+        StatusBar.setActiveMessage(algoritmName + " interupted after : " + mutableStatusCounter + " " + actionName + " " + getDuarationChrono() //
+                + ((interruptionInfo != null) ? ("(cause : " + interruptionInfo + ")") : "(unknown cause)") //
+        );
+    }
+    
+    protected void statusAddCause(String cause) {
+        if(interruptionInfo==null)
+            interruptionInfo = cause;
+        else 
+            interruptionInfo += "; " + cause;
     }
 
     protected void statusBuildIs(boolean state) {
@@ -70,7 +81,7 @@ public abstract class AbstractAlgorithm {
     }
 
     public abstract void accept(Vector<AbstractLayer> v, InterfaceGraphicVisitor visitor);
-    
+
     public abstract int hashCode();
 
     public abstract AbstractShape getCompositeShape();

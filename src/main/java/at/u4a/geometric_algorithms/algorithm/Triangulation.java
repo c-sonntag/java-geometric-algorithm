@@ -78,6 +78,11 @@ public class Triangulation extends AbstractAlgorithm {
 
         makeTriangulation();
 
+        /*
+         * for (Point p : mp.perimeter) { System.out.print(p.toString() + " ");
+         * } System.out.println();
+         */
+
         //
         if (actualType == Polygon.Type.Monotone) {
 
@@ -96,7 +101,7 @@ public class Triangulation extends AbstractAlgorithm {
         // visitor.drawEdgeTipFromList(poly, poly.perimeter);
 
     }
-    
+
     @Override
     public int hashCode() {
         return as.hashCode();
@@ -143,7 +148,6 @@ public class Triangulation extends AbstractAlgorithm {
                 statusFinishBuild();
             } else
                 statusInteruptBuild();
-                
 
             //
             mutablePreviousPolyHash = currentPolyHash;
@@ -225,11 +229,15 @@ public class Triangulation extends AbstractAlgorithm {
 
         final int size = points.size();
 
-        if (size < 3)
+        if (size < 3) {
+            statusAddCause("Needs more than 3 points");
             return false;
+        }
 
+        //
         double topY = 0, bottomY = 0;
 
+        //
         Point precPoint = null, precPrecPoint = null, currentPoint;
         int countAngle = 0;
 
@@ -257,8 +265,10 @@ public class Triangulation extends AbstractAlgorithm {
                     if (((precPrecPoint.y > precPoint.y) && (currentPoint.y > precPoint.y)) || ((precPrecPoint.y < precPoint.y) && (currentPoint.y < precPoint.y))) {
                         countAngle++;
 
-                        if (countAngle > 2)
+                        if (countAngle > 2) {
+                            statusAddCause("not-monotone/bad-angle");
                             return false;
+                        }
                     }
                 }
 
@@ -273,6 +283,7 @@ public class Triangulation extends AbstractAlgorithm {
             precPoint = currentPoint;
         }
 
+        //
         topPoint = points.get(topPointIndex);
         bottomPoint = points.get(bottomPointIndex);
 
@@ -443,14 +454,19 @@ public class Triangulation extends AbstractAlgorithm {
                 //
                 Iterator<PointTipped> stack_it = stack.descendingIterator();
                 if (stack_it.hasNext()) {
+
                     PointTipped endStackPoint = stack_it.next();
+
                     while (stack_it.hasNext()) {
+
                         PointTipped stackPoint = stack_it.next();
 
                         // block vertex that can traverse edge of opposite side
-                        if (endStackPoint != null)
-                            if (inP(endStackPoint, stackPoint, currentPoint))
-                                return false;
+                        // if (endStackPoint != null)
+                        // if (inP(endStackPoint, stackPoint, currentPoint)) {
+                        // statusAddCause("Point not in Polygon");
+                        // return false;
+                        // }
 
                         triangulationFusion.add(new Segment(currentPoint, stackPoint));
                         endStackPoint = null;
@@ -466,6 +482,13 @@ public class Triangulation extends AbstractAlgorithm {
 
             }
         }
+
+        //
+        /*
+         * double sumProdVectZ = 0; if (sumProdVectZ > 0) {
+         * statusAddCause("Point not in Polygon"); return false; } sumProdVectZ
+         * += Calc.resumeProduitVectorielZ(precPoint, currentPoint);
+         */
 
         // except the first diagonals
         triangulationFusion.remove(0);
