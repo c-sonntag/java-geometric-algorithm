@@ -236,7 +236,7 @@ public class Monotisation extends AbstractAlgorithm {
             final double s1xMin = Math.min(s1.a.x, s1.b.x);
             final double s2xMin = Math.min(s2.a.x, s2.b.x);
 
-            if ((s1xMin < s2xMin) || (s1xMax < s2xMax))
+            if ((s1xMin < s2xMin) && (s1xMax < s2xMax))
                 return -1;
 
             if ((s1xMin == s2xMin) && (s1xMax == s2xMax))
@@ -406,7 +406,9 @@ public class Monotisation extends AbstractAlgorithm {
             final Edge eDirectRightOfVi = statusNavigator.higher(viSearch);
 
             System.out.println("Not find eDirectLeft Of vi(" + vi.toString() + "), eDirectRightOfVi(" + eDirectRightOfVi + ") sc(" + sc.compare(viSearch, eDirectRightOfVi) + ")");
-
+            final Edge eDirectLeftOfViBis = statusNavigator.floor(viSearch);
+            
+            
             throw new NotDirectLeftFindException();
         }
     }
@@ -616,151 +618,6 @@ public class Monotisation extends AbstractAlgorithm {
         mp_v.add(mp);
         return mp;
     }
-
-    private int mutableDebugLotsLoop = 0;
-
-    private boolean seeParcours = false;
-    private int parcoursCount = 0;
-
-    private void courseVertices_1(final MonotonePolygon mpStart, final VertexInform viStart, final VertexInform viToStopAndCloseMp) throws NotComputeVecZException {
-        VertexInform vi = viStart;
-        MonotonePolygon mp = mpStart;
-
-        while (vi != viToStopAndCloseMp) {
-
-            if (seeParcours)
-                drawTextTipPosDecal("●" + (parcoursCount++), vi, -3);
-
-            if (mutableDebugLotsLoop > 200)
-                break;
-
-            mutableDebugLotsLoop++;
-
-            statusAddCounter();
-
-            mp.addPoint(vi);
-
-            /*
-             * if (vi.divergeTo != null) drawTextTipPosDecal("├ ", vi.divergeTo,
-             * 2); if (vi.divergeFrom != null) drawTextTipPosDecal(" ┤",
-             * vi.divergeFrom, 2);
-             */
-
-            if (vi.divergeTo != null) {
-
-                final MonotonePolygon subMp = createEmptyMonotonePolygon();
-                subMp.addPoint(vi);
-                courseVertices(subMp, vi.next, vi.divergeTo);
-
-                mp.addPoint(vi.divergeTo);
-                vi = vi.divergeTo.next;
-
-            } else if (vi.divergeFrom != null) {
-
-                final MonotonePolygon subMp = mp;
-                subMp.addPoint(vi.divergeFrom);
-                courseVertices(subMp, vi.divergeFrom.next, viStart);
-
-                mp = createEmptyMonotonePolygon();
-                mp.addPoint(vi);
-
-                vi = vi.next;
-
-            } else if (((vi.divergeTo != null) || (vi.divergeFrom != null)) && false) {
-
-                drawTextTipPosDecal("100", vi.back, 1);
-                drawTextTipPosDecal("000", vi, 1);
-                drawTextTipPosDecal("001", vi.next, 1);
-
-                if (vi.divergeTo != null)
-                    drawTextTipPosDecal("├", vi.divergeTo, 2);
-                if (vi.divergeFrom != null)
-                    drawTextTipPosDecal("┤", vi.divergeFrom, 2);
-
-                VertexInform subViEnd = (vi.divergeTo != null) ? vi.divergeTo : vi.divergeFrom;
-
-                final MonotonePolygon subMp = createEmptyMonotonePolygon();
-                subMp.addPoint(vi);
-
-                //
-                seeParcours = true;
-                courseVertices(subMp, vi.next, subViEnd);
-                parcoursCount = 0;
-                seeParcours = false;
-
-                //
-                vi = subViEnd;
-
-                // drawTextTipPosDecal(String.valueOf(System.identityHashCode(vi.divergeTo)),
-                // vi.divergeTo, -1);
-                /*
-                 * final MonotonePolygon subMp = createEmptyMonotonePolygon();
-                 * subMp.addPoint(vi); courseVertices(subMp, vi.next,
-                 * vi.divergeTo);
-                 * 
-                 * // // mp.addPoint(vi.divergeTo); vi = vi.divergeTo;
-                 */
-            } else
-                vi = vi.next;
-        }
-
-        if (seeParcours)
-            drawTextTipPosDecal((parcoursCount++) + "∆", vi, -3);
-
-        mp.addPoint(vi);
-
-        drawPolygon(mp);
-
-        // sumOfVectorialZProd += resumeProduitVectorielZ(pA, pO, pB);
-    }
-
-    private boolean createSubMonotone_1() {
-        mp_v.clear();
-        if (firstVertexInform == null)
-            return false;
-
-        mutableDebugLotsLoop = 0;
-
-        /*
-         * final ArrayDeque<>
-         * 
-         * Vector<Point> perimeter = new Vector<Point>();
-         * 
-         * Iterator<Point> p_it = pl.iterator(); Point pA = p_it.next(); Point
-         * pO = p_it.next(); while (p_it.hasNext()) { Point pB = p_it.next();
-         * sumOfVectorialZProd += resumeProduitVectorielZ(pA, pO, pB); } return
-         * sumOfVectorialZProd;
-         * 
-         * double sumOfVectorialZProd = 0;
-         */
-        // VertexInform viFirst = vertices.iterator().next();
-
-        try {
-            courseVertices_1(createEmptyMonotonePolygon(), firstVertexInform, firstVertexInform.back);
-
-        } catch (NotComputeVecZException useless) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /*
-     * private void courseVertices(final MonotonePolygon mpStart, final
-     * VertexInform viStart, final VertexInform viToStopAndCloseMp) throws
-     * NotComputeVecZException { VertexInform vi = viStart; MonotonePolygon mp =
-     * mpStart;
-     * 
-     * while (vi != viToStopAndCloseMp) {
-     * 
-     * 
-     * 
-     * vi = vi.next;
-     * 
-     * }
-     * 
-     * }
-     */
 
     class CourseEntry {
         final MonotonePolygon mp;
