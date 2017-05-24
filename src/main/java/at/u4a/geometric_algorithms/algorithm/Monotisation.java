@@ -1,10 +1,15 @@
 package at.u4a.geometric_algorithms.algorithm;
 
 import java.util.AbstractList;
+import java.util.ArrayDeque;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.NavigableSet;
 import java.util.Set;
 import java.util.TreeSet;
@@ -182,6 +187,17 @@ public class Monotisation extends AbstractAlgorithm {
         }
     };
 
+    private static class StatusComparator_3 implements Comparator<Segment> {
+        @Override
+        public int compare(Segment s1, Segment s2) {
+            if (s1.a.equals(s2.a) && s1.b.equals(s2.b))
+                return 0;
+            final double s1x = Math.max(s1.a.x, s1.b.x), s2x = Math.max(s2.a.x, s2.b.x);
+            final double s1y = Math.max(s1.a.y, s1.b.y), s2y = Math.max(s2.a.y, s2.b.y);
+            return (s1x != s2x) ? ((s1x < s2x) ? -1 : 1) : ((s1y <= s2y) ? -1 : 1);
+        }
+    };
+
     private static class StatusComparator implements Comparator<Segment> {
 
         @Override
@@ -190,10 +206,47 @@ public class Monotisation extends AbstractAlgorithm {
             if (s1.a.equals(s2.a) && s1.b.equals(s2.b))
                 return 0;
 
-            final double s1x = Math.max(s1.a.x, s1.b.x), s2x = Math.max(s2.a.x, s2.b.x);
-            final double s1y = Math.max(s1.a.y, s1.b.y), s2y = Math.max(s2.a.y, s2.b.y);
+            /*
+             * final double s1x = Math.max(s1.a.x, s1.b.x); final double s2x =
+             * Math.max(s2.a.x, s2.b.x); final double s1y = Math.max(s1.a.y,
+             * s1.b.y); final double s2y = Math.max(s2.a.y, s2.b.y);
+             */
 
-            return (s1x != s2x) ? ((s1x < s2x) ? -1 : 1) : ((s1y <= s2y) ? -1 : 1);
+            final double s1xMax = Math.max(s1.a.x, s1.b.x);
+            final double s2xMax = Math.max(s2.a.x, s2.b.x);
+
+            int xMin = ((Math.min(s1.a.x, s1.b.x) < Math.min(s2.a.x, s2.b.x)) ? -1 : 1);
+            int xMax = (s1xMax < s2xMax) ? -1 : 1;
+
+            
+            if ((xMin < 0) || (xMax < 0))
+                return -1;
+
+            int yMax = ((Math.max(s1.a.x, s1.b.x) < Math.max(s2.a.x, s2.b.x)) ? -1 : 1);
+
+            return (s1xMax != s2xMax) ? xMax : yMax;
+
+            /*
+             * final double s1x = Math.max(s1.a.x, s1.b.x); final double s2x =
+             * Math.max(s2.a.x, s2.b.x); final double s1y = Math.max(s1.a.y,
+             * s1.b.y); final double s2y = Math.max(s2.a.y, s2.b.y);
+             */
+
+            // final double s1x = Math.abs(s1.a.x - s1.b.x), s2x =
+            // Math.abs(s2.a.x - s2.b.x);
+            // final double s1y = Math.abs(s1.a.y - s1.b.y), s2y =
+            // Math.abs(s2.a.y - s2.b.y);
+
+            /*
+             * final double s1x = Math.max(s1.a.x, s1.b.x) + Math.abs(s1.a.x -
+             * s1.b.x); final double s2x = Math.max(s2.a.x, s2.b.x) +
+             * Math.abs(s2.a.x - s2.b.x); final double s1y = Math.max(s1.a.y,
+             * s1.b.y) + Math.abs(s1.a.y - s1.b.y); final double s2y =
+             * Math.max(s2.a.y, s2.b.y) + Math.abs(s2.a.y - s2.b.y);
+             */
+
+            // return (s1x != s2x) ? ((s1x < s2x) ? -1 : 1) : ((s1y <= s2y) ? -1
+            // : 1);
 
             // final double wS1Decal = (s1.a.x + s1.b.x) / 2, wS2Decal = (s2.a.x
             // + s2.b.x) / 2;
@@ -235,7 +288,8 @@ public class Monotisation extends AbstractAlgorithm {
 
     private final Set<VertexInform> helper = new TreeSet<VertexInform>(new Point.PointUpLeftAlignementComparator());
 
-    private final Vector<Segment> bordersOfSubMonotones = new Vector<Segment>();
+    private final Vector<Segment> bordersBySegment = new Vector<Segment>();
+    private final Map<VertexInform, HashSet<VertexInform>> bordersMap = new HashMap<VertexInform, HashSet<VertexInform>>();
 
     /* ************** */
 
@@ -283,10 +337,28 @@ public class Monotisation extends AbstractAlgorithm {
     }
 
     private void attachBorder(VertexInform vi1, VertexInform vi2) {
-        
+
         vi1.divergeTo = vi2;
         vi2.divergeFrom = vi1;
-        bordersOfSubMonotones.add(new Segment(vi1, vi2));
+        bordersBySegment.add(new Segment(vi1, vi2));
+
+        // drawBorder(bordersBySegment.lastElement());
+
+        //
+        HashSet<VertexInform> bm1 = bordersMap.get(vi1);
+        if (bm1 == null) {
+            bm1 = new HashSet<VertexInform>();
+            bordersMap.put(vi1, bm1);
+        }
+        bm1.add(vi2);
+
+        //
+        HashSet<VertexInform> bm2 = bordersMap.get(vi1);
+        if (bm2 == null) {
+            bm2 = new HashSet<VertexInform>();
+            bordersMap.put(vi2, bm2);
+        }
+        bm2.add(vi1);
     }
 
     private final Edge getDirectLeft(VertexInform vi) throws NotDirectLeftFindException {
@@ -295,8 +367,10 @@ public class Monotisation extends AbstractAlgorithm {
         //
         if (eDirectLeftOfVi != null)
             return eDirectLeftOfVi;
-        else
+        else {
+            System.out.println("Not find eDirectLeft Of vi(" + vi.toString() + ")");
             throw new NotDirectLeftFindException();
+        }
     }
 
     /* ************** */
@@ -373,11 +447,12 @@ public class Monotisation extends AbstractAlgorithm {
 
     private boolean partitionPolygon() {
 
-        bordersOfSubMonotones.clear();
+        bordersBySegment.clear();
+        bordersMap.clear();
         status.clear();
 
-        int counter = 0;
-        
+        // int counter = 0;
+
         //
         try {
 
@@ -402,12 +477,11 @@ public class Monotisation extends AbstractAlgorithm {
                     handleStartVertex(vi);
                     break;
                 }
-                
-                drawStatusTip(counter++);
-                
+
+                // drawStatusTip(counter++);
+                drawStatusMinus();
+
             }
-            
-            
 
         } catch (NotDirectLeftFindException useless) {
             return false;
@@ -422,10 +496,10 @@ public class Monotisation extends AbstractAlgorithm {
 
         final double produit = Calc.resumeProduitVectorielZ(vi.back, vi, vi.next);
 
-        final boolean haveUpperNeighbour = (vi.y > vi.back.y) && (vi.y > vi.next.y);
-        final boolean haveLowerNeighbour = (vi.y < vi.back.y) && (vi.y < vi.next.y);
+        final boolean haveUpperNeighbour = (vi.y >= vi.back.y) && (vi.y > vi.next.y);
+        final boolean haveLowerNeighbour = (vi.y <= vi.back.y) && (vi.y < vi.next.y);
 
-        final boolean isLesserThanPi = produit > 0;
+        final boolean isLesserThanPi = produit >= 0;
 
         if (haveLowerNeighbour)
             vi.type = isLesserThanPi ? VertexType.Start : VertexType.Split;
@@ -510,7 +584,7 @@ public class Monotisation extends AbstractAlgorithm {
     private boolean seeParcours = false;
     private int parcoursCount = 0;
 
-    private void courseVertices(final MonotonePolygon mpStart, final VertexInform viStart, final VertexInform viToStopAndCloseMp) throws NotComputeVecZException {
+    private void courseVertices_1(final MonotonePolygon mpStart, final VertexInform viStart, final VertexInform viToStopAndCloseMp) throws NotComputeVecZException {
         VertexInform vi = viStart;
         MonotonePolygon mp = mpStart;
 
@@ -527,13 +601,12 @@ public class Monotisation extends AbstractAlgorithm {
             statusAddCounter();
 
             mp.addPoint(vi);
-            
+
             /*
-            if (vi.divergeTo != null)
-                drawTextTipPosDecal("├ ", vi.divergeTo, 2);
-            if (vi.divergeFrom != null)
-                drawTextTipPosDecal(" ┤", vi.divergeFrom, 2);*/
-            
+             * if (vi.divergeTo != null) drawTextTipPosDecal("├ ", vi.divergeTo,
+             * 2); if (vi.divergeFrom != null) drawTextTipPosDecal(" ┤",
+             * vi.divergeFrom, 2);
+             */
 
             if (vi.divergeTo != null) {
 
@@ -555,7 +628,7 @@ public class Monotisation extends AbstractAlgorithm {
 
                 vi = vi.next;
 
-            } else if ( ((vi.divergeTo != null) || (vi.divergeFrom != null)) && false) {
+            } else if (((vi.divergeTo != null) || (vi.divergeFrom != null)) && false) {
 
                 drawTextTipPosDecal("100", vi.back, 1);
                 drawTextTipPosDecal("000", vi, 1);
@@ -603,7 +676,7 @@ public class Monotisation extends AbstractAlgorithm {
         // sumOfVectorialZProd += resumeProduitVectorielZ(pA, pO, pB);
     }
 
-    private boolean createSubMonotone() {
+    private boolean createSubMonotone_1() {
         mp_v.clear();
         if (firstVertexInform == null)
             return false;
@@ -625,11 +698,99 @@ public class Monotisation extends AbstractAlgorithm {
         // VertexInform viFirst = vertices.iterator().next();
 
         try {
-            courseVertices(createEmptyMonotonePolygon(), firstVertexInform, firstVertexInform.back);
+            courseVertices_1(createEmptyMonotonePolygon(), firstVertexInform, firstVertexInform.back);
 
         } catch (NotComputeVecZException useless) {
             return false;
         }
+
+        return true;
+    }
+
+    /*
+     * private void courseVertices(final MonotonePolygon mpStart, final
+     * VertexInform viStart, final VertexInform viToStopAndCloseMp) throws
+     * NotComputeVecZException { VertexInform vi = viStart; MonotonePolygon mp =
+     * mpStart;
+     * 
+     * while (vi != viToStopAndCloseMp) {
+     * 
+     * 
+     * 
+     * vi = vi.next;
+     * 
+     * }
+     * 
+     * }
+     */
+
+    class CourseEntry {
+        final MonotonePolygon mp;
+        final VertexInform start;
+
+        public CourseEntry(VertexInform start) {
+            this.mp = createEmptyMonotonePolygon();
+            this.start = start;
+        }
+    }
+
+    private boolean createSubMonotone() {
+        mp_v.clear();
+        if (firstVertexInform == null)
+            return false;
+
+        ArrayDeque<CourseEntry> queue = new ArrayDeque<CourseEntry>();
+
+        //
+        CourseEntry curentCourse = new CourseEntry(firstVertexInform);
+        VertexInform vi = firstVertexInform;
+        VertexInform viToStopAndCloseMp = firstVertexInform.back;
+
+        System.out.println();
+        
+        //
+        queue.push(curentCourse);
+
+        //
+        while (vi != viToStopAndCloseMp) {
+            curentCourse.mp.addPoint(vi);
+
+            System.out.print(vi.toString() + " ");
+            
+            //
+            final HashSet<VertexInform> borders = bordersMap.get(vi);
+            if (borders != null) {
+                
+                //
+                final VertexInform oppositeBorder = curentCourse.start;
+                if (borders.contains(oppositeBorder)) {
+                    curentCourse = queue.pop();
+                    
+                }
+                
+                //
+                for (VertexInform borderVi : bordersMap.get(vi)) {
+                    if (borderVi != oppositeBorder) {
+                        curentCourse = new CourseEntry(vi);
+                        curentCourse.mp.addPoint(vi);
+                        queue.push(curentCourse);
+                    }
+                }
+            }
+            
+            vi = vi.next;
+
+        }
+
+        curentCourse.mp.addPoint(vi);
+        
+        System.out.println();
+
+        /*
+         * // try { courseVertices(createEmptyMonotonePolygon(),
+         * firstVertexInform, firstVertexInform.back); return true; } catch
+         * (NotComputeVecZException useless) { return false; }
+         */
 
         return true;
     }
@@ -652,12 +813,14 @@ public class Monotisation extends AbstractAlgorithm {
             return false;
 
         //
-        drawBordersOfSubMonotones();
-        drawVertexInformDiverge();
+        // drawBordersOfSubMonotones();
+        // drawVertexInformDiverge();
+
+        drawBordersByMap();
 
         //
-        //if (!createSubMonotone())
-          //  return false;
+        if (!createSubMonotone())
+        return false;
 
         //
         return true;
@@ -702,9 +865,7 @@ public class Monotisation extends AbstractAlgorithm {
         mutableVisitorForDebugging.getGraphicsContext().setStroke(Color.HOTPINK);
         mutableVisitorForDebugging.visit(p);
         mutableVisitorForDebugging.getGraphicsContext().restore();
-        
-       
-        
+
     }
 
     public void drawAngle(String txt, Point p) {
@@ -717,7 +878,7 @@ public class Monotisation extends AbstractAlgorithm {
         mutableVisitorForDebugging.drawTip(txt, pToOrigin);
     }
 
-    public void drawBordersOfSubMonotones() {
+    public void drawBordersBySegment() {
         if (mutableVisitorForDebugging == null)
             return;
 
@@ -726,33 +887,84 @@ public class Monotisation extends AbstractAlgorithm {
         mutableVisitorForDebugging.getGraphicsContext().setStroke(Color.RED);
 
         final Segment sToOrigin = new Segment();
-
-        for (Segment s : bordersOfSubMonotones) {
+        for (Segment s : bordersBySegment) {
             sToOrigin.set(s);
             as.convertToStandard(sToOrigin.a);
             as.convertToStandard(sToOrigin.b);
             mutableVisitorForDebugging.visit_unit(sToOrigin);
         }
+        mutableVisitorForDebugging.getGraphicsContext().restore();
+    }
+
+    public void drawBordersByMap() {
+        if (mutableVisitorForDebugging == null)
+            return;
+
+        mutableVisitorForDebugging.getGraphicsContext().save();
+        mutableVisitorForDebugging.getGraphicsContext().setStroke(Color.RED);
+
+        final Segment sToOrigin = new Segment();
+
+        for (final Entry<VertexInform, HashSet<VertexInform>> entry : bordersMap.entrySet()) {
+            sToOrigin.a.set(entry.getKey());
+            as.convertToStandard(sToOrigin.a);
+
+            for (final VertexInform b : entry.getValue()) {
+                sToOrigin.b.set(b);
+                as.convertToStandard(sToOrigin.b);
+
+                mutableVisitorForDebugging.getGraphicsContext().setLineWidth(5);
+                mutableVisitorForDebugging.visit_unit(sToOrigin);
+
+                mutableVisitorForDebugging.getGraphicsContext().setLineWidth(1);
+                drawDivergeTip(b);
+            }
+
+            drawDivergeTip(entry.getKey());
+        }
 
         mutableVisitorForDebugging.getGraphicsContext().restore();
+    }
+
+    public void drawBorder(Segment s) {
+        if (mutableVisitorForDebugging == null)
+            return;
+
+        mutableVisitorForDebugging.getGraphicsContext().save();
+        mutableVisitorForDebugging.getGraphicsContext().setLineWidth(5);
+        mutableVisitorForDebugging.getGraphicsContext().setStroke(Color.RED);
+        final Segment sToOrigin = new Segment();
+        sToOrigin.set(s);
+        as.convertToStandard(sToOrigin.a);
+        as.convertToStandard(sToOrigin.b);
+        mutableVisitorForDebugging.visit_unit(sToOrigin);
+        mutableVisitorForDebugging.getGraphicsContext().restore();
+
+        drawDivergeTip((VertexInform) s.a);
+        drawDivergeTip((VertexInform) s.b);
+    }
+
+    public void drawDivergeTip(VertexInform vi) {
+        if (vi.divergeTo != null)
+            drawTextTipPosDecal("├ ", vi.divergeTo, 1);
+        if (vi.divergeFrom != null)
+            drawTextTipPosDecal(" ┤", vi.divergeFrom, 1);
     }
 
     public void drawVertexInformDiverge() {
         if (mutableVisitorForDebugging == null)
             return;
-        
-        
+
         for (VertexInform vi : verticesInform) {
-            
-            
+
             if (vi.divergeTo != null)
                 drawTextTipPosDecal("├ ", vi.divergeTo, 1);
             if (vi.divergeFrom != null)
                 drawTextTipPosDecal(" ┤", vi.divergeFrom, 1);
-            
-            
+
         }
     }
+
     public void drawVertexInformType() {
         if (mutableVisitorForDebugging == null)
             return;
@@ -791,12 +1003,12 @@ public class Monotisation extends AbstractAlgorithm {
             pToOrigin.y -= 5;
 
             mutableVisitorForDebugging.drawTip(type, pToOrigin);
-            
-            if (vi.divergeTo != null)
-                drawTextTipPosDecal("├ ", vi.divergeTo, 1);
-            if (vi.divergeFrom != null)
-                drawTextTipPosDecal(" ┤", vi.divergeFrom, 1);
 
+            /*
+             * if (vi.divergeTo != null) drawTextTipPosDecal("├ ", vi.divergeTo,
+             * 1); if (vi.divergeFrom != null) drawTextTipPosDecal(" ┤",
+             * vi.divergeFrom, 1);
+             */
             /*
              * pToOrigin.y -= 10;
              * mutableVisitorForDebugging.drawTip(vi.toString(), pToOrigin);
@@ -833,6 +1045,15 @@ public class Monotisation extends AbstractAlgorithm {
              * + e.p.toString() + "]", e.p); counterL++; break; }
              */
             counter++;
+        }
+    }
+
+    public void drawStatusMinus() {
+        final Point pCenter = new Point();
+        for (Edge e : status) {
+            pCenter.x = (e.a.x + e.b.x) / 2;
+            pCenter.y = (e.a.y + e.b.y) / 2;
+            drawTextTip("--", pCenter);
         }
     }
 
