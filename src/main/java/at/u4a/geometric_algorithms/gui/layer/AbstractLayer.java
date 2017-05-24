@@ -112,6 +112,8 @@ public abstract class AbstractLayer {
     abstract public Vector<AbstractLayer> getSubLayer();
 
     abstract public void accept(InterfaceGraphicVisitor visitor);
+    
+    abstract public int hashCode();
 
     /* ABSTRACT PUBLIC FUNCTION - SHAPES */
 

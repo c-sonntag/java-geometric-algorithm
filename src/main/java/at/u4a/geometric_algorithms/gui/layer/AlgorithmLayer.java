@@ -98,6 +98,11 @@ public class AlgorithmLayer<TAlgorithm extends AbstractAlgorithm> extends Abstra
             algorithm.accept(subLayer, visitor);
         }
     }
+    
+    @Override
+    public int hashCode() {
+        return algorithm.hashCode();
+    }
 
     @Override
     public boolean contains(Point p) {
@@ -124,5 +129,6 @@ public class AlgorithmLayer<TAlgorithm extends AbstractAlgorithm> extends Abstra
         for (AbstractLayer al : subLayer)
             al.translate(p);
     }
+
 
 }

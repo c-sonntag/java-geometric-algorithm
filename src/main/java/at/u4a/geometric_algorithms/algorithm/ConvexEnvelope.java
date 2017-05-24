@@ -74,14 +74,19 @@ public class ConvexEnvelope extends AbstractAlgorithm {
 
     /* ************** */
 
-    InterfaceGraphicVisitor mutableVisitorForDebugging = null;
-
     @Override
     public void accept(Vector<AbstractLayer> v, InterfaceGraphicVisitor visitor) {
         makeConvexEnveloppe();
         visitor.visit(convexPoly);
     }
+    
+    @Override
+    public int hashCode() {
+        return as.hashCode();
+    }
 
+    InterfaceGraphicVisitor mutableVisitorForDebugging = null;
+    
     public void acceptDebug(Vector<AbstractLayer> v, InterfaceGraphicVisitor visitor) {
         mutableVisitorForDebugging = visitor;
         makeConvexEnveloppe();

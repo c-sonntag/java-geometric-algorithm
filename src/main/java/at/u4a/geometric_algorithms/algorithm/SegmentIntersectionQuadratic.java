@@ -86,6 +86,11 @@ public class SegmentIntersectionQuadratic extends AbstractAlgorithm {
         visitor.visit(cop);
     }
 
+    @Override
+    public int hashCode() {
+        return as.hashCode();
+    }
+    
     /* ************** */
 
     public CloudOfPoints getCloudOfPoint() {

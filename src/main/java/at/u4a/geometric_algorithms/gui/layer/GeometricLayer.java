@@ -86,6 +86,11 @@ public class GeometricLayer<TShape extends AbstractShape> extends AbstractLayer 
             shape.accept((InterfaceShapePainterVisitor) visitor);
         }
     }
+    
+    @Override
+    public int hashCode() {
+        return shape.hashCode();
+    }
 
     @Override
     public boolean contains(Point p) {

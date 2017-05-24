@@ -88,6 +88,11 @@ public class SegmentIntersection extends AbstractAlgorithm {
         makeSegmentInteraction();
         visitor.visit(cop);
     }
+    
+    @Override
+    public int hashCode() {
+        return as.hashCode();
+    }
 
     /* ************** */
 

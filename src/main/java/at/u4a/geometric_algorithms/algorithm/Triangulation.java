@@ -96,6 +96,11 @@ public class Triangulation extends AbstractAlgorithm {
         // visitor.drawEdgeTipFromList(poly, poly.perimeter);
 
     }
+    
+    @Override
+    public int hashCode() {
+        return as.hashCode();
+    }
 
     /* ************** */
 

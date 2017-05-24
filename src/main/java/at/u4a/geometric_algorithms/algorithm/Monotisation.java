@@ -79,25 +79,38 @@ public class Monotisation extends AbstractAlgorithm {
         this.points = points;
         this.as = as;
         this.mp_v = new Vector<MonotonePolygon>();
-        // this.mp_v = new MonotonePolygon(as.origin, points);
     }
 
     /* ************** */
 
+    //@Override
+    public void accept_1(Vector<AbstractLayer> v, InterfaceGraphicVisitor visitor) {
+       
+        
+        makeMonotisation();
+        if (haveMake) {
+            final Segment sToOrigin = new Segment();
+            for (Segment s : bordersBySegment) {
+                sToOrigin.set(s);
+                as.convertToStandard(sToOrigin.a);
+                as.convertToStandard(sToOrigin.b);
+                visitor.visit_unit(sToOrigin);
+            }
+        }
+    }
+
+    
     private InterfaceGraphicVisitor mutableVisitorForDebugging = null;
-
-    private int countStroboscope = 0;
-
-    private Color colorStrop[] = { Color.CORAL, Color.BLUEVIOLET, Color.MEDIUMSPRINGGREEN, Color.HOTPINK, Color.YELLOWGREEN, Color.FIREBRICK, Color.GREEN };
-
-    @Override
+    
     public void accept(Vector<AbstractLayer> v, InterfaceGraphicVisitor visitor) {
+
+        int countStroboscope = 0;
+        Color colorStrop[] = { Color.CORAL, Color.BLUEVIOLET, Color.MEDIUMSPRINGGREEN, Color.HOTPINK, Color.YELLOWGREEN, Color.FIREBRICK, Color.GREEN };
 
         mutableVisitorForDebugging = visitor;
 
-        countStroboscope = 0;
-
         makeMonotisation();
+        drawVertexInformType();
 
         if (haveMake) {
 
@@ -106,26 +119,26 @@ public class Monotisation extends AbstractAlgorithm {
                 sToOrigin.set(s);
                 as.convertToStandard(sToOrigin.a);
                 as.convertToStandard(sToOrigin.b);
-                mutableVisitorForDebugging.visit_unit(sToOrigin);
+                visitor.visit_unit(sToOrigin);
             }
 
-            /*
-             * mutableVisitorForDebugging.getGraphicsContext().save();
-             * mutableVisitorForDebugging.getGraphicsContext().setLineWidth(10);
-             */
-            /*
-             * for (MonotonePolygon mp : mp_v) { Color sC =
-             * colorStrop[countStroboscope];
-             * mutableVisitorForDebugging.getGraphicsContext().setStroke(Color.
-             * color(sC.getRed(), sC.getGreen(), sC.getBlue(), 0.2));
-             * visitor.visit(mp); countStroboscope = (countStroboscope + 1) %
-             * colorStrop.length; } System.out.println("NbPolygon(" +
-             * mp_v.size() + ")");
-             */
-            // mutableVisitorForDebugging.getGraphicsContext().restore();
+            visitor.getGraphicsContext().save();
+            visitor.getGraphicsContext().setLineWidth(10);
+            for (MonotonePolygon mp : mp_v) {
+                Color sC = colorStrop[countStroboscope];
+                mutableVisitorForDebugging.getGraphicsContext().setStroke(Color.color(sC.getRed(), sC.getGreen(), sC.getBlue(), 0.2));
+                visitor.visit(mp);
+                countStroboscope = (countStroboscope + 1) % colorStrop.length;
+            }
+            System.out.println("NbPolygon(" + mp_v.size() + ")");
+            visitor.getGraphicsContext().restore();
 
         }
+    }
 
+    @Override
+    public int hashCode() {
+        return as.hashCode();
     }
 
     /* ************** */
@@ -398,7 +411,7 @@ public class Monotisation extends AbstractAlgorithm {
                 }
 
                 // drawStatusTip(counter++);
-                drawStatusMinus();
+                //drawStatusMinus();
 
             }
 
@@ -506,6 +519,10 @@ public class Monotisation extends AbstractAlgorithm {
             this.mp = createEmptyMonotonePolygon();
             this.start = start;
         }
+
+        public void add(VertexInform vi) {
+            mp.addPoint(vi);
+        }
     }
 
     private boolean createSubMonotone() {
@@ -524,7 +541,7 @@ public class Monotisation extends AbstractAlgorithm {
 
         //
         while (true) {
-            curentCourse.mp.addPoint(vi);
+            curentCourse.add(vi);
 
             // drawTextTipPosDecal(String.valueOf(counter++), vi, -3);
 
@@ -556,7 +573,7 @@ public class Monotisation extends AbstractAlgorithm {
 
                         //
                         curentCourse = queue.pop();
-                        curentCourse.mp.addPoint(vi);
+                        curentCourse.add(vi);
                         haveRemove = true;
                     }
 
@@ -568,7 +585,7 @@ public class Monotisation extends AbstractAlgorithm {
                     // System.out.print(vi.toString() + "|+ ");
                     queue.push(curentCourse);
                     curentCourse = new CourseEntry(vi);
-                    curentCourse.mp.addPoint(vi);
+                    curentCourse.add(vi);
                 }
             }
 
@@ -608,7 +625,7 @@ public class Monotisation extends AbstractAlgorithm {
             return false;
 
         //
-        drawVertexInformType();
+        //drawVertexInformType();
 
         //
         if (!partitionPolygon())

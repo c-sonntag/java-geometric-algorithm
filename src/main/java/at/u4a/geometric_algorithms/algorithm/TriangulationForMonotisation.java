@@ -2,6 +2,7 @@ package at.u4a.geometric_algorithms.algorithm;
 
 import java.util.AbstractList;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -16,7 +17,7 @@ import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGraphicVisitor;
 import at.u4a.geometric_algorithms.gui.layer.AbstractLayer;
 import at.u4a.geometric_algorithms.gui.layer.AlgorithmLayer;
 import at.u4a.geometric_algorithms.utils.Calc;
-
+import javafx.scene.paint.Color;
 
 public class TriangulationForMonotisation extends AbstractAlgorithm {
 
@@ -65,40 +66,105 @@ public class TriangulationForMonotisation extends AbstractAlgorithm {
     @Override
     public void accept(Vector<AbstractLayer> v, InterfaceGraphicVisitor visitor) {
 
+        int countStroboscope = 0;
+        Color colorStrop[] = { Color.CORAL, Color.BLUEVIOLET, Color.MEDIUMSPRINGGREEN, Color.HOTPINK, Color.YELLOWGREEN, Color.FIREBRICK, Color.GREEN };
+
         makeTriangulationForMonotisation();
 
-        //
-        if (actualType == Polygon.Type.Monotone) {
+        System.out.println();
 
-            //
-            final Segment sToOrigin = new Segment();
-            for (Segment tf : triangulationFusion) {
-                sToOrigin.set(tf);
-                as.convertToStandard(sToOrigin.a);
-                as.convertToStandard(sToOrigin.b);
-                visitor.visit_unit(sToOrigin);
+        if (haveMonotized) {
+
+            for (Triangulation triangulation : triangulations) {
+
+                MonotonePolygon mp = triangulation.getPolygon();
+
+                System.out.print(countStroboscope + " : ");
+
+                for (Point p : mp.perimeter) {
+                    System.out.print(p.toString() + " ");
+                }
+
+                System.out.println();
+
+                Color sC = colorStrop[countStroboscope];
+
+                visitor.getGraphicsContext().save();
+
+                visitor.getGraphicsContext().setLineWidth(2);
+                visitor.getGraphicsContext().setStroke(sC);
+
+                // visitor.getGraphicsContext().setStroke(Color.color(sC.getRed(),
+                // sC.getGreen(), sC.getBlue()));
+
+                triangulation.accept(v, visitor);
+                visitor.visit(triangulation.getPolygon());
+
+                visitor.getGraphicsContext().restore();
+
+                countStroboscope = (countStroboscope + 1) % colorStrop.length;
             }
 
         }
 
         //
-        // visitor.drawEdgeTipFromList(poly, poly.perimeter);
 
+        /*
+         * if (actualType == Polygon.Type.Monotone) {
+         * 
+         * // final Segment sToOrigin = new Segment(); for (Segment tf :
+         * triangulationFusion) { sToOrigin.set(tf);
+         * as.convertToStandard(sToOrigin.a); as.convertToStandard(sToOrigin.b);
+         * visitor.visit_unit(sToOrigin); }
+         * 
+         * }
+         * 
+         * // // visitor.drawEdgeTipFromList(poly, poly.perimeter);
+         */
+
+    }
+
+    /*
+     * int countStroboscope = 0; Color colorStrop[] = { Color.CORAL,
+     * Color.BLUEVIOLET, Color.MEDIUMSPRINGGREEN, Color.HOTPINK,
+     * Color.YELLOWGREEN, Color.FIREBRICK, Color.GREEN };
+     * 
+     * mutableVisitorForDebugging = visitor;
+     * 
+     * makeMonotisation(); drawVertexInformType();
+     * 
+     * if (haveMake) {
+     * 
+     * final Segment sToOrigin = new Segment(); for (Segment s :
+     * bordersBySegment) { sToOrigin.set(s); as.convertToStandard(sToOrigin.a);
+     * as.convertToStandard(sToOrigin.b); visitor.visit_unit(sToOrigin); }
+     * 
+     * visitor.getGraphicsContext().save();
+     * visitor.getGraphicsContext().setLineWidth(10); for (MonotonePolygon mp :
+     * mp_v) { Color sC = colorStrop[countStroboscope];
+     * mutableVisitorForDebugging.getGraphicsContext().setStroke(Color.color(sC.
+     * getRed(), sC.getGreen(), sC.getBlue(), 0.2)); visitor.visit(mp);
+     * countStroboscope = (countStroboscope + 1) % colorStrop.length; }
+     * System.out.println("NbPolygon(" + mp_v.size() + ")");
+     * visitor.getGraphicsContext().restore();
+     * 
+     */
+
+    @Override
+    public int hashCode() {
+        return monotisationAlgorithm.hashCode();
     }
 
     /* ************** */
 
     public boolean isMonotonized() {
         makeTriangulationForMonotisation();
-        return actualType == Polygon.Type.Monotone;
+        return haveMonotized;
     }
 
-    public List<MonotonePolygon> getPolygon() {
+    public Vector<MonotonePolygon> getMonotonesPolygon() {
         makeTriangulationForMonotisation();
-        if (actualType == Polygon.Type.Monotone)
-            return mp;
-        else
-            return null;
+        return monotisationAlgorithm.getMonotonesPolygon();
     }
 
     /* ************** */
@@ -110,27 +176,45 @@ public class TriangulationForMonotisation extends AbstractAlgorithm {
 
     /* ************** */
 
-    private int mutablePreviousPolyHash = 0;
+    private ArrayList<Triangulation> triangulations = new ArrayList<Triangulation>();
+
+    /* ************** */
+
+    private int mutablePreviousMonotisationHash = 0;
+
+    boolean haveMonotized = false;
 
     protected void makeTriangulationForMonotisation() {
 
-        int currentPolyHash = as.hashCode();
-        if (currentPolyHash != mutablePreviousPolyHash) {
+        int currentMonotisationHash = monotisationAlgorithm.hashCode();
+        if (currentMonotisationHash != mutablePreviousMonotisationHash) {
 
             //
-            statusStartBuild();
+            triangulations.clear();
+            haveMonotized = true;
 
             //
-            actualType = Polygon.Type.Simple;
-            if (buildTriangulationForMonotisation()) {
-                actualType = Polygon.Type.Monotone;
-                statusFinishBuild();
-            } else
-                statusInteruptBuild();
-                
+            final Vector<MonotonePolygon> mp_v = monotisationAlgorithm.getMonotonesPolygon();
 
             //
-            mutablePreviousPolyHash = currentPolyHash;
+            for (MonotonePolygon mp : mp_v) {
+
+                //
+                final Triangulation triangulationsAlgorithm = new Triangulation(mp.perimeter, mp);
+                triangulationsAlgorithm.makeTriangulation();
+
+                //
+                if (!triangulationsAlgorithm.isMonotone()) {
+                    haveMonotized = false;
+                    break;
+                }
+
+                //
+                triangulations.add(triangulationsAlgorithm);
+            }
+
+            //
+            mutablePreviousMonotisationHash = currentMonotisationHash;
         }
 
     }

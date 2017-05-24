@@ -70,6 +70,8 @@ public abstract class AbstractAlgorithm {
     }
 
     public abstract void accept(Vector<AbstractLayer> v, InterfaceGraphicVisitor visitor);
+    
+    public abstract int hashCode();
 
     public abstract AbstractShape getCompositeShape();
 
