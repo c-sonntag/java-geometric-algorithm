@@ -52,16 +52,16 @@ public class SegmentIntersection extends AbstractAlgorithm {
         public AbstractLayer builder(AbstractLayer l) {
 
             Iterable<Segment> cloud = null;
-            
+
             //
             AbstractShape as = l.getShape();
-            
+
             //
-            if(as instanceof CloudOfSegments) 
-                cloud = ((CloudOfSegments)as).cloud;
-             else if (as instanceof Polygon) 
-                cloud = ((Polygon)as);
-             else
+            if (as instanceof CloudOfSegments)
+                cloud = ((CloudOfSegments) as).cloud;
+            else if (as instanceof Polygon)
+                cloud = ((Polygon) as);
+            else
                 throw new RuntimeException("SegmentIntersection need a CloudOfSegments Shape, or Polygon Shape !");
 
             //
@@ -75,14 +75,19 @@ public class SegmentIntersection extends AbstractAlgorithm {
 
     private final Iterable<Segment> cloud;
     private final AbstractShape as;
-
     private final CloudOfPoints cop;
+    private final boolean notExactly;
 
     public SegmentIntersection(Iterable<Segment> cloud, AbstractShape as) {
+        this(cloud, as, false);
+    }
+
+    public SegmentIntersection(Iterable<Segment> cloud, AbstractShape as, boolean notExactly) {
         super("intersections tests");
         this.cloud = cloud;
         this.as = as;
         this.cop = new CloudOfPoints(as.origin);
+        this.notExactly = notExactly;
     }
 
     /* ************** */
@@ -154,6 +159,28 @@ public class SegmentIntersection extends AbstractAlgorithm {
 
     /* ************** */
 
+    private Point roundPoint(Point p) {
+        return new Point(Math.round(p.x), Math.round(p.y));
+    }
+
+    private Segment roundSegment(Segment s) {
+        return new Segment(roundPoint(s.a), roundPoint(s.b));
+    }
+
+    private Point getIntersection(Segment s1, Segment s2) {
+        statusAddCounter();
+
+        if (notExactly) {
+            final Point intersectionPoint = Calc.intersectionOnLine(s1, s2);
+            return (intersectionPoint != null) ? //
+                    Calc.intersectionOnLine(roundSegment(s1), roundSegment(s2)) : //
+                    null; //
+        } else
+            return Calc.intersection(s1, s2);
+    }
+
+    /* ************** */
+
     private static final SweepLineComparator sweeplineComparator = new SweepLineComparator();
 
     private final Arrangement arrangements = new Arrangement();
@@ -187,7 +214,7 @@ public class SegmentIntersection extends AbstractAlgorithm {
 
         private static class ArrangementComparator implements Comparator<EventPoint> {
             public int compare(EventPoint psa1, EventPoint psa2) {
-                return ( psa1.s.equals(psa2.s) ? 0 : ( //
+                return (psa1.s.equals(psa2.s) ? 0 : ( //
                 (psa1.p.y == psa2.p.y) ? //
                         ((psa1.p.x < psa2.p.x) ? -1 : 1) : //
                         ((psa1.p.y < psa2.p.y) ? -1 : 1) //
@@ -261,8 +288,7 @@ public class SegmentIntersection extends AbstractAlgorithm {
     }
 
     private void addIfIntersection(Segment s1, Segment s2) {
-        statusAddCounter();
-        final Point intersectionPoint = Calc.intersectionOnLine(s1, s2);
+        final Point intersectionPoint = getIntersection(s1, s2);
         if (intersectionPoint != null) {
             cop.addPoint(intersectionPoint);
         }
@@ -408,7 +434,7 @@ public class SegmentIntersection extends AbstractAlgorithm {
      */
     private void findNewEvent(Segment left, Segment right, Point p) {
         statusAddCounter();
-        Point intersectionPoint = Calc.intersection(left, right);
+        final Point intersectionPoint = getIntersection(left, right);
 
         /** @todo check "on it" intersection */
 
@@ -430,10 +456,6 @@ public class SegmentIntersection extends AbstractAlgorithm {
     private boolean buildSegmentInteraction() {
 
         //
-        // if (cloud.size() <= 2)
-        // return buildSegmentInteractionQuadratic();
-
-        //
         cop.clear();
         arrangements.init(cloud);
         sweepline.clear();
@@ -446,45 +468,6 @@ public class SegmentIntersection extends AbstractAlgorithm {
         // System.out.println("Size : " + arrangements.size());
 
         //
-        return true;
-    }
-
-    /* ************** */
-
-    /**
-     * Used for size <= 2
-     */
-    protected boolean buildSegmentInteractionQuadratic() {
-
-        //
-        cop.clear();
-        Set<Point> intersections = new HashSet<Point>();
-
-        for (Segment s1 : cloud) {
-            boolean firstS2 = true;
-
-            for (Segment s2 : cloud) {
-
-                if (firstS2) {
-                    firstS2 = false;
-                    continue;
-                }
-
-                //
-                statusAddCounter();
-
-                //
-                Point pInter = Calc.intersection(s1, s2);
-                if (pInter == null)
-                    continue;
-
-                if (!intersections.contains(pInter)) {
-                    intersections.add(pInter);
-                    cop.addPoint(pInter);
-                }
-            }
-        }
-
         return true;
     }
 

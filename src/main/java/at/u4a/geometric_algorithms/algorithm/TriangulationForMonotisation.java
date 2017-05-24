@@ -77,8 +77,8 @@ public class TriangulationForMonotisation extends AbstractAlgorithm {
 
             for (Triangulation triangulation : triangulations) {
 
-                //MonotonePolygon mp = triangulation.getPolygon();
-                
+                // MonotonePolygon mp = triangulation.getPolygon();
+
                 System.out.print(countStroboscope + " : ");
 
                 Color sC = colorStrop[countStroboscope];
@@ -191,20 +191,25 @@ public class TriangulationForMonotisation extends AbstractAlgorithm {
             final Vector<MonotonePolygon> mp_v = monotisationAlgorithm.getMonotonesPolygon();
 
             //
-            for (MonotonePolygon mp : mp_v) {
+            if (mp_v == null) {
+                haveMonotized = false;
 
-                //
-                final Triangulation triangulationsAlgorithm = new Triangulation(mp.perimeter, mp);
-                triangulationsAlgorithm.makeTriangulation();
+            } else {
+                for (MonotonePolygon mp : mp_v) {
 
-                //
-                if (!triangulationsAlgorithm.isMonotone()) {
-                    haveMonotized = false;
-                    break;
+                    //
+                    final Triangulation triangulationsAlgorithm = new Triangulation(mp.perimeter, mp, false);
+                    triangulationsAlgorithm.makeTriangulation();
+
+                    //
+                    if (!triangulationsAlgorithm.isMonotone()) {
+                        haveMonotized = false;
+                        break;
+                    }
+
+                    //
+                    triangulations.add(triangulationsAlgorithm);
                 }
-
-                //
-                triangulations.add(triangulationsAlgorithm);
             }
 
             //

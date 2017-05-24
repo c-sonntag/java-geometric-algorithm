@@ -71,37 +71,37 @@ public class Monotisation extends AbstractAlgorithm {
     };
 
     private final AbstractList<Point> points;
-    private final AbstractShape as;
+    private final Polygon poly;
 
     private final Vector<MonotonePolygon> mp_v;
+    private final SegmentIntersection intersectionTester;
 
-    public Monotisation(Vector<Point> points, AbstractShape as) {
+    public Monotisation(Vector<Point> points, Polygon poly) {
         this.points = points;
-        this.as = as;
+        this.poly = poly;
         this.mp_v = new Vector<MonotonePolygon>();
+        this.intersectionTester = new SegmentIntersection(poly, poly, true);
     }
 
     /* ************** */
 
     @Override
     public void accept(Vector<AbstractLayer> v, InterfaceGraphicVisitor visitor) {
-       
-        
+
         makeMonotisation();
         if (haveMake) {
             final Segment sToOrigin = new Segment();
             for (Segment s : bordersBySegment) {
                 sToOrigin.set(s);
-                as.convertToStandard(sToOrigin.a);
-                as.convertToStandard(sToOrigin.b);
+                poly.convertToStandard(sToOrigin.a);
+                poly.convertToStandard(sToOrigin.b);
                 visitor.visit_unit(sToOrigin);
             }
         }
     }
 
-    
     private InterfaceGraphicVisitor mutableVisitorForDebugging = null;
-    
+
     public void acceptDebug(Vector<AbstractLayer> v, InterfaceGraphicVisitor visitor) {
 
         int countStroboscope = 0;
@@ -117,8 +117,8 @@ public class Monotisation extends AbstractAlgorithm {
             final Segment sToOrigin = new Segment();
             for (Segment s : bordersBySegment) {
                 sToOrigin.set(s);
-                as.convertToStandard(sToOrigin.a);
-                as.convertToStandard(sToOrigin.b);
+                poly.convertToStandard(sToOrigin.a);
+                poly.convertToStandard(sToOrigin.b);
                 visitor.visit_unit(sToOrigin);
             }
 
@@ -138,7 +138,7 @@ public class Monotisation extends AbstractAlgorithm {
 
     @Override
     public int hashCode() {
-        return as.hashCode();
+        return poly.hashCode();
     }
 
     /* ************** */
@@ -147,17 +147,16 @@ public class Monotisation extends AbstractAlgorithm {
         makeMonotisation();
         return haveMake;
     }
- 
-    
+
     public Vector<MonotonePolygon> getMonotonesPolygon() {
         makeMonotisation();
-        
-        if(bordersBySegment.isEmpty() && haveMake) {
+
+        if (bordersBySegment.isEmpty() && haveMake) {
             Vector<MonotonePolygon> mp_v_once = new Vector<MonotonePolygon>();
-            mp_v_once.add(new MonotonePolygon(as.origin, (Vector<Point>) points));
+            mp_v_once.add(new MonotonePolygon(poly.origin, (Vector<Point>) points));
             return mp_v_once;
         }
-        
+
         return (haveMake) ? mp_v : null;
     }
 
@@ -175,7 +174,7 @@ public class Monotisation extends AbstractAlgorithm {
 
     protected void makeMonotisation() {
 
-        int currentPolyHash = as.hashCode();
+        int currentPolyHash = poly.hashCode();
         if (currentPolyHash != mutablePreviousPolyHash) {
 
             //
@@ -420,7 +419,7 @@ public class Monotisation extends AbstractAlgorithm {
                 }
 
                 // drawStatusTip(counter++);
-                //drawStatusMinus();
+                // drawStatusMinus();
 
             }
 
@@ -515,7 +514,7 @@ public class Monotisation extends AbstractAlgorithm {
     }
 
     private final MonotonePolygon createEmptyMonotonePolygon() {
-        final MonotonePolygon mp = new MonotonePolygon(as.origin, new Vector<Point>());
+        final MonotonePolygon mp = new MonotonePolygon(poly.origin, new Vector<Point>());
         mp_v.add(mp);
         return mp;
     }
@@ -626,8 +625,12 @@ public class Monotisation extends AbstractAlgorithm {
 
     private boolean buildMonotisation() {
 
-        /** @todo find if the polygon have colision */
-        
+        //
+        if (intersectionTester.haveIntersections()) {
+            statusAddCause("Polygon have intersection");
+            return false;
+        }
+
         System.out.println();
 
         //
@@ -635,7 +638,7 @@ public class Monotisation extends AbstractAlgorithm {
             return false;
 
         //
-        //drawVertexInformType();
+        // drawVertexInformType();
 
         //
         if (!partitionPolygon())
@@ -663,7 +666,7 @@ public class Monotisation extends AbstractAlgorithm {
             return;
         final Point pToOrigin = new Point();
         pToOrigin.set(p);
-        as.convertToStandard(pToOrigin);
+        poly.convertToStandard(pToOrigin);
         mutableVisitorForDebugging.drawTip(txt, pToOrigin);
     }
 
@@ -680,7 +683,7 @@ public class Monotisation extends AbstractAlgorithm {
         final Point pToOrigin = new Point();
         pToOrigin.set(p);
         pToOrigin.y += 20 + pos * 15;
-        as.convertToStandard(pToOrigin);
+        poly.convertToStandard(pToOrigin);
         mutableVisitorForDebugging.drawTip(txt, pToOrigin);
     }
 
@@ -701,7 +704,7 @@ public class Monotisation extends AbstractAlgorithm {
         final Point pToOrigin = new Point();
         pToOrigin.set(p);
         pToOrigin.y -= 20;
-        as.convertToStandard(pToOrigin);
+        poly.convertToStandard(pToOrigin);
         mutableVisitorForDebugging.drawTip(txt, pToOrigin);
     }
 
@@ -716,8 +719,8 @@ public class Monotisation extends AbstractAlgorithm {
         final Segment sToOrigin = new Segment();
         for (Segment s : bordersBySegment) {
             sToOrigin.set(s);
-            as.convertToStandard(sToOrigin.a);
-            as.convertToStandard(sToOrigin.b);
+            poly.convertToStandard(sToOrigin.a);
+            poly.convertToStandard(sToOrigin.b);
             mutableVisitorForDebugging.visit_unit(sToOrigin);
         }
         mutableVisitorForDebugging.getGraphicsContext().restore();
@@ -734,13 +737,13 @@ public class Monotisation extends AbstractAlgorithm {
 
         for (final Entry<VertexInform, HashSet<VertexInform>> entry : bordersByMap.entrySet()) {
             sToOrigin.a.set(entry.getKey());
-            as.convertToStandard(sToOrigin.a);
+            poly.convertToStandard(sToOrigin.a);
 
             System.out.print(entry.getKey() + " : ");
 
             for (final VertexInform b : entry.getValue()) {
                 sToOrigin.b.set(b);
-                as.convertToStandard(sToOrigin.b);
+                poly.convertToStandard(sToOrigin.b);
 
                 System.out.print(b + " ");
                 mutableVisitorForDebugging.getGraphicsContext().setLineWidth(5);
@@ -764,8 +767,8 @@ public class Monotisation extends AbstractAlgorithm {
         mutableVisitorForDebugging.getGraphicsContext().setStroke(Color.RED);
         final Segment sToOrigin = new Segment();
         sToOrigin.set(s);
-        as.convertToStandard(sToOrigin.a);
-        as.convertToStandard(sToOrigin.b);
+        poly.convertToStandard(sToOrigin.a);
+        poly.convertToStandard(sToOrigin.b);
         mutableVisitorForDebugging.visit_unit(sToOrigin);
         mutableVisitorForDebugging.getGraphicsContext().restore();
     }
@@ -780,7 +783,7 @@ public class Monotisation extends AbstractAlgorithm {
 
             final Point pToOrigin = new Point();
             pToOrigin.set(vi);
-            as.convertToStandard(pToOrigin);
+            poly.convertToStandard(pToOrigin);
 
             String type = "☺";
 

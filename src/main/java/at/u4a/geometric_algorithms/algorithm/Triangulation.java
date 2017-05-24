@@ -74,7 +74,7 @@ public class Triangulation extends AbstractAlgorithm {
         this.poly = poly;
 
         this.mp = new MonotonePolygon(poly.origin, points);
-        intersectionTester = checkIntersection ? new SegmentIntersection(poly, poly) : null;
+        intersectionTester = checkIntersection ? new SegmentIntersection(poly, poly, true) : null;
     }
 
     /* ************** */
@@ -415,16 +415,16 @@ public class Triangulation extends AbstractAlgorithm {
      *      TRIANGULATEMONOTONEPOLYGON
      */
     private boolean buildTriangulation() {
-       
+
         //
-        if(intersectionTester != null) {
-            if(intersectionTester.haveIntersections()) {
+        if (intersectionTester != null) {
+            if (intersectionTester.haveIntersections()) {
                 mutableVisitorForDebugging.visit(intersectionTester.getCloudOfPoint());
                 statusAddCause("Polygon have intersection");
                 return false;
             }
         }
-        
+
         //
         if (!buildFusion())
             return false;
