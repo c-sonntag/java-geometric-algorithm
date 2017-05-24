@@ -17,6 +17,7 @@ import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGraphicVisitor;
 import at.u4a.geometric_algorithms.gui.layer.AbstractLayer;
 import at.u4a.geometric_algorithms.gui.layer.AlgorithmLayer;
 import at.u4a.geometric_algorithms.utils.Calc;
+import javafx.scene.paint.Color;
 
 /**
  * Triangulation
@@ -406,7 +407,9 @@ public class Triangulation extends AbstractAlgorithm {
 
     static boolean inP(Point pA, PointTipped pOrigine, Point pB) {
         double produit = Calc.resumeProduitVectorielZ(pA, pOrigine, pB);
-        return (((produit > 0) && (pOrigine.tip == Tip.Right)) || ((produit < 0) && (pOrigine.tip == Tip.Left)) || (pOrigine.tip == Tip.Up) || (pOrigine.tip == Tip.Down));
+        return (((produit > 0) && (pOrigine.tip == Tip.Right)) || //
+                ((produit < 0) && (pOrigine.tip == Tip.Left)) || //
+                (pOrigine.tip == Tip.Up) || (pOrigine.tip == Tip.Down));
     }
 
     /**
@@ -458,11 +461,19 @@ public class Triangulation extends AbstractAlgorithm {
 
                 //
                 while (!stack.isEmpty()) {
-                    stackFirst = stack.peekFirst();
+                    stackFirst = stack.getFirst();
+
+                    // drawSegmentByPoint(currentPoint, stackPop);
+                    // drawSegmentByPoint(currentPoint, stackFirst);
+
+                    drawTextTipPosDecal("C", currentPoint, -2);
 
                     if (inP(currentPoint, stackPop, stackFirst)) {
                         stackPop = stack.pop();
                         triangulationFusion.add(new Segment(currentPoint, stackPop));
+                        
+                        
+
                     } else
                         break;
                 }
@@ -474,24 +485,23 @@ public class Triangulation extends AbstractAlgorithm {
             } else { // opposite chain
 
                 //
+                /*
+                 * Iterator<PointTipped> stack_it = stack.descendingIterator();
+                 * if (stack_it.hasNext()) { stack_it.next(); while
+                 * (stack_it.hasNext()) { PointTipped stackPoint =
+                 * stack_it.next(); triangulationFusion.add(new
+                 * Segment(currentPoint, stackPoint)); } } stack.clear();
+                 */
 
-                Iterator<PointTipped> stack_it = stack.descendingIterator();
-                if (stack_it.hasNext()) {
-                    stack_it.next();
-                    while (stack_it.hasNext()) {
-                        PointTipped stackPoint = stack_it.next();
+                Iterator<PointTipped> stack_it = stack.iterator();
+                while (stack_it.hasNext()) {
+                    PointTipped stackPoint = stack_it.next();
+                    if (stack_it.hasNext()) {
+                        drawTextTipPosDecal("S", stackPoint, -3);
                         triangulationFusion.add(new Segment(currentPoint, stackPoint));
                     }
                 }
                 stack.clear();
-
-                /*
-                 * Iterator<PointTipped> stack_it = stack.iterator(); while
-                 * (stack_it.hasNext()) { PointTipped stackPoint =
-                 * stack_it.next(); if (stack_it.hasNext())
-                 * triangulationFusion.add(new Segment(currentPoint,
-                 * stackPoint)); } stack.clear();
-                 */
 
                 /*
                  * PointTipped stackPoint = null; stack.poll();
@@ -549,5 +559,34 @@ public class Triangulation extends AbstractAlgorithm {
     /*
      * ****************************** DEBUG ONLY ******************************
      */
+
+    public void drawTextTipPosDecal(String txt, Point p, int pos) {
+        if (mutableVisitorForDebugging == null)
+            return;
+        final Point pToOrigin = new Point();
+        pToOrigin.set(p);
+        pToOrigin.y += 20 + pos * 15;
+        poly.convertToStandard(pToOrigin);
+        mutableVisitorForDebugging.drawTip(txt, pToOrigin);
+    }
+
+    public void drawSegmentByPoint(Point a, Point b) {
+        if (mutableVisitorForDebugging == null)
+            return;
+
+        mutableVisitorForDebugging.getGraphicsContext().save();
+        mutableVisitorForDebugging.getGraphicsContext().setLineWidth(5);
+        mutableVisitorForDebugging.getGraphicsContext().setStroke(Color.YELLOW);
+
+        final Segment sToOrigin = new Segment();
+        sToOrigin.a.set(a);
+        sToOrigin.b.set(b);
+        poly.convertToStandard(sToOrigin.a);
+        poly.convertToStandard(sToOrigin.b);
+
+        mutableVisitorForDebugging.visit_unit(sToOrigin);
+        mutableVisitorForDebugging.getGraphicsContext().restore();
+
+    }
 
 };

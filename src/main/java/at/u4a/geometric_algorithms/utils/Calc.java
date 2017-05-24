@@ -15,10 +15,10 @@ public class Calc {
      * = 0 z = a.x*b.y - a.y*b.x
      */
     public static double resumeProduitVectorielZ(Point pA, Point pOrigine, Point pB) {
-        final double pAx = pA.x - pOrigine.x;
-        final double pAy = pA.y - pOrigine.y;
-        final double pBx = pB.x - pOrigine.x;
-        final double pBy = pB.y - pOrigine.y;
+        final double pAx = pOrigine.x - pA.x;
+        final double pAy = pB.x - pA.x;
+        final double pBx = pOrigine.y - pA.y;
+        final double pBy = pB.y - pA.y;
         return pAx * pBy - pAy * pBx;
     }
 

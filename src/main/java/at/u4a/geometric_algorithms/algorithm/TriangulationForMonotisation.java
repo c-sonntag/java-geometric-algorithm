@@ -63,9 +63,13 @@ public class TriangulationForMonotisation extends AbstractAlgorithm {
 
     /* ************** */
 
+    InterfaceGraphicVisitor mutableVisitorForDebugging = null;
+    
     @Override
     public void accept(Vector<AbstractLayer> v, InterfaceGraphicVisitor visitor) {
 
+        mutableVisitorForDebugging = visitor;
+        
         makeTriangulationForMonotisation();
 
         if (haveMonotized) {
@@ -216,6 +220,7 @@ public class TriangulationForMonotisation extends AbstractAlgorithm {
                     
                     //
                     final Triangulation triangulationsAlgorithm = new Triangulation(mp.perimeter, mp, false);
+                    triangulationsAlgorithm.mutableVisitorForDebugging = mutableVisitorForDebugging;
                     
                     //
                     if (!triangulationsAlgorithm.isMonotone()) {
