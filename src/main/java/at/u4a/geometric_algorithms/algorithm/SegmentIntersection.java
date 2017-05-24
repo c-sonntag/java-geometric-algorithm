@@ -73,6 +73,8 @@ public class SegmentIntersection extends AbstractAlgorithm {
 
     };
 
+    static double NOT_EXACTLY_MIN = 1.0;
+
     private final Iterable<Segment> cloud;
     private final AbstractShape as;
     private final CloudOfPoints cop;
@@ -159,24 +161,25 @@ public class SegmentIntersection extends AbstractAlgorithm {
 
     /* ************** */
 
-    private Point roundPoint(Point p) {
-        return new Point(Math.round(p.x), Math.round(p.y));
-    }
-
-    private Segment roundSegment(Segment s) {
-        return new Segment(roundPoint(s.a), roundPoint(s.b));
+    /**
+     * Si le test ne doit pas comprendre les intersection au niveau des points d'extremités
+     */
+    private boolean checkNotExactly(double i, double j) {
+        return Math.abs(i - j) <= NOT_EXACTLY_MIN;
     }
 
     private Point getIntersection(Segment s1, Segment s2) {
         statusAddCounter();
 
-        if (notExactly) {
-            final Point intersectionPoint = Calc.intersectionOnLine(s1, s2);
-            return (intersectionPoint != null) ? //
-                    Calc.intersectionOnLine(roundSegment(s1), roundSegment(s2)) : //
-                    null; //
-        } else
-            return Calc.intersection(s1, s2);
+        //
+        final Point intersectionPoint = notExactly ? Calc.intersectionOnLine(s1, s2) : Calc.intersection(s1, s2);
+        if (notExactly)
+            if ((intersectionPoint != null))
+                if (checkNotExactly(intersectionPoint.x, s1.a.x) || checkNotExactly(intersectionPoint.x, s1.b.x) || checkNotExactly(intersectionPoint.x, s2.a.x) || checkNotExactly(intersectionPoint.x, s2.b.x) || //
+                        checkNotExactly(intersectionPoint.y, s1.a.y) || checkNotExactly(intersectionPoint.y, s1.b.y) || checkNotExactly(intersectionPoint.y, s2.a.y) || checkNotExactly(intersectionPoint.y, s2.b.y))//
+                    return null;
+        //
+        return intersectionPoint;
     }
 
     /* ************** */
@@ -300,8 +303,6 @@ public class SegmentIntersection extends AbstractAlgorithm {
 
     private void handleEventPoint(EventPoint ep) {
 
-        drawSquare(ep.p, 0);
-
         //
         upper.clear();
         contain.clear();
@@ -363,7 +364,7 @@ public class SegmentIntersection extends AbstractAlgorithm {
          **/
 
         //
-        if ((contain.size() + upper.size()) == 0) {
+        if (contain.isEmpty() && upper.isEmpty()) {
 
             if (ep.type == EventType.Intersection)
                 return;
@@ -435,6 +436,11 @@ public class SegmentIntersection extends AbstractAlgorithm {
     private void findNewEvent(Segment left, Segment right, Point p) {
         statusAddCounter();
         final Point intersectionPoint = getIntersection(left, right);
+
+        if (notExactly) {
+            if (left.a == right.a || left.a == right.b || left.b == right.a || left.b == right.b)
+                return;
+        }
 
         /** @todo check "on it" intersection */
 
