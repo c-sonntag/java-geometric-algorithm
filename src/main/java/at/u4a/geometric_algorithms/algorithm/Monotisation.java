@@ -83,8 +83,8 @@ public class Monotisation extends AbstractAlgorithm {
 
     /* ************** */
 
-    //@Override
-    public void accept_1(Vector<AbstractLayer> v, InterfaceGraphicVisitor visitor) {
+    @Override
+    public void accept(Vector<AbstractLayer> v, InterfaceGraphicVisitor visitor) {
        
         
         makeMonotisation();
@@ -102,7 +102,7 @@ public class Monotisation extends AbstractAlgorithm {
     
     private InterfaceGraphicVisitor mutableVisitorForDebugging = null;
     
-    public void accept(Vector<AbstractLayer> v, InterfaceGraphicVisitor visitor) {
+    public void acceptDebug(Vector<AbstractLayer> v, InterfaceGraphicVisitor visitor) {
 
         int countStroboscope = 0;
         Color colorStrop[] = { Color.CORAL, Color.BLUEVIOLET, Color.MEDIUMSPRINGGREEN, Color.HOTPINK, Color.YELLOWGREEN, Color.FIREBRICK, Color.GREEN };
@@ -627,6 +627,7 @@ public class Monotisation extends AbstractAlgorithm {
     private boolean buildMonotisation() {
 
         /** @todo find if the polygon have colision */
+        
         System.out.println();
 
         //

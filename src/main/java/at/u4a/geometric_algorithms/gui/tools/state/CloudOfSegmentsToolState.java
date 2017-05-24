@@ -69,7 +69,7 @@ public class CloudOfSegmentsToolState extends ToolState {
 
     public void valid(Drawer drawer) {
         GeometricLayer<CloudOfSegments> cofLayer = new GeometricLayer<CloudOfSegments>(cof,Tool.CloudOfSegment);
-        cofLayer.setLayerName("cof" + String.valueOf(ColoudOfSegmentsCount));
+        cofLayer.setLayerName("cos" + String.valueOf(ColoudOfSegmentsCount));
         ColoudOfSegmentsCount++;
 
         drawer.getDS().getLayerManager().addLayerAndSelectIt(cofLayer);

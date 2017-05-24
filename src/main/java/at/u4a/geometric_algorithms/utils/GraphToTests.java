@@ -32,24 +32,25 @@ public class GraphToTests {
 
     static int Cloud_of_Points_NB = 6;
     static double Cloud_of_Points_FACTOR = 2;
-    
+
     static int Cloud_of_Segments_NB = 10;
     static double Cloud_of_Segments_FACTOR = 3;
 
     public static void defaultGraph(LayerManager lm) {
         Random rnd = new Random(1123581321345589L);
-        //Random rnd = new Random();
-        
-        lm.addLayer(monotisation(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, false)));
-        lm.addLayer(monotisation(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, true)));
-        
+        // Random rnd = new Random();
+
+        lm.addLayer(triangulation(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, false)));
+        lm.addLayer(triangulation(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, true)));
+
         //
         if (activeDefault) {
+            lm.addLayer(monotisation(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, false)));
+            lm.addLayer(monotisation(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, true)));
+
             lm.addLayer(rectangle(rnd.nextLong(), Square_FACTOR));
             lm.addLayer(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, false));
             lm.addLayer(segment_intersection(cloud_of_segments(rnd.nextLong(), Cloud_of_Segments_NB, Cloud_of_Segments_FACTOR)));
-            lm.addLayer(triangulation(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, false)));
-            lm.addLayer(triangulation(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, true)));
             lm.addLayer(cloud_of_points(rnd.nextLong(), Cloud_of_Points_NB, Cloud_of_Points_FACTOR));
             lm.addLayer(convex_envelope(cloud_of_points(rnd.nextLong(), Cloud_of_Points_NB, Cloud_of_Points_FACTOR)));
         }
@@ -69,12 +70,18 @@ public class GraphToTests {
         return tb.builder(layer);
     }
 
+    static AbstractLayer triangulationForMonotisation(AbstractLayer layer) {
+        TriangulationForMonotisation.Builder tfmb = new TriangulationForMonotisation.Builder();
+        layer.getAuthorized().clear();
+        return tfmb.builder(layer);
+    }
+
     static AbstractLayer segment_intersection(AbstractLayer layer) {
         SegmentIntersection.Builder si = new SegmentIntersection.Builder();
         layer.getAuthorized().clear();
         return si.builder(layer);
     }
-    
+
     static AbstractLayer monotisation(AbstractLayer layer) {
         Monotisation.Builder m = new Monotisation.Builder();
         layer.getAuthorized().clear();
@@ -137,12 +144,12 @@ public class GraphToTests {
         Random rnd = new Random(seed);
 
         CloudOfSegments cloudOfSegments = new CloudOfSegments();
-        cloudOfSegments.origin.set(100+(30 + rnd.nextInt(100))* factor, 100+(40 + rnd.nextInt(100))* factor);
+        cloudOfSegments.origin.set(100 + (30 + rnd.nextInt(100)) * factor, 100 + (40 + rnd.nextInt(100)) * factor);
 
-        for (int i = 0; i < nb * 2; i+=2) {
+        for (int i = 0; i < nb * 2; i += 2) {
             cloudOfSegments.addSegment( //
                     new Point((100 - rnd.nextInt(200)) * factor, (100 - rnd.nextInt(200)) * factor), //
-                    new Point((100 - rnd.nextInt(200)) * factor, (i%2 * 100 + 100 - rnd.nextInt(200)) * factor) //
+                    new Point((100 - rnd.nextInt(200)) * factor, (i % 2 * 100 + 100 - rnd.nextInt(200)) * factor) //
             );
         }
 
@@ -215,11 +222,11 @@ public class GraphToTests {
     private static void addCloudOfPoints(LayerManager lm) {
         Random rnd = new Random();
         JSpinner seed = new JSpinner(new SpinnerNumberModel(rnd.nextLong(), Long.MIN_VALUE, Long.MAX_VALUE, 1));
-        JSpinner nb = new JSpinner(new SpinnerNumberModel(6, 1, 1000000, 1));
+        JSpinner nb = new JSpinner(new SpinnerNumberModel(50, 1, 1000000, 1));
         JSpinner factor = new JSpinner(new SpinnerNumberModel(1, 1, 100, 0.5));
         //
         JPanel p = new JPanel();
-        makeInputItem(p, "Nb segments:", nb);
+        makeInputItem(p, "Nb points:", nb);
         makeInputItem(p, "Factor:", factor);
         //
         JPanel pSeed = new JPanel();
@@ -232,7 +239,7 @@ public class GraphToTests {
                     ((Number) factor.getValue()).doubleValue() //
             ));
     }
-    
+
     private static void addCloudOfSegments(LayerManager lm) {
         Random rnd = new Random();
         JSpinner seed = new JSpinner(new SpinnerNumberModel(rnd.nextLong(), Long.MIN_VALUE, Long.MAX_VALUE, 1));

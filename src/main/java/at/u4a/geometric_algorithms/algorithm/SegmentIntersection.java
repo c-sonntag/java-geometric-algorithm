@@ -15,6 +15,7 @@ import at.u4a.geometric_algorithms.geometric.AbstractShape;
 import at.u4a.geometric_algorithms.geometric.CloudOfPoints;
 import at.u4a.geometric_algorithms.geometric.CloudOfSegments;
 import at.u4a.geometric_algorithms.geometric.Point;
+import at.u4a.geometric_algorithms.geometric.Polygon;
 import at.u4a.geometric_algorithms.geometric.Segment;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGraphicVisitor;
 import at.u4a.geometric_algorithms.gui.layer.AbstractLayer;
@@ -41,7 +42,8 @@ public class SegmentIntersection extends AbstractAlgorithm {
 
         @Override
         public boolean canApply(AbstractLayer l) {
-            return (l.getShape() instanceof CloudOfSegments);
+            AbstractShape as = l.getShape();
+            return ((as instanceof CloudOfSegments) || (as instanceof Polygon));
         }
 
         static int SegmentIntersectionCount = 1;
@@ -49,16 +51,21 @@ public class SegmentIntersection extends AbstractAlgorithm {
         @Override
         public AbstractLayer builder(AbstractLayer l) {
 
+            Iterable<Segment> cloud = null;
+            
             //
             AbstractShape as = l.getShape();
-            if (!(as instanceof CloudOfSegments))
-                throw new RuntimeException("SegmentIntersection need a CloudOfSegments Shape !");
+            
+            //
+            if(as instanceof CloudOfSegments) 
+                cloud = ((CloudOfSegments)as).cloud;
+             else if (as instanceof Polygon) 
+                cloud = ((Polygon)as);
+             else
+                throw new RuntimeException("SegmentIntersection need a CloudOfSegments Shape, or Polygon Shape !");
 
             //
-            CloudOfSegments cos = (CloudOfSegments) as;
-
-            //
-            AbstractLayer al = new AlgorithmLayer<SegmentIntersection>(new SegmentIntersection(cos.cloud, cos), Algorithm.SegmentIntersection, l);
+            AbstractLayer al = new AlgorithmLayer<SegmentIntersection>(new SegmentIntersection(cloud, as), Algorithm.SegmentIntersection, l);
             al.setLayerName("si" + String.valueOf(SegmentIntersectionCount));
             SegmentIntersectionCount++;
             return al;
@@ -66,12 +73,12 @@ public class SegmentIntersection extends AbstractAlgorithm {
 
     };
 
-    private final AbstractList<Segment> cloud;
+    private final Iterable<Segment> cloud;
     private final AbstractShape as;
 
     private final CloudOfPoints cop;
 
-    public SegmentIntersection(AbstractList<Segment> cloud, AbstractShape as) {
+    public SegmentIntersection(Iterable<Segment> cloud, AbstractShape as) {
         super("intersections tests");
         this.cloud = cloud;
         this.as = as;
@@ -88,7 +95,7 @@ public class SegmentIntersection extends AbstractAlgorithm {
         makeSegmentInteraction();
         visitor.visit(cop);
     }
-    
+
     @Override
     public int hashCode() {
         return as.hashCode();
@@ -99,6 +106,11 @@ public class SegmentIntersection extends AbstractAlgorithm {
     public CloudOfPoints getCloudOfPoint() {
         makeSegmentInteraction();
         return cop;
+    }
+
+    public boolean haveIntersections() {
+        makeSegmentInteraction();
+        return !cop.cloud.isEmpty();
     }
 
     /* ************** */
@@ -175,7 +187,7 @@ public class SegmentIntersection extends AbstractAlgorithm {
 
         private static class ArrangementComparator implements Comparator<EventPoint> {
             public int compare(EventPoint psa1, EventPoint psa2) {
-                return (psa1.p.equals(psa2.p) ? 0 : ( //
+                return ( psa1.s.equals(psa2.s) ? 0 : ( //
                 (psa1.p.y == psa2.p.y) ? //
                         ((psa1.p.x < psa2.p.x) ? -1 : 1) : //
                         ((psa1.p.y < psa2.p.y) ? -1 : 1) //
@@ -183,13 +195,14 @@ public class SegmentIntersection extends AbstractAlgorithm {
             }
         };
 
-        //public final NavigableSet<EventPoint> navigator = (NavigableSet<EventPoint>) this;
+        // public final NavigableSet<EventPoint> navigator =
+        // (NavigableSet<EventPoint>) this;
 
         public Arrangement() {
             super(new ArrangementComparator());
         }
 
-        public void init(AbstractList<Segment> ls) {
+        public void init(Iterable<Segment> ls) {
             clear();
             for (Segment s : ls) {
                 if (s == null)
@@ -249,12 +262,11 @@ public class SegmentIntersection extends AbstractAlgorithm {
 
     private void addIfIntersection(Segment s1, Segment s2) {
         statusAddCounter();
-        final Point intersectionPoint = Calc.intersection(s1, s2);
+        final Point intersectionPoint = Calc.intersectionOnLine(s1, s2);
         if (intersectionPoint != null) {
             cop.addPoint(intersectionPoint);
         }
     }
-
 
     private Vector<Segment> upper = new Vector<Segment>();
     private Vector<Segment> contain = new Vector<Segment>();
@@ -397,7 +409,7 @@ public class SegmentIntersection extends AbstractAlgorithm {
     private void findNewEvent(Segment left, Segment right, Point p) {
         statusAddCounter();
         Point intersectionPoint = Calc.intersection(left, right);
-        
+
         /** @todo check "on it" intersection */
 
         if (intersectionPoint != null) {
@@ -411,15 +423,15 @@ public class SegmentIntersection extends AbstractAlgorithm {
 
     /* ************** */
 
-    //int countForcePush = 0;
+    // int countForcePush = 0;
 
     /**
      */
     private boolean buildSegmentInteraction() {
 
         //
-        if (cloud.size() <= 2)
-            return buildSegmentInteractionQuadratic();
+        // if (cloud.size() <= 2)
+        // return buildSegmentInteractionQuadratic();
 
         //
         cop.clear();
@@ -427,11 +439,11 @@ public class SegmentIntersection extends AbstractAlgorithm {
         sweepline.clear();
 
         //
-        //countForcePush = 0;
+        // countForcePush = 0;
         findIntersections();
 
-        //System.out.println("CountForcePush : " + countForcePush);
-        //System.out.println("Size : " + arrangements.size());
+        // System.out.println("CountForcePush : " + countForcePush);
+        // System.out.println("Size : " + arrangements.size());
 
         //
         return true;
@@ -476,7 +488,9 @@ public class SegmentIntersection extends AbstractAlgorithm {
         return true;
     }
 
-    /* ****************************** DEBUG ONLY ****************************** */
+    /*
+     * ****************************** DEBUG ONLY ******************************
+     */
 
     public void drawTextTip(String txt, Point p) {
         if (mutableVisitorForDebugging == null)

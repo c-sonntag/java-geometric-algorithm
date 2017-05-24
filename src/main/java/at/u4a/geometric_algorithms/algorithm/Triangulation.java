@@ -60,21 +60,31 @@ public class Triangulation extends AbstractAlgorithm {
     };
 
     private final AbstractList<Point> points;
-    private final AbstractShape as;
-
+    private final Polygon poly;
     private final MonotonePolygon mp;
 
-    public Triangulation(Vector<Point> points, AbstractShape as) {
-        this.points = points;
-        this.as = as;
+    private final SegmentIntersection intersectionTester;
 
-        this.mp = new MonotonePolygon(as.origin, points);
+    public Triangulation(Vector<Point> points, Polygon poly) {
+        this(points, poly, true);
+    }
+
+    public Triangulation(Vector<Point> points, Polygon poly, boolean checkIntersection) {
+        this.points = points;
+        this.poly = poly;
+
+        this.mp = new MonotonePolygon(poly.origin, points);
+        intersectionTester = checkIntersection ? new SegmentIntersection(poly, poly) : null;
     }
 
     /* ************** */
 
+    InterfaceGraphicVisitor mutableVisitorForDebugging = null;
+
     @Override
     public void accept(Vector<AbstractLayer> v, InterfaceGraphicVisitor visitor) {
+
+        mutableVisitorForDebugging = visitor;
 
         makeTriangulation();
 
@@ -90,8 +100,8 @@ public class Triangulation extends AbstractAlgorithm {
             final Segment sToOrigin = new Segment();
             for (Segment tf : triangulationFusion) {
                 sToOrigin.set(tf);
-                as.convertToStandard(sToOrigin.a);
-                as.convertToStandard(sToOrigin.b);
+                poly.convertToStandard(sToOrigin.a);
+                poly.convertToStandard(sToOrigin.b);
                 visitor.visit_unit(sToOrigin);
             }
 
@@ -104,7 +114,7 @@ public class Triangulation extends AbstractAlgorithm {
 
     @Override
     public int hashCode() {
-        return as.hashCode();
+        return poly.hashCode();
     }
 
     /* ************** */
@@ -135,7 +145,7 @@ public class Triangulation extends AbstractAlgorithm {
 
     protected void makeTriangulation() {
 
-        int currentPolyHash = as.hashCode();
+        int currentPolyHash = poly.hashCode();
         if (currentPolyHash != mutablePreviousPolyHash) {
 
             //
@@ -405,6 +415,17 @@ public class Triangulation extends AbstractAlgorithm {
      *      TRIANGULATEMONOTONEPOLYGON
      */
     private boolean buildTriangulation() {
+       
+        //
+        if(intersectionTester != null) {
+            if(intersectionTester.haveIntersections()) {
+                mutableVisitorForDebugging.visit(intersectionTester.getCloudOfPoint());
+                statusAddCause("Polygon have intersection");
+                return false;
+            }
+        }
+        
+        //
         if (!buildFusion())
             return false;
 
@@ -430,7 +451,8 @@ public class Triangulation extends AbstractAlgorithm {
             PointTipped stackFirst = stack.getFirst();
 
             // same chain
-            if ((currentPoint.tip.code & stackFirst.tip.code) != 0) {
+            if (currentPoint.tip == stackFirst.tip) {
+                // if ((currentPoint.tip.code & stackFirst.tip.code) != 0) {
 
                 PointTipped stackPop = stack.pop();
 
@@ -462,11 +484,12 @@ public class Triangulation extends AbstractAlgorithm {
                         PointTipped stackPoint = stack_it.next();
 
                         // block vertex that can traverse edge of opposite side
-                        // if (endStackPoint != null)
-                        // if (inP(endStackPoint, stackPoint, currentPoint)) {
-                        // statusAddCause("Point not in Polygon");
-                        // return false;
-                        // }
+                        if (endStackPoint != null) {
+                            // if (inP(endStackPoint, stackPoint, currentPoint))
+                            // {
+                            // statusAddCause("Point not in Polygon");
+                            // return false;
+                        }
 
                         triangulationFusion.add(new Segment(currentPoint, stackPoint));
                         endStackPoint = null;
@@ -495,5 +518,9 @@ public class Triangulation extends AbstractAlgorithm {
 
         return true;
     }
+
+    /*
+     * ****************************** DEBUG ONLY ******************************
+     */
 
 };

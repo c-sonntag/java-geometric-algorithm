@@ -16,6 +16,7 @@ import at.u4a.geometric_algorithms.geometric.AbstractShape;
 import at.u4a.geometric_algorithms.geometric.CloudOfPoints;
 import at.u4a.geometric_algorithms.geometric.CloudOfSegments;
 import at.u4a.geometric_algorithms.geometric.Point;
+import at.u4a.geometric_algorithms.geometric.Polygon;
 import at.u4a.geometric_algorithms.geometric.Segment;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGraphicVisitor;
 import at.u4a.geometric_algorithms.gui.layer.AbstractLayer;
@@ -41,7 +42,8 @@ public class SegmentIntersectionQuadratic extends AbstractAlgorithm {
 
         @Override
         public boolean canApply(AbstractLayer l) {
-            return (l.getShape() instanceof CloudOfSegments);
+            AbstractShape as = l.getShape();
+            return ((as instanceof CloudOfSegments) || (as instanceof Polygon));
         }
 
         static int SegmentIntersectionQuadraticCount = 1;
@@ -49,16 +51,21 @@ public class SegmentIntersectionQuadratic extends AbstractAlgorithm {
         @Override
         public AbstractLayer builder(AbstractLayer l) {
 
+            Iterable<Segment> cloud = null;
+
             //
             AbstractShape as = l.getShape();
-            if (!(as instanceof CloudOfSegments))
-                throw new RuntimeException("SegmentIntersection need a CloudOfSegments Shape !");
 
             //
-            CloudOfSegments cos = (CloudOfSegments) as;
+            if (as instanceof CloudOfSegments)
+                cloud = ((CloudOfSegments) as).cloud;
+            else if (as instanceof Polygon)
+                cloud = ((Polygon) as);
+            else
+                throw new RuntimeException("SegmentIntersection need a CloudOfSegments Shape, or Polygon Shape !");
 
             //
-            AbstractLayer al = new AlgorithmLayer<SegmentIntersectionQuadratic>(new SegmentIntersectionQuadratic(cos.cloud, cos), Algorithm.SegmentIntersection, l);
+            AbstractLayer al = new AlgorithmLayer<SegmentIntersectionQuadratic>(new SegmentIntersectionQuadratic(cloud, as), Algorithm.SegmentIntersectionQuadratic, l);
             al.setLayerName("siq" + String.valueOf(SegmentIntersectionQuadraticCount));
             SegmentIntersectionQuadraticCount++;
             return al;
@@ -66,12 +73,12 @@ public class SegmentIntersectionQuadratic extends AbstractAlgorithm {
 
     };
 
-    private final AbstractList<Segment> cloud;
+    private final Iterable<Segment> cloud;
     private final AbstractShape as;
 
     private final CloudOfPoints cop;
 
-    public SegmentIntersectionQuadratic(AbstractList<Segment> cloud, AbstractShape as) {
+    public SegmentIntersectionQuadratic(Iterable<Segment> cloud, AbstractShape as) {
         super("intersections tests");
         this.cloud = cloud;
         this.as = as;
@@ -90,7 +97,7 @@ public class SegmentIntersectionQuadratic extends AbstractAlgorithm {
     public int hashCode() {
         return as.hashCode();
     }
-    
+
     /* ************** */
 
     public CloudOfPoints getCloudOfPoint() {
@@ -114,7 +121,7 @@ public class SegmentIntersectionQuadratic extends AbstractAlgorithm {
         int currentLinesHash = as.hashCode();
         if (currentLinesHash != mutablePreviousLinesHash) {
             statusStartBuild();
-            statusBuildIs(buildSegmentInteractionQuadratic()); 
+            statusBuildIs(buildSegmentInteractionQuadratic());
             mutablePreviousLinesHash = currentLinesHash;
         }
 
@@ -142,7 +149,7 @@ public class SegmentIntersectionQuadratic extends AbstractAlgorithm {
                 statusAddCounter();
 
                 //
-                Point pInter = Calc.intersection(s1, s2);
+                Point pInter = Calc.intersectionOnLine(s1, s2);
                 if (pInter == null)
                     continue;
 

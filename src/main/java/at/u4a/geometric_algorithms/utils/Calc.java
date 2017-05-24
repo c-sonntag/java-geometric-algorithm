@@ -21,38 +21,36 @@ public class Calc {
         final double pBy = pB.y - pOrigine.y;
         return pAx * pBy - pAy * pBx;
     }
-    
+
     public static double resumeProduitVectorielZ(Point pA, Point pB) {
         return pA.x * pB.y - pA.y * pB.x;
     }
 
-
     /**
      * Permet de connaître le sens d'écriture d'un polygon
      * 
-     * @return - sumOfVectorialZProd<>0 : sens horaire, - sumOfVectorialZProd<0 :
-     *         sens anti-horaire, - sumOfVectorialZProd==0 : aucun sens
+     * @return - sumOfVectorialZProd<>0 : sens horaire, - sumOfVectorialZProd<0
+     *         : sens anti-horaire, - sumOfVectorialZProd==0 : aucun sens
      */
     public static double getClockwise(AbstractList<Point> pl) {
         if (pl.size() < 2)
             return 0;
-        
+
         Iterator<Point> p_it = pl.iterator();
         final Point pFirst = p_it.next();
         Point pA = pFirst, pB = null;
-        
+
         double sumOfVectorialZProd = 0;
-        
+
         while (p_it.hasNext()) {
             pB = p_it.next();
             sumOfVectorialZProd += resumeProduitVectorielZ(pA, pB);
             pA = pB;
         }
         sumOfVectorialZProd += resumeProduitVectorielZ(pB, pFirst);
-        
+
         return sumOfVectorialZProd;
     }
-    
 
     /*
      * public static double resumeProduitVectorielZWithoutXTorque(Point pA,
@@ -94,6 +92,31 @@ public class Calc {
             /* maxX */ (intersectLine.x <= Math.max(sb.a.x, sb.b.x)) &&
             /* minY */ (intersectLine.y >= Math.min(sb.a.y, sb.b.y)) &&
             /* maxY */ (intersectLine.y <= Math.max(sb.a.y, sb.b.y)))
+            /* */ ) ? intersectLine : null;
+    }
+
+    /**
+     * Renvoi l'intersection entre 2 segments sans prendre en compte les points
+     * d'extrémité
+     * 
+     * @return Si aucune intersection est trouvé renvoie null
+     */
+    public static Point intersectionOnLine(Segment sa, Segment sb) {
+        final Point intersectLine = intersection((Line) sa, (Line) sb);
+        if (intersectLine == null)
+            return null;
+        else
+            return /* */
+            /* Sa : */ (
+            /* minX */ ((intersectLine.x > Math.min(sa.a.x, sa.b.x)) &&
+            /* maxX */ (intersectLine.x < Math.max(sa.a.x, sa.b.x)) &&
+            /* minY */ (intersectLine.y > Math.min(sa.a.y, sa.b.y)) &&
+            /* maxY */ (intersectLine.y < Math.max(sa.a.y, sa.b.y)))) &&
+            /* Sb : */ (
+            /* minX */ ((intersectLine.x > Math.min(sb.a.x, sb.b.x)) &&
+            /* maxX */ (intersectLine.x < Math.max(sb.a.x, sb.b.x)) &&
+            /* minY */ (intersectLine.y > Math.min(sb.a.y, sb.b.y)) &&
+            /* maxY */ (intersectLine.y < Math.max(sb.a.y, sb.b.y)))
             /* */ ) ? intersectLine : null;
     }
 

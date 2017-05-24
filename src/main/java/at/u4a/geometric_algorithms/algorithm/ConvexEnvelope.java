@@ -303,6 +303,7 @@ public class ConvexEnvelope extends AbstractAlgorithm {
         // + ") left(" + sideSearchHozIdLeft.left + ") ");
 
         if ((uTop < 0) || (vTop < 0) || (uBottom < 0) || (vBottom < 0)) {
+            statusAddCause("Internal error from script");
             throw new RuntimeException("Internal error from script");
             // return null;
         }
@@ -385,7 +386,7 @@ public class ConvexEnvelope extends AbstractAlgorithm {
                 vBottom = Math.floorMod(vBottom + 1, polyRightSize);
                 // vBottom = Math.floorMod(vBottom - 1, polyRightSize);
                 vBottomChange = true;
-                printLnDebug("uBottom_IsOnTop_OfThePolyRight_BottomLine");
+                //printLnDebug("uBottom_IsOnTop_OfThePolyRight_BottomLine");
             }
 
             //
@@ -394,7 +395,7 @@ public class ConvexEnvelope extends AbstractAlgorithm {
                 uBottom = Math.floorMod(uBottom - 1, polyLeftSize);
                 // uBottom = Math.floorMod(uBottom + 1, polyLeftSize);
                 uBottomChange = true;
-                printLnDebug("vBottom_IsOnBottom_OfThePolyLeft_BottomLine");
+                //printLnDebug("vBottom_IsOnBottom_OfThePolyLeft_BottomLine");
             }
 
             //
@@ -402,7 +403,7 @@ public class ConvexEnvelope extends AbstractAlgorithm {
                 break;
         }
 
-        printLnDebug("");
+        //printLnDebug("");
 
         Vector<Point> convexPoints = (deph == 0) ? convexPoly.perimeter : new Vector<Point>();
 
