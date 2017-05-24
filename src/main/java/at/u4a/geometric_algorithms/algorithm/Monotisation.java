@@ -86,17 +86,35 @@ public class Monotisation extends AbstractAlgorithm {
 
     private InterfaceGraphicVisitor mutableVisitorForDebugging = null;
 
+    private int countStroboscope = 0;
+
+    private Color colorStrop[] = { Color.CORAL, Color.CRIMSON, Color.AQUA, Color.AQUAMARINE, Color.AZURE, Color.BEIGE, Color.BISQUE };
+
     @Override
     public void accept(Vector<AbstractLayer> v, InterfaceGraphicVisitor visitor) {
 
         mutableVisitorForDebugging = visitor;
 
+        countStroboscope = 0;
+
         makeMonotisation();
+
+        mutableVisitorForDebugging.getGraphicsContext().save();
+
         if (haveMake) {
             for (MonotonePolygon mp : mp_v) {
+
+                mutableVisitorForDebugging.getGraphicsContext().setStroke(colorStrop[countStroboscope]);
+
                 visitor.visit(mp);
+
+                countStroboscope = (countStroboscope + 1) % colorStrop.length;
+
             }
         }
+
+        mutableVisitorForDebugging.getGraphicsContext().restore();
+
     }
 
     /* ************** */
@@ -218,7 +236,6 @@ public class Monotisation extends AbstractAlgorithm {
             int xMin = ((Math.min(s1.a.x, s1.b.x) < Math.min(s2.a.x, s2.b.x)) ? -1 : 1);
             int xMax = (s1xMax < s2xMax) ? -1 : 1;
 
-            
             if ((xMin < 0) || (xMax < 0))
                 return -1;
 
@@ -353,13 +370,15 @@ public class Monotisation extends AbstractAlgorithm {
         bm1.add(vi2);
 
         //
-        HashSet<VertexInform> bm2 = bordersMap.get(vi1);
+        HashSet<VertexInform> bm2 = bordersMap.get(vi2);
         if (bm2 == null) {
             bm2 = new HashSet<VertexInform>();
             bordersMap.put(vi2, bm2);
         }
         bm2.add(vi1);
     }
+
+    StatusComparator sc = new StatusComparator();
 
     private final Edge getDirectLeft(VertexInform vi) throws NotDirectLeftFindException {
         final Edge viSearch = new Edge(vi, vi);
@@ -368,7 +387,11 @@ public class Monotisation extends AbstractAlgorithm {
         if (eDirectLeftOfVi != null)
             return eDirectLeftOfVi;
         else {
-            System.out.println("Not find eDirectLeft Of vi(" + vi.toString() + ")");
+
+            final Edge eDirectRightOfVi = statusNavigator.higher(viSearch);
+
+            System.out.println("Not find eDirectLeft Of vi(" + vi.toString() + "), eDirectRightOfVi(" + eDirectRightOfVi + ") sc(" + sc.compare(viSearch, eDirectRightOfVi) + ")");
+
             throw new NotDirectLeftFindException();
         }
     }
@@ -746,8 +769,6 @@ public class Monotisation extends AbstractAlgorithm {
         VertexInform vi = firstVertexInform;
         VertexInform viToStopAndCloseMp = firstVertexInform.back;
 
-        System.out.println();
-        
         //
         queue.push(curentCourse);
 
@@ -755,36 +776,42 @@ public class Monotisation extends AbstractAlgorithm {
         while (vi != viToStopAndCloseMp) {
             curentCourse.mp.addPoint(vi);
 
-            System.out.print(vi.toString() + " ");
-            
             //
             final HashSet<VertexInform> borders = bordersMap.get(vi);
             if (borders != null) {
-                
+
                 //
                 final VertexInform oppositeBorder = curentCourse.start;
                 if (borders.contains(oppositeBorder)) {
+
+                    System.out.print(vi.toString() + "- ");
+
                     curentCourse = queue.pop();
-                    
+                    curentCourse.mp.addPoint(vi);
                 }
-                
+
                 //
                 for (VertexInform borderVi : bordersMap.get(vi)) {
                     if (borderVi != oppositeBorder) {
+
+                        System.out.print(vi.toString() + "+ ");
+
                         curentCourse = new CourseEntry(vi);
                         curentCourse.mp.addPoint(vi);
                         queue.push(curentCourse);
+
                     }
                 }
             }
-            
-            vi = vi.next;
 
+            vi = vi.next;
         }
 
         curentCourse.mp.addPoint(vi);
-        
+
         System.out.println();
+
+        System.out.println("NbPolygon(" + mp_v.size() + ")");
 
         /*
          * // try { courseVertices(createEmptyMonotonePolygon(),
@@ -800,6 +827,7 @@ public class Monotisation extends AbstractAlgorithm {
     private boolean buildMonotisation() {
 
         /** @todo find if the polygon have colision */
+        System.out.println();
 
         //
         if (!createVertexInform())
@@ -820,7 +848,7 @@ public class Monotisation extends AbstractAlgorithm {
 
         //
         if (!createSubMonotone())
-        return false;
+            return false;
 
         //
         return true;
@@ -909,9 +937,13 @@ public class Monotisation extends AbstractAlgorithm {
             sToOrigin.a.set(entry.getKey());
             as.convertToStandard(sToOrigin.a);
 
+            System.out.print(entry.getKey() + " : ");
+
             for (final VertexInform b : entry.getValue()) {
                 sToOrigin.b.set(b);
                 as.convertToStandard(sToOrigin.b);
+
+                System.out.print(b + " ");
 
                 mutableVisitorForDebugging.getGraphicsContext().setLineWidth(5);
                 mutableVisitorForDebugging.visit_unit(sToOrigin);
@@ -920,9 +952,12 @@ public class Monotisation extends AbstractAlgorithm {
                 drawDivergeTip(b);
             }
 
+            System.out.println();
+
             drawDivergeTip(entry.getKey());
         }
 
+        System.out.println("--");
         mutableVisitorForDebugging.getGraphicsContext().restore();
     }
 
@@ -1009,13 +1044,11 @@ public class Monotisation extends AbstractAlgorithm {
              * 1); if (vi.divergeFrom != null) drawTextTipPosDecal(" ┤",
              * vi.divergeFrom, 1);
              */
-            /*
-             * pToOrigin.y -= 10;
-             * mutableVisitorForDebugging.drawTip(vi.toString(), pToOrigin);
-             * pToOrigin.y -= 10;
-             * mutableVisitorForDebugging.drawTip(String.valueOf(counter++),
-             * pToOrigin);
-             */
+
+            pToOrigin.y -= 10;
+            mutableVisitorForDebugging.drawTip(vi.toString(), pToOrigin);
+            pToOrigin.y -= 10;
+            mutableVisitorForDebugging.drawTip(String.valueOf(counter++), pToOrigin);
 
             /*
              * drawTextTipPosDecal( //
