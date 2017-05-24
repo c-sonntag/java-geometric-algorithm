@@ -73,7 +73,7 @@ public class SegmentIntersection extends AbstractAlgorithm {
 
     };
 
-    static double NOT_EXACTLY_MIN = 1.0;
+    static double NOT_EXACTLY_MIN = 0.01;
 
     private final Iterable<Segment> cloud;
     private final AbstractShape as;

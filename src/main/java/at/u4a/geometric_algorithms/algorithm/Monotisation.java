@@ -459,10 +459,10 @@ public class Monotisation extends AbstractAlgorithm {
 
         //
         double sumVecZ = Calc.getClockwise(points);
-        if (sumVecZ == 0)
-            return false;
-
-        System.out.println("sumVecZ=" + sumVecZ);
+        if (sumVecZ == 0) {
+            statusAddCause("Unable to find sens of polygon");
+            return false; 
+        }
 
         //
         final Iterator<Point> p_it = (sumVecZ < 0) ? points.iterator() : new Collection.ReverseIterable<Point>(points).iterator();
@@ -630,8 +630,6 @@ public class Monotisation extends AbstractAlgorithm {
             statusAddCause("Polygon have intersection");
             return false;
         }
-
-        System.out.println();
 
         //
         if (!createVertexInform())

@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.Vector;
 
 import at.u4a.geometric_algorithms.algorithm.InterfaceAlgorithmBuilder;
+import at.u4a.geometric_algorithms.algorithm.Triangulation.PointTipped;
 import at.u4a.geometric_algorithms.algorithm.Triangulation.PointTipped.Tip;
 import at.u4a.geometric_algorithms.geometric.AbstractShape;
 import at.u4a.geometric_algorithms.geometric.Point;
@@ -419,7 +420,6 @@ public class Triangulation extends AbstractAlgorithm {
         //
         if (intersectionTester != null) {
             if (intersectionTester.haveIntersections()) {
-                mutableVisitorForDebugging.visit(intersectionTester.getCloudOfPoint());
                 statusAddCause("Polygon have intersection");
                 return false;
             }
@@ -451,8 +451,8 @@ public class Triangulation extends AbstractAlgorithm {
             PointTipped stackFirst = stack.getFirst();
 
             // same chain
-            if (currentPoint.tip == stackFirst.tip) {
-                // if ((currentPoint.tip.code & stackFirst.tip.code) != 0) {
+            // if (currentPoint.tip == stackFirst.tip) {
+            if ((currentPoint.tip.code & stackFirst.tip.code) != 0) {
 
                 PointTipped stackPop = stack.pop();
 
@@ -471,33 +471,40 @@ public class Triangulation extends AbstractAlgorithm {
                 stack.push(stackPop);
                 stack.push(currentPoint);
 
-            } else { // oposite chain
+            } else { // opposite chain
 
                 //
+
                 Iterator<PointTipped> stack_it = stack.descendingIterator();
                 if (stack_it.hasNext()) {
-
-                    PointTipped endStackPoint = stack_it.next();
-
+                    stack_it.next();
                     while (stack_it.hasNext()) {
-
                         PointTipped stackPoint = stack_it.next();
-
-                        // block vertex that can traverse edge of opposite side
-                        if (endStackPoint != null) {
-                            // if (inP(endStackPoint, stackPoint, currentPoint))
-                            // {
-                            // statusAddCause("Point not in Polygon");
-                            // return false;
-                        }
-
                         triangulationFusion.add(new Segment(currentPoint, stackPoint));
-                        endStackPoint = null;
                     }
                 }
-
-                //
                 stack.clear();
+
+                /*
+                 * Iterator<PointTipped> stack_it = stack.iterator(); while
+                 * (stack_it.hasNext()) { PointTipped stackPoint =
+                 * stack_it.next(); if (stack_it.hasNext())
+                 * triangulationFusion.add(new Segment(currentPoint,
+                 * stackPoint)); } stack.clear();
+                 */
+
+                /*
+                 * PointTipped stackPoint = null; stack.poll();
+                 * while((stackPoint = stack.poll()) != null) {
+                 * triangulationFusion.add(new Segment(currentPoint,
+                 * stackPoint)); }
+                 */
+
+                /*
+                 * while (stack.size() > 1) { PointTipped stackPoint =
+                 * stack.pop(); triangulationFusion.add(new
+                 * Segment(currentPoint, stackPoint)); }
+                 */
 
                 //
                 stack.push(fusionPoints.get(i - 1));
@@ -512,9 +519,29 @@ public class Triangulation extends AbstractAlgorithm {
          * statusAddCause("Point not in Polygon"); return false; } sumProdVectZ
          * += Calc.resumeProduitVectorielZ(precPoint, currentPoint);
          */
+        /*
+         * if(stack.size() > 2)
+         * System.out.println("Stack have more tha 2 elements");
+         */
+
+        /*
+         * if(!stack.isEmpty()) { Iterator<PointTipped> stack_it =
+         * stack.iterator(); if(stack_it.hasNext()) { stack_it.next(); // except
+         * the first do{ PointTipped pt = stack_it.next();
+         * if(stack_it.hasNext()) // and except the lasted one break;
+         * triangulationFusion.add(new Segment(currentPoint, pt)); }while
+         * (true);
+         * 
+         * 
+         * }
+         * 
+         * }
+         */
 
         // except the first diagonals
         triangulationFusion.remove(0);
+        if (!triangulationFusion.isEmpty())
+            triangulationFusion.remove(triangulationFusion.size() - 1);
 
         return true;
     }

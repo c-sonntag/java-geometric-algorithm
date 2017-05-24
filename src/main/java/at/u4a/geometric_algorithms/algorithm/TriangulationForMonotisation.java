@@ -66,6 +66,19 @@ public class TriangulationForMonotisation extends AbstractAlgorithm {
     @Override
     public void accept(Vector<AbstractLayer> v, InterfaceGraphicVisitor visitor) {
 
+        makeTriangulationForMonotisation();
+
+        if (haveMonotized) {
+            for (Triangulation triangulation : triangulations) {
+                triangulation.accept(v, visitor);
+                //visitor.visit(triangulation.getPolygon());
+            }
+        }
+
+    }
+
+    public void acceptDebug(Vector<AbstractLayer> v, InterfaceGraphicVisitor visitor) {
+
         int countStroboscope = 0;
         Color colorStrop[] = { Color.CORAL, Color.BLUEVIOLET, Color.MEDIUMSPRINGGREEN, Color.HOTPINK, Color.YELLOWGREEN, Color.FIREBRICK, Color.GREEN };
 
@@ -198,12 +211,16 @@ public class TriangulationForMonotisation extends AbstractAlgorithm {
                 for (MonotonePolygon mp : mp_v) {
 
                     //
+                    if(mp.perimeter.size() <= 3)
+                        continue;
+                    
+                    //
                     final Triangulation triangulationsAlgorithm = new Triangulation(mp.perimeter, mp, false);
-                    triangulationsAlgorithm.makeTriangulation();
-
+                    
                     //
                     if (!triangulationsAlgorithm.isMonotone()) {
                         haveMonotized = false;
+                        
                         break;
                     }
 

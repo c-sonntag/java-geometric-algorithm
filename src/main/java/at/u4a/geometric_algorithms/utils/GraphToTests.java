@@ -40,14 +40,15 @@ public class GraphToTests {
         Random rnd = new Random(1123581321345589L);
         // Random rnd = new Random();
 
-        lm.addLayer(triangulation(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, false)));
-        lm.addLayer(triangulation(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, true)));
+        lm.addLayer(triangulationForMonotisation(monotisation(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, false))));
+        // lm.addLayer(triangulationForMonotisation(monotisation(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, true))));
 
         //
         if (activeDefault) {
             lm.addLayer(monotisation(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, false)));
             lm.addLayer(monotisation(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, true)));
-
+            lm.addLayer(triangulation(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, false)));
+            lm.addLayer(triangulation(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, true)));
             lm.addLayer(rectangle(rnd.nextLong(), Square_FACTOR));
             lm.addLayer(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, false));
             lm.addLayer(segment_intersection(cloud_of_segments(rnd.nextLong(), Cloud_of_Segments_NB, Cloud_of_Segments_FACTOR)));
