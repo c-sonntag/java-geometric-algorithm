@@ -643,24 +643,19 @@ public class Monotisation extends AbstractAlgorithm {
         VertexInform vi = firstVertexInform;
         VertexInform viToStopAndCloseMp = firstVertexInform.back;
 
-        int counter = 0;
-
-        final Point pToOrigin = new Point();
-
-        //
-        // queue.push(curentCourse);
+        //int counter = 0;
 
         //
         while (true) {
             curentCourse.mp.addPoint(vi);
 
-            drawTextTipPosDecal(String.valueOf(counter++), vi, -3);
+            //drawTextTipPosDecal(String.valueOf(counter++), vi, -3);
 
             //
             final HashSet<VertexInform> borders = bordersMap.get(vi);
             if (borders != null) {
 
-                System.out.print("  (" + queue.size() + ") ");
+                //System.out.print("  (" + queue.size() + ") ");
                 boolean haveRemove;
                 
                 //
@@ -670,16 +665,19 @@ public class Monotisation extends AbstractAlgorithm {
                     haveRemove = false;
 
                     //
+                    /*
                     if (oppositeBorder != null) {
                         System.out.print("[start:" + oppositeBorder.toString() + "] ");
-                    }
+                    }*/
 
                     //
                     if (borders.contains(oppositeBorder)) {
 
-                        System.out.print(vi.toString() + "|- ");
+                        //
+                        //System.out.print(vi.toString() + "|- ");
                         borders.remove(oppositeBorder);
-
+                        
+                        //
                         curentCourse = queue.pop();
                         curentCourse.mp.addPoint(vi);
                         haveRemove = true;
@@ -689,7 +687,6 @@ public class Monotisation extends AbstractAlgorithm {
 
                 //
                 for (VertexInform borderVi : borders) {
-                    // if (borderVi != oppositeBorder) {
 
                     System.out.print(vi.toString() + "|+ ");
 
