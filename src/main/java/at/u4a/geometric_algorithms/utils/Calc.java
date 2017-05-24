@@ -11,9 +11,17 @@ public class Calc {
 
     /**
      * Fait le calcul necessaire au decalage de A et B en fonction de Origine et
-     * effectue le produit vectoriel : x = a.y*0 - 0*b.y* = 0 y = 0*b.x - a.x*0
-     * = 0 z = a.x*b.y - a.y*b.x
+     * effectue le produit vectoriel
      */
+    public static double resumeProduitVectorielZ_1(Point pA, Point pOrigine, Point pB) {
+        final double pAx = pA.x - pOrigine.x;
+        final double pAy = pA.y - pOrigine.y;
+        final double pBx = pB.x - pOrigine.x;
+        final double pBy = pB.y - pOrigine.y;
+        return pAx * pBy - pAy * pBx;
+    }
+    
+    
     public static double resumeProduitVectorielZ(Point pA, Point pOrigine, Point pB) {
         final double pAx = pOrigine.x - pA.x;
         final double pAy = pB.x - pA.x;

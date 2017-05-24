@@ -409,7 +409,7 @@ public class Triangulation extends AbstractAlgorithm {
         double produit = Calc.resumeProduitVectorielZ(pA, pOrigine, pB);
         return (((produit > 0) && (pOrigine.tip == Tip.Right)) || //
                 ((produit < 0) && (pOrigine.tip == Tip.Left)) || //
-                (pOrigine.tip == Tip.Up) || (pOrigine.tip == Tip.Down));
+                (!((pOrigine.tip == Tip.Up) || (pOrigine.tip == Tip.Down))));
     }
 
     /**
@@ -471,8 +471,6 @@ public class Triangulation extends AbstractAlgorithm {
                     if (inP(currentPoint, stackPop, stackFirst)) {
                         stackPop = stack.pop();
                         triangulationFusion.add(new Segment(currentPoint, stackPop));
-                        
-                        
 
                     } else
                         break;
@@ -493,15 +491,14 @@ public class Triangulation extends AbstractAlgorithm {
                  * Segment(currentPoint, stackPoint)); } } stack.clear();
                  */
 
-                Iterator<PointTipped> stack_it = stack.iterator();
-                while (stack_it.hasNext()) {
-                    PointTipped stackPoint = stack_it.next();
-                    if (stack_it.hasNext()) {
-                        drawTextTipPosDecal("S", stackPoint, -3);
-                        triangulationFusion.add(new Segment(currentPoint, stackPoint));
-                    }
-                }
-                stack.clear();
+                /*
+                 * Iterator<PointTipped> stack_it = stack.iterator(); while
+                 * (stack_it.hasNext()) { PointTipped stackPoint =
+                 * stack_it.next(); if (stack_it.hasNext()) {
+                 * drawTextTipPosDecal("S", stackPoint, -3);
+                 * triangulationFusion.add(new Segment(currentPoint,
+                 * stackPoint)); } } stack.clear();
+                 */
 
                 /*
                  * PointTipped stackPoint = null; stack.poll();
@@ -510,11 +507,11 @@ public class Triangulation extends AbstractAlgorithm {
                  * stackPoint)); }
                  */
 
-                /*
-                 * while (stack.size() > 1) { PointTipped stackPoint =
-                 * stack.pop(); triangulationFusion.add(new
-                 * Segment(currentPoint, stackPoint)); }
-                 */
+                while (stack.size() > 1) {
+                    PointTipped stackPoint = stack.pop();
+                    triangulationFusion.add(new Segment(currentPoint, stackPoint));
+                }
+                stack.poll();
 
                 //
                 stack.push(fusionPoints.get(i - 1));
@@ -550,8 +547,9 @@ public class Triangulation extends AbstractAlgorithm {
 
         // except the first diagonals
         triangulationFusion.remove(0);
-        if (!triangulationFusion.isEmpty())
-            triangulationFusion.remove(triangulationFusion.size() - 1);
+
+        // if (!triangulationFusion.isEmpty())
+        // triangulationFusion.remove(triangulationFusion.size() - 1);
 
         return true;
     }
