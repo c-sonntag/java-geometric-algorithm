@@ -233,15 +233,30 @@ public class Monotisation extends AbstractAlgorithm {
             final double s1xMax = Math.max(s1.a.x, s1.b.x);
             final double s2xMax = Math.max(s2.a.x, s2.b.x);
 
-            int xMin = ((Math.min(s1.a.x, s1.b.x) < Math.min(s2.a.x, s2.b.x)) ? -1 : 1);
-            int xMax = (s1xMax < s2xMax) ? -1 : 1;
+            final double s1xMin = Math.min(s1.a.x, s1.b.x);
+            final double s2xMin = Math.min(s2.a.x, s2.b.x);
 
-            if ((xMin < 0) || (xMax < 0))
+            if ((s1xMin < s2xMin) || (s1xMax < s2xMax))
                 return -1;
 
-            int yMax = ((Math.max(s1.a.x, s1.b.x) < Math.max(s2.a.x, s2.b.x)) ? -1 : 1);
+            if ((s1xMin == s2xMin) && (s1xMax == s2xMax))
+                return ((Math.max(s1.a.y, s1.b.y) < Math.max(s2.a.y, s2.b.y)) ? -1 : 1);
 
-            return (s1xMax != s2xMax) ? xMax : yMax;
+            return +1;
+
+            // turn (s1xMax != s2xMax) ? xMax : yMax;
+
+            /*
+             * int xMin = ((Math.min(s1.a.x, s1.b.x) < Math.min(s2.a.x, s2.b.x))
+             * ? -1 : 1); int xMax = (s1xMax < s2xMax) ? -1 : 1;
+             * 
+             * if ((xMin < 0) || (xMax < 0)) return -1;
+             * 
+             * int yMax = ((Math.max(s1.a.x, s1.b.x) < Math.max(s2.a.x, s2.b.x))
+             * ? -1 : 1);
+             * 
+             * return (s1xMax != s2xMax) ? xMax : yMax;
+             */
 
             /*
              * final double s1x = Math.max(s1.a.x, s1.b.x); final double s2x =
@@ -780,21 +795,23 @@ public class Monotisation extends AbstractAlgorithm {
             final HashSet<VertexInform> borders = bordersMap.get(vi);
             if (borders != null) {
 
+                System.out.print("(" + queue.size() + ") ");
+
                 //
                 final VertexInform oppositeBorder = curentCourse.start;
                 if (borders.contains(oppositeBorder)) {
 
-                    System.out.print(vi.toString() + "- ");
+                    System.out.print(vi.toString() + "|- ");
 
                     curentCourse = queue.pop();
                     curentCourse.mp.addPoint(vi);
                 }
 
                 //
-                for (VertexInform borderVi : bordersMap.get(vi)) {
+                for (VertexInform borderVi : borders) {
                     if (borderVi != oppositeBorder) {
 
-                        System.out.print(vi.toString() + "+ ");
+                        System.out.print(vi.toString() + "|+ ");
 
                         curentCourse = new CourseEntry(vi);
                         curentCourse.mp.addPoint(vi);
