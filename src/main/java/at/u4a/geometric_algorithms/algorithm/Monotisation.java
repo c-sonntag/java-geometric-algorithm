@@ -83,8 +83,7 @@ public class Monotisation extends AbstractAlgorithm {
 
     /* ************** */
 
-    @Override
-    public void accept(Vector<AbstractLayer> v, InterfaceGraphicVisitor visitor) {
+    public void accept_2(Vector<AbstractLayer> v, InterfaceGraphicVisitor visitor) {
 
         makeMonotisation();
         if (haveMake) {
@@ -99,6 +98,26 @@ public class Monotisation extends AbstractAlgorithm {
     }
 
     private InterfaceGraphicVisitor mutableVisitorForDebugging = null;
+
+    public void accept(Vector<AbstractLayer> v, InterfaceGraphicVisitor visitor) {
+
+        mutableVisitorForDebugging = visitor;
+
+        makeMonotisation();
+
+        if (haveMake) {
+
+            drawVertexInformType();
+
+            final Segment sToOrigin = new Segment();
+            for (Segment s : bordersBySegment) {
+                sToOrigin.set(s);
+                poly.convertToStandard(sToOrigin.a);
+                poly.convertToStandard(sToOrigin.b);
+                visitor.visit_unit(sToOrigin);
+            }
+        }
+    }
 
     public void acceptDebug(Vector<AbstractLayer> v, InterfaceGraphicVisitor visitor) {
 
@@ -133,6 +152,8 @@ public class Monotisation extends AbstractAlgorithm {
 
         }
     }
+
+    /* ************** */
 
     @Override
     public int hashCode() {
@@ -332,6 +353,8 @@ public class Monotisation extends AbstractAlgorithm {
         final Edge eDirectLeftOfVi = getDirectLeft(vi);
         if (eDirectLeftOfVi.helper != null)
             attachBorder(vi, eDirectLeftOfVi.helper);
+        else
+            System.out.println("Normaly need a helper for eDirectLeftOfVi("+eDirectLeftOfVi.toString()+")");
         eDirectLeftOfVi.helper = vi;
 
         //
@@ -378,6 +401,7 @@ public class Monotisation extends AbstractAlgorithm {
                 if (eDirectLeftOfVi.helper.type == VertexType.Merge)
                     attachBorder(vi, eDirectLeftOfVi.helper);
             }
+            eDirectLeftOfVi.helper = vi;
         }
     }
 
@@ -459,7 +483,7 @@ public class Monotisation extends AbstractAlgorithm {
         double sumVecZ = Calc.getClockwise(points);
         if (sumVecZ == 0) {
             statusAddCause("Unable to find sens of polygon");
-            return false; 
+            return false;
         }
 
         //
@@ -814,10 +838,8 @@ public class Monotisation extends AbstractAlgorithm {
              * vi.divergeFrom, 1);
              */
 
-            /*
-             * pToOrigin.y -= 10;
-             * mutableVisitorForDebugging.drawTip(vi.toString(), pToOrigin);
-             */
+            pToOrigin.y -= 10;
+            mutableVisitorForDebugging.drawTip(vi.toString(), pToOrigin);
 
             /*
              * pToOrigin.y -= 10;
