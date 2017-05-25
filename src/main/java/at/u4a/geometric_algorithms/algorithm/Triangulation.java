@@ -673,6 +673,30 @@ public class Triangulation extends AbstractAlgorithm {
 
             }
         }
+        
+        if (!stack.isEmpty()) {
+            Iterator<PointTipped> stack_it = stack.iterator();
+            stack_it.next(); // except the first
+
+            PointTipped lastPoint = fusionPoints.lastElement();
+            System.out.print("StackPoint : ");
+
+            if (stack_it.hasNext()) {
+                do {
+                    PointTipped pt = stack_it.next();
+
+                    if (stack_it.hasNext()) {
+                        triangulationFusion.add(new Segment(lastPoint, pt));
+                        System.out.print(pt.toString() + " ");
+                    } else
+                        break; // and except the lasted one
+
+                } while (true);
+
+            }
+            System.out.println();
+        }
+        
 
         //
         /*
