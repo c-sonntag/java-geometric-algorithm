@@ -120,6 +120,9 @@ public class LayerTree extends JTree {
     }
 
     private void insertLayer(DefaultMutableTreeNode node, AbstractList<AbstractLayer> layers) {
+        if(layers == null)
+            return;
+        
         for (AbstractLayer layer : layers) {
             DefaultMutableTreeNode dmtn = new DefaultMutableTreeNode(layer);
             if (layer.isContener())

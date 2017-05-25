@@ -90,7 +90,7 @@ public class Monotisation extends AbstractAlgorithm {
 
     /* ************** */
 
-    public void accept_2(AbstractList<AbstractLayer> subLayers, InterfaceGraphicVisitor visitor) {
+    public void accept(AbstractList<AbstractLayer> subLayers, InterfaceGraphicVisitor visitor) {
 
         makeMonotisation();
         if (haveMake) {
@@ -106,7 +106,7 @@ public class Monotisation extends AbstractAlgorithm {
 
     private InterfaceGraphicVisitor mutableVisitorForDebugging = null;
 
-    public void accept(AbstractList<AbstractLayer> subLayers, InterfaceGraphicVisitor visitor) {
+    public void accept_3(AbstractList<AbstractLayer> subLayers, InterfaceGraphicVisitor visitor) {
 
         mutableVisitorForDebugging = visitor;
 

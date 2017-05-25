@@ -181,10 +181,10 @@ public class LayerManager implements Iterable<AbstractLayer> {
         AutoLayerSelector als = new AutoLayerSelector();
 
         for (AbstractLayer l : toDeletes) {
-            
-            if(!l.getAuthorized().contains(AuthorizedAction.Delete))
+
+            if (!l.getAuthorized().contains(AuthorizedAction.Delete))
                 continue;
-            
+
             als.check(l);
             layers.remove(l);
         }
@@ -221,7 +221,7 @@ public class LayerManager implements Iterable<AbstractLayer> {
 
         for (AbstractLayer l : toDeletes) {
 
-            if(!l.getAuthorized().contains(AuthorizedAction.DeleteAlgorithm))
+            if (!l.getAuthorized().contains(AuthorizedAction.DeleteAlgorithm))
                 continue;
 
             //
@@ -268,8 +268,45 @@ public class LayerManager implements Iterable<AbstractLayer> {
         ds.refresh();
     }
 
+    public void remplaceLayer(AbstractList<AbstractLayer> alRem_l, AbstractLayer newLayer) {
 
+        //
+        Iterator<AbstractLayer> alRem_it = alRem_l.iterator();
+        if (alRem_it.hasNext()) {
+            int minId = layers.indexOf(alRem_it.next());
+            while (alRem_it.hasNext()) {
+                int otherMinId = layers.indexOf(alRem_it.next());
+                if (otherMinId < minId)
+                    minId = otherMinId;
+            }
+            layers.insertElementAt(newLayer, minId);
+        } else
+            layers.add(newLayer);
 
+        //
+        layers.removeAll(alRem_l);
+        selectedLayers.removeAll(alRem_l);
+
+        //
+        refresh();
+        ds.refresh();
+
+    }
+
+    public void remplaceLayer(AbstractLayer findLayer, AbstractLayer newLayer) {
+
+        //
+        int findLayerIndex = layers.indexOf(findLayer);
+        if (findLayerIndex >= 0)
+            layers.set(findLayerIndex, newLayer);
+
+        //
+        selectedLayers.clear();
+
+        //
+        refresh();
+        ds.refresh();
+    }
 
     /* */
 

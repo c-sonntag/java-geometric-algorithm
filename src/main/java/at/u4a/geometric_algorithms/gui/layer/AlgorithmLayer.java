@@ -20,19 +20,22 @@ public class AlgorithmLayer<TAlgorithm extends AbstractAlgorithm> extends Abstra
     private final Algorithm algorithmType;
 
     private final AbstractList<AbstractLayer> subLayer;
-    
+
     private final ColorSet algorithmColor;
 
     public AlgorithmLayer(TAlgorithm algorithm, Algorithm algorithmType, AbstractList<AbstractLayer> subLayer) {
         super(getAuthorizationForAlgorithmLayer());
         this.algorithm = algorithm;
         this.algorithmType = algorithmType;
-        this.subLayer = subLayer;
-        
+
         //
-        this.algorithmColor = new ColorSet(getLayerType() + " color", ColorSet.rand() );
+        this.subLayer = new Vector<AbstractLayer>();
+        this.subLayer.addAll(subLayer);
+
+        //
+        this.algorithmColor = new ColorSet(getLayerType() + " color", ColorSet.rand());
         this.colors = new Vector<ColorSet>();
-        this.colors.add( algorithmColor );
+        this.colors.add(algorithmColor);
 
     }
 
@@ -40,7 +43,7 @@ public class AlgorithmLayer<TAlgorithm extends AbstractAlgorithm> extends Abstra
     public AbstractShape getShape() {
         return algorithm.getCompositeShape();
     }
-    
+
     @Override
     public AbstractAlgorithm getAlgorithm() {
         return algorithm;
@@ -50,7 +53,7 @@ public class AlgorithmLayer<TAlgorithm extends AbstractAlgorithm> extends Abstra
     public LayerCategory getCategory() {
         return LayerCategory.Algorithm;
     }
-    
+
     @Override
     public void restoreAuthorization() {
         authorized.clear();
@@ -99,7 +102,7 @@ public class AlgorithmLayer<TAlgorithm extends AbstractAlgorithm> extends Abstra
             algorithm.accept(subLayer, visitor);
         }
     }
-    
+
     @Override
     public int hashCode() {
         return algorithm.hashCode();
@@ -130,6 +133,5 @@ public class AlgorithmLayer<TAlgorithm extends AbstractAlgorithm> extends Abstra
         for (AbstractLayer al : subLayer)
             al.translate(p);
     }
-
 
 }

@@ -466,6 +466,7 @@ public class PrincipalGui extends JFrame {
                 sl.getAuthorized().clear();
             //
             lm.remplaceLayer(selectedLayers, algorithmLayer);
+            lm.setSelectedLayer(algorithmLayer);
         }
 
     }
