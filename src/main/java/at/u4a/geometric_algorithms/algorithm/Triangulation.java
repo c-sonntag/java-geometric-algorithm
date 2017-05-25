@@ -809,8 +809,6 @@ public class Triangulation extends AbstractAlgorithm {
                     // drawSegmentByPoint(currentPoint, stackPop);
                     // drawSegmentByPoint(currentPoint, stackFirst);
 
-                    final boolean isInLeft = 0 > ((stackPop.x - currentPoint.x) * (stackFirst.y - currentPoint.y) - (stackFirst.x - currentPoint.x) * (stackPop.y - currentPoint.y));
-
                     drawTextTipPosDecal("C", currentPoint, -2);
 
                     // if (((currentPoint.tip.code & Tip.Left.code) != 0) &&
