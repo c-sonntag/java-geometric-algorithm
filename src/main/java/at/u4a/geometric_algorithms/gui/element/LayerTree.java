@@ -8,6 +8,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -18,36 +19,24 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.EventObject;
 import java.util.Iterator;
-import java.util.Random;
 import java.util.Vector;
 
 import javax.swing.AbstractCellEditor;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JToolBar;
 import javax.swing.JTree;
-import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
-import javax.swing.event.TreeModelEvent;
-import javax.swing.event.TreeModelListener;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellEditor;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeCellEditor;
 import javax.swing.tree.TreeCellRenderer;
-import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
-import at.u4a.geometric_algorithms.gui.element.ColorChooserButton.ColorChangedListener;
 import at.u4a.geometric_algorithms.gui.layer.AbstractLayer;
 import at.u4a.geometric_algorithms.gui.layer.AbstractLayer.ColorSet;
 import at.u4a.geometric_algorithms.gui.layer.LayerCategory;
@@ -81,35 +70,22 @@ public class LayerTree extends JTree {
         // super(editorLayerTest());
 
         LayerNodeRenderer renderer = new LayerNodeRenderer();
+
+        // this.setEditable(true);
+
         this.setCellRenderer(renderer);
-        this.setEditable(true);
-        this.setCellEditor(new LayerNodeEditor(this));
+
+        // this.setCellEditor(new LayerNodeEditor(this));
 
         //
-        getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        // getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        // getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
 
-        /// ///
+        getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
 
-        // super(editorTest());
+        //
+        expandRow(0);
 
-        // CheckBoxNodeRenderer renderer = new CheckBoxNodeRenderer();
-        // this.setCellRenderer(renderer);
-        // this.setEditable(true);
-        // this.setCellEditor(new CheckBoxNodeEditor(this));
-
-        /// ///
-
-        // super(createNodes());
-        // TreeCellRenderer renderer = new LayerTreeCell();
-        // this.setCellRenderer(renderer);
-
-        /// ///
-
-        // super(simpleTest2());
-        // TreeCellRenderer renderer = new LayerNonEditCellRenderer();
-        // this.setCellRenderer(renderer);
-
-        /// ///
         /// ///
 
         this.ds = ds;
@@ -120,37 +96,6 @@ public class LayerTree extends JTree {
 
         reload();
 
-    }
-
-    /*
-     * public void reload() { ObjectNode selectedNode = this.getSelectedNode();
-     * Vector allNodes = this.getNodes((ObjectNode) treeModel.getRoot()); Vector
-     * visibleNodes = new Vector(); for (int i = 0; i < allNodes.size(); i++) {
-     * if (this.isVisible(new TreePath(((ObjectNode)
-     * allNodes.elementAt(i)).getPath()))) {
-     * visibleNodes.add(allNodes.elementAt(i)); } } ((DefaultTreeModel)
-     * this.getModel()).reload(); for (int i = 0; i < visibleNodes.size(); i++)
-     * { this.scrollPathToVisible(new TreePath(((ObjectNode)
-     * visibleNodes.elementAt(i)).getPath())); } if (selectedNode != null) {
-     * TreePath path = new TreePath(selectedNode.getPath());
-     * this.setSelectionPath(path); this.requestFocus(); } }
-     */
-
-    public void reloadO() {
-
-        DefaultTreeModel model = (DefaultTreeModel) getModel();
-        DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getRoot();
-        model.insertNodeInto((MutableTreeNode) this, root, root.getChildCount());
-
-        // DefaultTreeModel model = (DefaultTreeModel)getModel();
-        // DefaultMutableTreeNode root =
-        // (DefaultMutableTreeNode)model.getRoot();
-        // root.add(new DefaultMutableTreeNode("another_child"));
-        // root.add(new DefaultMutableTreeNode(lm.getLayers()));
-        // root.add();
-        // model.reload();
-        // model.
-        // model.reload( root );
     }
 
     private void insertLayer(DefaultMutableTreeNode node, Vector<AbstractLayer> layers) {
@@ -167,22 +112,15 @@ public class LayerTree extends JTree {
 
         lm.setSelectedLayer(null);
         rootNode.removeAllChildren();
-        // rootNode.setUserObject(lm.getLayers()); // rename the root node
-        // rootNode.add( new DefaultMutableTreeNode("another_child") );
-        // rootNode.add( new DefaultMutableTreeNode(lm.getLayers()) );
-
-        // rootNode.setUserObject(lm.getLayers());
-
-        // for (AbstractLayer l : lm.getLayers()) {
-        // DefaultMutableTreeNode yop = new DefaultMutableTreeNode(l);
-        // rootNode.add(yop);
-        // }
 
         insertLayer(rootNode, lm.getLayers());
 
         // The method below rebuit the JTree in my app - you should do the same
         // here
         // this.createFileTree(rootNode, rootFile); // rescan the file structure
+
+        getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
+
         ((DefaultTreeModel) treeModel).reload();
     }
 
@@ -223,6 +161,7 @@ public class LayerTree extends JTree {
     static private final ImageIcon noLayerImageIcon = new ImageIcon("icons/layer/no_layer.png");
 
     class LayerNodeRenderer implements TreeCellRenderer {
+        // class LayerNodeRenderer extends DefaultTreeCellRenderer {
 
         // private JCheckBox leafRenderer = new JCheckBox();
 
@@ -233,17 +172,13 @@ public class LayerTree extends JTree {
 
         public LayerNodeRenderer() {
 
-            Dimension rigidAreaSize = new Dimension(5, 0);
+            // super(renderer);
 
-            // Font fontValue;
-            // fontValue = UIManager.getFont("Tree.font");
-            // if (fontValue != null) {
-            // leafRenderer.setFont(fontValue);
-            // }
-            // Boolean booleanValue = (Boolean)
-            // UIManager.get("Tree.drawsFocusBorderAroundIcon");
-            // leafRenderer.setFocusPainted((booleanValue != null) &&
-            // (booleanValue.booleanValue()));
+            renderer.setFocusable(false);
+            renderer.setRequestFocusEnabled(false);
+            renderer.setOpaque(false);
+
+            Dimension rigidAreaSize = new Dimension(5, 0);
 
             backgroundSelectionColor = defaultRenderer.getBackgroundSelectionColor();
             backgroundNonSelectionColor = defaultRenderer.getBackgroundNonSelectionColor();
@@ -266,52 +201,17 @@ public class LayerTree extends JTree {
             });
             toolBar.add(chckbxActive);
 
-            // toolBar.addSeparator();
-            // toolBar.add(rigidArea);
-            // toolBar.add(Box.createRigidArea(rigidAreaSize));
-
             lblCategoryGen = new LayerCategoryLabel(LayerCategory.Geometry);
             toolBar.add(lblCategoryGen);
 
-            // toolBar.addSeparator();
-            // toolBar.add(rigidArea);
-            // toolBar.add(Box.createRigidArea(rigidAreaSize));
-
-            // lblLayerType = new JLabel("_LayerType_");
             lblLayerType = new JLabel("");
             lblLayerType.setIcon(noLayerImageIcon);
             toolBar.add(lblLayerType);
 
-            // toolBar.addSeparator();
-            // toolBar.add(rigidArea);
-            // toolBar.add(Box.createRigidArea(rigidAreaSize));
-
             lblLayerName = new JLabel("_LayerName_");
             toolBar.add(lblLayerName);
 
-            // toolBar.addSeparator();
-            // toolBar.add(rigidArea);
-            // toolBar.add(Box.createRigidArea(rigidAreaSize));
-
             colorChooserButtonList = new ArrayList<ColorChooserButton>();
-
-            // ColorChooserButton ccTest1 = new ColorChooserButton(Color.CYAN);
-            // ccTest1.setToolTipText("Yooo");
-            // toolBar.add(ccTest1);
-
-            // ColorChooserButton ccTest2 = new ColorChooserButton(Color.CYAN);
-            // ccTest2.setToolTipText("YoooPP");
-            // toolBar.add(ccTest2);
-
-            // toolBar.addSeparator();
-            // toolBar.add(rigidArea);
-            // toolBar.add(Box.createRigidArea(rigidAreaSize));
-
-            // toolBar.pack();
-
-            // JPanel panel_1 = new JPanel();
-            // toolBar.add(panel_1);
-            // panel_1.setLayout(new BoxLayout(panel_1, BoxLayout.X_AXIS));
 
         }
 
@@ -424,56 +324,36 @@ public class LayerTree extends JTree {
             return renderer;
         }
 
+        @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-
-            Component returnValue = null;
 
             if ((value != null) && (value instanceof DefaultMutableTreeNode)) {
 
-                Object userObject = ((DefaultMutableTreeNode) value).getUserObject();
+                renderer.setEnabled(tree.isEnabled());
+                renderer.setFont(tree.getFont());
 
-                // if (userObject instanceof Employee) {
-                // Employee e = (Employee) userObject;
-                // firstNameLabel.setText(e.firstName);
-                // lastNameLabel.setText(e.lastName);
-                // salaryLabel.setText("" + e.salary);
-                // if (selected) {
-                // renderer.setBackground(backgroundSelectionColor);
-                // } else {
-                // renderer.setBackground(backgroundNonSelectionColor);
-                // }
-                // renderer.setEnabled(tree.isEnabled());
-                // returnValue = renderer;
-                // }
+                Object userObject = ((DefaultMutableTreeNode) value).getUserObject();
 
                 if (userObject instanceof AbstractLayer) {
 
                     AbstractLayer node = (AbstractLayer) userObject;
-
                     update(node);
 
                     if (selected) {
-                        lm.setSelectedLayer(node);
+                        //lm.setSelectedLayer(node);
+                        System.out.println("Selected Layer : " + node);
+                        
                         renderer.setBackground(backgroundSelectionColor);
                     } else {
                         renderer.setBackground(backgroundNonSelectionColor);
                     }
 
-                    // renderer.setEnabled(selected);
-
-                    /** @todo voir plutot avec le parent */
-                    // renderer.setEnabled(tree.isEnabled());
-
-                    returnValue = renderer;
-
+                    
+                    return renderer;
                 }
-
-            }
-            if (returnValue == null) {
-                returnValue = defaultRenderer.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
             }
 
-            return returnValue;
+            return defaultRenderer.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
         }
 
         // public Component getTreeCellRendererComponent(JTree tree, Object
@@ -506,6 +386,8 @@ public class LayerTree extends JTree {
 
     class LayerNodeEditor extends AbstractCellEditor implements TreeCellEditor {
 
+        private static final long serialVersionUID = 4900398139830702089L;
+
         LayerNodeRenderer renderer = new LayerNodeRenderer();
 
         ChangeEvent changeEvent = null;
@@ -514,6 +396,14 @@ public class LayerTree extends JTree {
 
         public LayerNodeEditor(JTree tree) {
             this.tree = tree;
+
+            renderer.chckbxActive.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    stopCellEditing();
+                }
+            });
+
         }
 
         public Object getCellEditorValue() {
@@ -528,7 +418,7 @@ public class LayerTree extends JTree {
             return renderer.getNode();
         }
 
-        public boolean isCellEditable(EventObject event) {
+        public boolean isCellEditable______1(EventObject event) {
             boolean returnValue = false;
             if (event instanceof MouseEvent) {
 
@@ -546,8 +436,26 @@ public class LayerTree extends JTree {
                     }
                 }
             }
-
             return returnValue;
+        }
+
+        @Override
+        public boolean isCellEditable(EventObject e) {
+            if (e instanceof MouseEvent && e.getSource() instanceof JTree) {
+                MouseEvent me = (MouseEvent) e;
+                TreePath path = tree.getPathForLocation(me.getX(), me.getY());
+                Rectangle r = tree.getPathBounds(path);
+                if (r == null) {
+                    return false;
+                }
+                Dimension d = renderer.renderer.getPreferredSize();
+                r.setSize(new Dimension(d.width, r.height));
+                if (r.contains(me.getX(), me.getY())) {
+                    renderer.renderer.setBounds(new Rectangle(0, 0, d.width, r.height));
+                    return true;
+                }
+            }
+            return false;
         }
 
         public Component getTreeCellEditorComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row) {

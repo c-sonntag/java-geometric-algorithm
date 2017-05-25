@@ -23,7 +23,7 @@ import at.u4a.geometric_algorithms.gui.tools.Tool;
 
 public class GraphToTests {
 
-    static boolean activeDefault = false;
+    static boolean activeDefault = true;
 
     static double Square_FACTOR = 5;
 
@@ -37,14 +37,14 @@ public class GraphToTests {
     static double Cloud_of_Segments_FACTOR = 3;
 
     public static void defaultGraph(LayerManager lm) {
-        Random rnd = new Random(1123581321345589L);
-        // Random rnd = new Random();
+        //Random rnd = new Random(1123581321345589L);
+        Random rnd = new Random();
 
-        lm.addLayer(triangulationForMonotisation(monotisation(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, false))));
-        // lm.addLayer(triangulationForMonotisation(monotisation(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, true))));
 
         //
         if (activeDefault) {
+            lm.addLayer(triangulationForMonotisation(monotisation(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, false))));
+            lm.addLayer(triangulationForMonotisation(monotisation(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, true))));            
             lm.addLayer(monotisation(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, false)));
             lm.addLayer(monotisation(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, true)));
             lm.addLayer(triangulation(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, false)));

@@ -25,6 +25,7 @@ import javax.swing.tree.TreeCellEditor;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 
 public class TestJTree {
     public static JComponent makeUI() {
@@ -39,10 +40,15 @@ public class TestJTree {
                 node.setUserObject(new CheckBoxNode((String) o, false));
             }
         }
-        tree.setEditable(true);
+        //tree.setEditable(true);
         tree.setCellRenderer(new CheckBoxNodeRenderer());
-        tree.setCellEditor(new CheckBoxNodeEditor());
+        //tree.setCellEditor(new CheckBoxNodeEditor());
         tree.expandRow(0);
+        
+        //tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        //tree.getSelectionModel().setSelectionMode(TreeSelectionModel.CONTIGUOUS_TREE_SELECTION);
+        tree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
+        
         return new JScrollPane(tree);
     }
 
@@ -81,10 +87,13 @@ class CheckBoxNodeRenderer implements TreeCellRenderer {
         p.setOpaque(false);
         p.add(check, BorderLayout.WEST);
         check.setOpaque(false);
+       
+        
     }
 
     @Override
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+        
         JLabel l = (JLabel) renderer.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
         
         System.out.println("CheckBoxNodeRenderer\t Width(" + String.valueOf(l.getPreferredSize().getWidth()) + ") Height(" + String.valueOf(l.getPreferredSize().getHeight()) + ")  ");
@@ -99,10 +108,11 @@ class CheckBoxNodeRenderer implements TreeCellRenderer {
                 l.setText(node.text);
                 check.setSelected(node.selected);
             }
-            p.add(l);
-            return p;
+            return l;
+            //p.add(l);
+            //return p;
         }
-        return l;
+        return p;
     }
 }
 
@@ -129,7 +139,11 @@ class CheckBoxNodeEditor extends AbstractCellEditor implements TreeCellEditor {
 
     @Override
     public Component getTreeCellEditorComponent(JTree tree, Object value, boolean isSelected, boolean expanded, boolean leaf, int row) {
+        
         JLabel l = (JLabel) renderer.getTreeCellRendererComponent(tree, value, true, expanded, leaf, row, true);
+        //JLabel l = (JLabel) renderer.getTreeCellRendererComponent(tree, value, isSelected, expanded, leaf, row);
+        
+        //renderer.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
         
         System.out.println("CheckBoxNodeEditor\t Width(" + String.valueOf(l.getPreferredSize().getWidth()) + ") Height(" + String.valueOf(l.getPreferredSize().getHeight()) + ")  ");
 
@@ -142,10 +156,10 @@ class CheckBoxNodeEditor extends AbstractCellEditor implements TreeCellEditor {
                 check.setSelected(node.selected);
                 str = node.text;
             }
-            p.add(l);
+            //p.add(l);
             return p;
         }
-        return l;
+        return p;
     }
 
     @Override
