@@ -7,11 +7,16 @@ import java.util.Vector;
 
 import at.u4a.geometric_algorithms.algorithm.InterfaceAlgorithmBuilder;
 import at.u4a.geometric_algorithms.geometric.AbstractShape;
+import at.u4a.geometric_algorithms.geometric.CloudOfPoints;
+import at.u4a.geometric_algorithms.geometric.Point;
 import at.u4a.geometric_algorithms.geometric.Polygon;
 import at.u4a.geometric_algorithms.geometric.Polygon.MonotonePolygon;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGraphicVisitor;
 import at.u4a.geometric_algorithms.gui.layer.AbstractLayer;
 import at.u4a.geometric_algorithms.gui.layer.AlgorithmLayer;
+import at.u4a.geometric_algorithms.utils.NonOrientedGraph;
+import at.u4a.geometric_algorithms.utils.NonOrientedGraph.Vertice;
+import at.u4a.geometric_algorithms.utils.Mutable;
 import javafx.scene.paint.Color;
 
 public class VisibilityGraph extends AbstractAlgorithm {
@@ -25,11 +30,26 @@ public class VisibilityGraph extends AbstractAlgorithm {
 
         @Override
         public boolean canApply(AbstractList<AbstractLayer> layers) {
-            if(layers.isEmpty())
+            if (layers.isEmpty())
                 return false;
+
             //
-            AbstractShape as = layers.get(0).getShape();
-            return (as instanceof Polygon);
+            int nbOfPolygon = 0;
+            int nbOfCloudOfPoint = 0;
+
+            //
+            for (AbstractLayer l : layers) {
+                AbstractShape as = l.getShape();
+                if (as instanceof Polygon)
+                    nbOfPolygon++;
+                else if (as instanceof CloudOfPoints)
+                    nbOfCloudOfPoint++;
+                else
+                    return false;
+            }
+
+            //
+            return (nbOfPolygon > 1) && (nbOfCloudOfPoint == 1);
         }
 
         static int VisibilityGraphCount = 1;
@@ -37,26 +57,25 @@ public class VisibilityGraph extends AbstractAlgorithm {
         @Override
         public AbstractLayer builder(AbstractList<AbstractLayer> layers) {
 
-            if(layers.isEmpty())
-                throw new RuntimeException("Need one layer !");
-            
             //
-            AbstractShape as = layers.get(0).getShape();
-            
-            /** @todo */
-            if(true)
-                throw new RuntimeException("VisibilityGraph need a List of Polygon");
-            
-            //
-            AbstractShape as = l.getShape();
-            if (!(as instanceof Polygon))
-                throw new RuntimeException("VisibilityGraph need a Monotisation Algorithm !");
+            if (!canApply(layers))
+                throw new RuntimeException("Need more that one layer and 2 points !");
 
             //
-            Polygon poly = (Polygon) as;
+            Vector<Polygon> polygons = new Vector<Polygon>();
+            CloudOfPoints cof = null;
 
             //
-            AbstractLayer al = new AlgorithmLayer<VisibilityGraph>(new VisibilityGraph(poly), Algorithm.VisibilityGraph, l);
+            for (AbstractLayer l : layers) {
+                AbstractShape as = l.getShape();
+                if (as instanceof Polygon)
+                    polygons.add((Polygon) as);
+                else if (as instanceof CloudOfPoints)
+                    cof = (CloudOfPoints) as;
+            }
+
+            //
+            AbstractLayer al = new AlgorithmLayer<VisibilityGraph>(new VisibilityGraph(polygons, cof), Algorithm.VisibilityGraph, layers);
             al.setLayerName("vg" + String.valueOf(VisibilityGraphCount));
             VisibilityGraphCount++;
             return al;
@@ -64,47 +83,40 @@ public class VisibilityGraph extends AbstractAlgorithm {
 
     };
 
-    private final List<Polygon> polygons;
+    private final AbstractList<Polygon> polygons;
+    private final CloudOfPoints cof;
 
-    public VisibilityGraph(List<Polygon> polygons) {
+    private final NonOrientedGraph<Point> g;
+
+    public VisibilityGraph(AbstractList<Polygon> polygons, CloudOfPoints cof) {
         this.polygons = polygons;
+        this.cof = cof;
+        this.g = new NonOrientedGraph<Point>();
     }
 
     /* ************** */
 
     InterfaceGraphicVisitor mutableVisitorForDebugging = null;
-    
+
     @Override
     public void accept(AbstractList<AbstractLayer> subLayers, InterfaceGraphicVisitor visitor) {
 
         mutableVisitorForDebugging = visitor;
-        
+
         makeVisibilityGraph();
 
-        if (haveMonotized) {
-            for (Triangulation triangulation : triangulations) {
-                triangulation.accept(v, visitor);
-                //visitor.visit(triangulation.getPolygon());
-            }
-        }
     }
-
 
     @Override
     public int hashCode() {
-        return monotisationAlgorithm.hashCode();
+        int polyHash = Mutable.getHashCode(polygons);
+        return (polyHash * 31) + cof.hashCode();
     }
 
     /* ************** */
 
-    public boolean isMonotonized() {
-        makeVisibilityGraph();
-        return haveMonotized;
-    }
-
-    public Vector<MonotonePolygon> getMonotonesPolygon() {
-        makeVisibilityGraph();
-        return monotisationAlgorithm.getMonotonesPolygon();
+    public boolean isCompute() {
+        return haveCompute;
     }
 
     /* ************** */
@@ -120,53 +132,53 @@ public class VisibilityGraph extends AbstractAlgorithm {
 
     /* ************** */
 
-    private int mutablePreviousMonotisationHash = 0;
+    private int mutablePreviousVisibilityGraphHash = 0;
 
-    boolean haveMonotized = false;
+    boolean haveCompute = false;
 
     protected void makeVisibilityGraph() {
 
-        int currentMonotisationHash = monotisationAlgorithm.hashCode();
-        if (currentMonotisationHash != mutablePreviousMonotisationHash) {
+        int currenVisibilityGraphHash = hashCode();
+        if (currenVisibilityGraphHash != mutablePreviousVisibilityGraphHash) {
 
             //
-            triangulations.clear();
-            haveMonotized = true;
+            haveCompute = false;
 
             //
-            final Vector<MonotonePolygon> mp_v = monotisationAlgorithm.getMonotonesPolygon();
+            buildVisibilityGraph();
 
             //
-            if (mp_v == null) {
-                haveMonotized = false;
-
-            } else {
-                for (MonotonePolygon mp : mp_v) {
-
-                    //
-                    if(mp.perimeter.size() <= 3)
-                        continue;
-                    
-                    //
-                    final Triangulation triangulationsAlgorithm = new Triangulation(mp.perimeter, mp, false);
-                    triangulationsAlgorithm.mutableVisitorForDebugging = mutableVisitorForDebugging;
-                    
-                    //
-                    if (!triangulationsAlgorithm.isMonotone()) {
-                        haveMonotized = false;
-                        
-                        break;
-                    }
-
-                    //
-                    triangulations.add(triangulationsAlgorithm);
-                }
-            }
-
-            //
-            mutablePreviousMonotisationHash = currentMonotisationHash;
+            mutablePreviousVisibilityGraphHash = currenVisibilityGraphHash;
         }
 
+    }
+
+    /* ************** */
+
+    protected Vector<NonOrientedGraph<Point>.Vertice> visibleVertices(NonOrientedGraph<Point>.Vertice v) {
+        return null;
+
+    }
+
+    protected boolean buildVisibilityGraph() {
+
+        //
+        g.clear();
+
+        //
+        for (Polygon poly : polygons)
+            for (Point p : poly.perimeter)
+                g.addVerticle(p);
+
+        //
+        for (NonOrientedGraph<Point>.Vertice v : g.vertices.values()) {
+            Vector<NonOrientedGraph<Point>.Vertice> visibles = visibleVertices(v);
+            if (visibles != null)
+                for (NonOrientedGraph<Point>.Vertice w : visibles)
+                    g.addArc(v, w);
+        }
+
+        return true;
     }
 
 };
