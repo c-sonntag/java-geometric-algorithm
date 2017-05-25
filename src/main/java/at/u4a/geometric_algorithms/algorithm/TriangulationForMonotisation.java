@@ -1,22 +1,14 @@
 package at.u4a.geometric_algorithms.algorithm;
 
-import java.util.AbstractList;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Vector;
 
 import at.u4a.geometric_algorithms.algorithm.InterfaceAlgorithmBuilder;
 import at.u4a.geometric_algorithms.geometric.AbstractShape;
-import at.u4a.geometric_algorithms.geometric.Point;
-import at.u4a.geometric_algorithms.geometric.Polygon;
 import at.u4a.geometric_algorithms.geometric.Polygon.MonotonePolygon;
-import at.u4a.geometric_algorithms.geometric.Segment;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGraphicVisitor;
 import at.u4a.geometric_algorithms.gui.layer.AbstractLayer;
 import at.u4a.geometric_algorithms.gui.layer.AlgorithmLayer;
-import at.u4a.geometric_algorithms.utils.Calc;
 import javafx.scene.paint.Color;
 
 public class TriangulationForMonotisation extends AbstractAlgorithm {
