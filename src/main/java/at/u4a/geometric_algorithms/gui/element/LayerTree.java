@@ -356,32 +356,6 @@ public class LayerTree extends JTree {
             return defaultRenderer.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
         }
 
-        // public Component getTreeCellRendererComponent(JTree tree, Object
-        // value, boolean selected, boolean expanded, boolean leaf, int row,
-        // boolean hasFocus) {
-        //
-        // Component returnValue;
-        // if (leaf) {
-        // String stringValue = tree.convertValueToText(value, selected,
-        // expanded, leaf, row, false);
-        // leafRenderer.setText(stringValue);
-        // leafRenderer.setSelected(false);
-        // leafRenderer.setEnabled(tree.isEnabled());
-        /// if ((value != null) && (value instanceof DefaultMutableTreeNode)) {
-        // Object userObject = ((DefaultMutableTreeNode) value).getUserObject();
-        // if (userObject instanceof CheckBoxNode) {
-        // CheckBoxNode node = (CheckBoxNode) userObject;
-        // leafRenderer.setText(node.getText());
-        // leafRenderer.setSelected(node.isSelected());
-        // }
-        // }
-        // returnValue = leafRenderer;
-        // } else {
-        // returnValue = nonLeafRenderer.getTreeCellRendererComponent(tree,
-        // value, selected, expanded, leaf, row, hasFocus);
-        // }
-        // return returnValue;
-        // }
     }
 
     class LayerNodeEditor extends AbstractCellEditor implements TreeCellEditor {
