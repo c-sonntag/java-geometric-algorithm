@@ -63,7 +63,7 @@ public class PrincipalGui extends JFrame {
     private final DrawerScene ds = new DrawerScene(da, la);
     private final LayerTree treeLayer = new LayerTree(ds);
     
-    private static final int WINDOW_WIDTH = 1000, WINDOW_HEIGHT = 800;
+    private static final int WINDOW_WIDTH = 1000, WINDOW_HEIGHT = 900;
 
     /**
      * Launch the application.

@@ -439,7 +439,7 @@ public class Monotisation extends AbstractAlgorithm {
         final boolean haveUpperNeighbour = (vi.y >= vi.back.y) && (vi.y > vi.next.y);
         final boolean haveLowerNeighbour = (vi.y <= vi.back.y) && (vi.y < vi.next.y);
 
-        final boolean isLesserThanPi = produit <= 0;
+        final boolean isLesserThanPi = produit >= 0;
 
         if (haveLowerNeighbour)
             vi.type = isLesserThanPi ? VertexType.Start : VertexType.Split;
