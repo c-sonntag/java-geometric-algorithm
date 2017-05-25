@@ -42,7 +42,7 @@ public class SegmentIntersection extends AbstractAlgorithm {
 
         @Override
         public boolean canApply(AbstractList<AbstractLayer> layers) {
-            if(layers.size() != 1)
+            if (layers.size() != 1)
                 return false;
             //
             AbstractShape as = layers.get(0).getShape();
@@ -54,9 +54,9 @@ public class SegmentIntersection extends AbstractAlgorithm {
         @Override
         public AbstractLayer builder(AbstractList<AbstractLayer> layers) {
 
-            if(layers.isEmpty())
+            if (layers.isEmpty())
                 throw new RuntimeException("Need one layer !");
-            
+
             //
             AbstractShape as = layers.get(0).getShape();
             Iterable<Segment> cloud = null;
@@ -167,7 +167,8 @@ public class SegmentIntersection extends AbstractAlgorithm {
     /* ************** */
 
     /**
-     * Si le test ne doit pas comprendre les intersection au niveau des points d'extremités
+     * Si le test ne doit pas comprendre les intersection au niveau des points
+     * d'extremités
      */
     private boolean checkNotExactly(double i, double j) {
         return Math.abs(i - j) <= NOT_EXACTLY_MIN;
@@ -177,7 +178,11 @@ public class SegmentIntersection extends AbstractAlgorithm {
         statusAddCounter();
 
         //
-        final Point intersectionPoint = notExactly ? Calc.intersectionOnLine(s1, s2) : Calc.intersection(s1, s2);
+        // final Point intersectionPoint = notExactly ?
+        // Calc.intersectionOnLine(s1, s2) : Calc.intersection(s1, s2);
+        final Point intersectionPoint = Calc.intersectionOnLine(s1, s2);
+        
+        //
         if (notExactly)
             if ((intersectionPoint != null))
                 if (checkNotExactly(intersectionPoint.x, s1.a.x) || checkNotExactly(intersectionPoint.x, s1.b.x) || checkNotExactly(intersectionPoint.x, s2.a.x) || checkNotExactly(intersectionPoint.x, s2.b.x) || //
