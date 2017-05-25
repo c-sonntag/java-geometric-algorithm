@@ -1,6 +1,7 @@
 package at.u4a.geometric_algorithms.algorithm;
 
 import java.util.Vector;
+import java.util.AbstractList;
 import java.util.Iterator;
 
 import at.u4a.geometric_algorithms.algorithm.InterfaceAlgorithmBuilder;
@@ -29,18 +30,24 @@ public class ConvexEnvelope extends AbstractAlgorithm {
         }
 
         @Override
-        public boolean canApply(AbstractLayer l) {
-            AbstractShape as = l.getShape();
+        public boolean canApply(AbstractList<AbstractLayer> layers) {
+            if(layers.size() != 1)
+                return false;
+            //
+            AbstractShape as = layers.get(0).getShape();
             return (as instanceof CloudOfPoints) || (as instanceof Polygon) || (as instanceof CloudOfSegments);
         }
 
         static int ConvexEnvelopeCount = 1;
 
         @Override
-        public AbstractLayer builder(AbstractLayer l) {
+        public AbstractLayer builder(AbstractList<AbstractLayer> layers) {
 
+            if(layers.isEmpty())
+                throw new RuntimeException("Need one layer !");
+            
             //
-            AbstractShape as = l.getShape();
+            AbstractShape as = layers.get(0).getShape();
             Vector<Point> points = null;
 
             //
@@ -55,7 +62,7 @@ public class ConvexEnvelope extends AbstractAlgorithm {
             }
 
             //
-            AbstractLayer al = new AlgorithmLayer<ConvexEnvelope>(new ConvexEnvelope(points, as), Algorithm.ConvexEnvelope, l);
+            AbstractLayer al = new AlgorithmLayer<ConvexEnvelope>(new ConvexEnvelope(points, as), Algorithm.ConvexEnvelope, layers);
             al.setLayerName("ce" + String.valueOf(ConvexEnvelopeCount));
             ConvexEnvelopeCount++;
             return al;
@@ -76,7 +83,7 @@ public class ConvexEnvelope extends AbstractAlgorithm {
     /* ************** */
 
     @Override
-    public void accept(Vector<AbstractLayer> v, InterfaceGraphicVisitor visitor) {
+    public void accept(AbstractList<AbstractLayer> layers, InterfaceGraphicVisitor visitor) {
         makeConvexEnveloppe();
         visitor.visit(convexPoly);
     }

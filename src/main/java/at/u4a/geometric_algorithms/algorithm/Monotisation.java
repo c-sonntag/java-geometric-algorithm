@@ -42,17 +42,24 @@ public class Monotisation extends AbstractAlgorithm {
         }
 
         @Override
-        public boolean canApply(AbstractLayer l) {
-            return (l.getShape() instanceof Polygon);
+        public boolean canApply(AbstractList<AbstractLayer> layers) {
+            if(layers.size() != 1)
+                return false;
+            //
+            AbstractShape as = layers.get(0).getShape();
+            return (as instanceof Polygon);
         }
 
         static int MonotisationCount = 1;
 
         @Override
-        public AbstractLayer builder(AbstractLayer l) {
+        public AbstractLayer builder(AbstractList<AbstractLayer> layers) {
 
+            if(layers.isEmpty())
+                throw new RuntimeException("Need one layer !");
+            
             //
-            AbstractShape as = l.getShape();
+            AbstractShape as = layers.get(0).getShape();
             if (!(as instanceof Polygon))
                 throw new RuntimeException("Monotisation need a Polygon Shape !");
 
@@ -60,7 +67,7 @@ public class Monotisation extends AbstractAlgorithm {
             Polygon poly = (Polygon) as;
 
             //
-            AbstractLayer al = new AlgorithmLayer<Monotisation>(new Monotisation(poly.perimeter, poly), Algorithm.Monotisation, l);
+            AbstractLayer al = new AlgorithmLayer<Monotisation>(new Monotisation(poly.perimeter, poly), Algorithm.Monotisation, layers);
             al.setLayerName("m" + String.valueOf(MonotisationCount));
             MonotisationCount++;
             return al;
@@ -83,7 +90,7 @@ public class Monotisation extends AbstractAlgorithm {
 
     /* ************** */
 
-    public void accept_2(Vector<AbstractLayer> v, InterfaceGraphicVisitor visitor) {
+    public void accept_2(AbstractList<AbstractLayer> subLayers, InterfaceGraphicVisitor visitor) {
 
         makeMonotisation();
         if (haveMake) {
@@ -99,7 +106,7 @@ public class Monotisation extends AbstractAlgorithm {
 
     private InterfaceGraphicVisitor mutableVisitorForDebugging = null;
 
-    public void accept(Vector<AbstractLayer> v, InterfaceGraphicVisitor visitor) {
+    public void accept(AbstractList<AbstractLayer> subLayers, InterfaceGraphicVisitor visitor) {
 
         mutableVisitorForDebugging = visitor;
 
@@ -119,7 +126,7 @@ public class Monotisation extends AbstractAlgorithm {
         }
     }
 
-    public void acceptDebug(Vector<AbstractLayer> v, InterfaceGraphicVisitor visitor) {
+    public void acceptDebug(AbstractList<AbstractLayer> subLayers, InterfaceGraphicVisitor visitor) {
 
         int countStroboscope = 0;
         Color colorStrop[] = { Color.CORAL, Color.BLUEVIOLET, Color.MEDIUMSPRINGGREEN, Color.HOTPINK, Color.YELLOWGREEN, Color.FIREBRICK, Color.GREEN };

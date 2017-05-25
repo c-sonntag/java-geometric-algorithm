@@ -1,5 +1,6 @@
 package at.u4a.geometric_algorithms.algorithm;
 
+import java.util.AbstractList;
 import java.util.Vector;
 
 import at.u4a.geometric_algorithms.geometric.AbstractShape;
@@ -80,7 +81,7 @@ public abstract class AbstractAlgorithm {
 
     }
 
-    public abstract void accept(Vector<AbstractLayer> v, InterfaceGraphicVisitor visitor);
+    public abstract void accept(AbstractList<AbstractLayer> v, InterfaceGraphicVisitor visitor);
 
     public abstract int hashCode();
 

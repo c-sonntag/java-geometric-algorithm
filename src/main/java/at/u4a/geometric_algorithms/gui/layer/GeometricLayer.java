@@ -1,5 +1,6 @@
 package at.u4a.geometric_algorithms.gui.layer;
 
+import java.util.AbstractList;
 import java.util.Vector;
 
 import javax.swing.ImageIcon;
@@ -54,7 +55,7 @@ public class GeometricLayer<TShape extends AbstractShape> extends AbstractLayer 
     }
 
     @Override
-    public Vector<AbstractLayer> getSubLayer() {
+    public AbstractList<AbstractLayer> getSubLayer() {
         return null;
     }
 

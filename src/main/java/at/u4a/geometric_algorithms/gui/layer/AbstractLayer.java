@@ -1,6 +1,8 @@
 package at.u4a.geometric_algorithms.gui.layer;
 
 import javafx.scene.paint.Color;
+
+import java.util.AbstractList;
 import java.util.EnumSet;
 import java.util.Vector;
 import java.util.Random;
@@ -109,7 +111,7 @@ public abstract class AbstractLayer {
 
     abstract public boolean isDeletable();
 
-    abstract public Vector<AbstractLayer> getSubLayer();
+    abstract public AbstractList<AbstractLayer> getSubLayer();
 
     abstract public void accept(InterfaceGraphicVisitor visitor);
     

@@ -1,5 +1,6 @@
 package at.u4a.geometric_algorithms.algorithm;
 
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Vector;
 
@@ -21,17 +22,24 @@ public class TriangulationForMonotisation extends AbstractAlgorithm {
         }
 
         @Override
-        public boolean canApply(AbstractLayer l) {
-            return (l.getAlgorithm() instanceof Monotisation);
+        public boolean canApply(AbstractList<AbstractLayer> layers) {
+            if(layers.size() != 1)
+                return false;
+            //
+            AbstractAlgorithm aa = layers.get(0).getAlgorithm();
+            return (aa instanceof Monotisation);
         }
 
         static int TriangulationForMonotisationCount = 1;
 
         @Override
-        public AbstractLayer builder(AbstractLayer l) {
+        public AbstractLayer builder(AbstractList<AbstractLayer> layers) {
 
+            if(layers.isEmpty())
+                throw new RuntimeException("Need one layer !");
+            
             //
-            AbstractAlgorithm aa = l.getAlgorithm();
+            AbstractAlgorithm aa = layers.get(0).getAlgorithm();
             if (!(aa instanceof Monotisation))
                 throw new RuntimeException("TriangulationForMonotisation need a Monotisation Algorithm !");
 
@@ -39,7 +47,7 @@ public class TriangulationForMonotisation extends AbstractAlgorithm {
             Monotisation monotisationAlgorithm = (Monotisation) aa;
 
             //
-            AbstractLayer al = new AlgorithmLayer<TriangulationForMonotisation>(new TriangulationForMonotisation(monotisationAlgorithm), Algorithm.TriangulationForMonotisation, l);
+            AbstractLayer al = new AlgorithmLayer<TriangulationForMonotisation>(new TriangulationForMonotisation(monotisationAlgorithm), Algorithm.TriangulationForMonotisation, layers);
             al.setLayerName("tfm" + String.valueOf(TriangulationForMonotisationCount));
             TriangulationForMonotisationCount++;
             return al;
@@ -58,7 +66,7 @@ public class TriangulationForMonotisation extends AbstractAlgorithm {
     InterfaceGraphicVisitor mutableVisitorForDebugging = null;
     
     @Override
-    public void accept(Vector<AbstractLayer> v, InterfaceGraphicVisitor visitor) {
+    public void accept(AbstractList<AbstractLayer> subLayers, InterfaceGraphicVisitor visitor) {
 
         mutableVisitorForDebugging = visitor;
         
@@ -66,14 +74,14 @@ public class TriangulationForMonotisation extends AbstractAlgorithm {
 
         if (haveMonotized) {
             for (Triangulation triangulation : triangulations) {
-                triangulation.accept(v, visitor);
+                triangulation.accept(subLayers, visitor);
                 //visitor.visit(triangulation.getPolygon());
             }
         }
 
     }
 
-    public void acceptDebug(Vector<AbstractLayer> v, InterfaceGraphicVisitor visitor) {
+    public void acceptDebug(AbstractList<AbstractLayer> subLayers, InterfaceGraphicVisitor visitor) {
 
         int countStroboscope = 0;
         Color colorStrop[] = { Color.CORAL, Color.BLUEVIOLET, Color.MEDIUMSPRINGGREEN, Color.HOTPINK, Color.YELLOWGREEN, Color.FIREBRICK, Color.GREEN };
@@ -100,7 +108,7 @@ public class TriangulationForMonotisation extends AbstractAlgorithm {
                 // visitor.getGraphicsContext().setStroke(Color.color(sC.getRed(),
                 // sC.getGreen(), sC.getBlue()));
 
-                triangulation.accept(v, visitor);
+                triangulation.accept(subLayers, visitor);
                 visitor.visit(triangulation.getPolygon());
 
                 visitor.getGraphicsContext().restore();

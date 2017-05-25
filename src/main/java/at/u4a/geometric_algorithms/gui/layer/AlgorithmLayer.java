@@ -1,5 +1,6 @@
 package at.u4a.geometric_algorithms.gui.layer;
 
+import java.util.AbstractList;
 import java.util.Arrays;
 import java.util.Vector;
 
@@ -18,15 +19,15 @@ public class AlgorithmLayer<TAlgorithm extends AbstractAlgorithm> extends Abstra
     private final TAlgorithm algorithm;
     private final Algorithm algorithmType;
 
-    private final Vector<AbstractLayer> subLayer;
+    private final AbstractList<AbstractLayer> subLayer;
     
     private final ColorSet algorithmColor;
 
-    public AlgorithmLayer(TAlgorithm algorithm, Algorithm algorithmType, AbstractLayer... subLayer) {
+    public AlgorithmLayer(TAlgorithm algorithm, Algorithm algorithmType, AbstractList<AbstractLayer> subLayer) {
         super(getAuthorizationForAlgorithmLayer());
         this.algorithm = algorithm;
         this.algorithmType = algorithmType;
-        this.subLayer = new Vector<AbstractLayer>(Arrays.asList(subLayer));
+        this.subLayer = subLayer;
         
         //
         this.algorithmColor = new ColorSet(getLayerType() + " color", ColorSet.rand() );
@@ -84,7 +85,7 @@ public class AlgorithmLayer<TAlgorithm extends AbstractAlgorithm> extends Abstra
     }
 
     @Override
-    public Vector<AbstractLayer> getSubLayer() {
+    public AbstractList<AbstractLayer> getSubLayer() {
         return subLayer;
     }
 

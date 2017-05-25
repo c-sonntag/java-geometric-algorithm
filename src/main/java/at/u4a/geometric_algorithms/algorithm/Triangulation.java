@@ -37,17 +37,24 @@ public class Triangulation extends AbstractAlgorithm {
         }
 
         @Override
-        public boolean canApply(AbstractLayer l) {
-            return (l.getShape() instanceof Polygon);
+        public boolean canApply(AbstractList<AbstractLayer> layers) {
+            if(layers.size() != 1)
+                return false;
+            //
+            AbstractShape as = layers.get(0).getShape();
+            return (as instanceof Polygon);
         }
 
         static int TriangulationCount = 1;
 
         @Override
-        public AbstractLayer builder(AbstractLayer l) {
+        public AbstractLayer builder(AbstractList<AbstractLayer> layers) {
 
+            if(layers.isEmpty())
+                throw new RuntimeException("Need one layer !");
+            
             //
-            AbstractShape as = l.getShape();
+            AbstractShape as = layers.get(0).getShape();
             if (!(as instanceof Polygon))
                 throw new RuntimeException("Triangulation need a Polygon Shape !");
 
@@ -55,7 +62,7 @@ public class Triangulation extends AbstractAlgorithm {
             Polygon poly = (Polygon) as;
 
             //
-            AbstractLayer al = new AlgorithmLayer<Triangulation>(new Triangulation(poly.perimeter, poly), Algorithm.Triangulation, l);
+            AbstractLayer al = new AlgorithmLayer<Triangulation>(new Triangulation(poly.perimeter, poly), Algorithm.Triangulation, layers);
             al.setLayerName("t" + String.valueOf(TriangulationCount));
             TriangulationCount++;
             return al;
@@ -86,7 +93,7 @@ public class Triangulation extends AbstractAlgorithm {
     InterfaceGraphicVisitor mutableVisitorForDebugging = null;
 
     @Override
-    public void accept(Vector<AbstractLayer> v, InterfaceGraphicVisitor visitor) {
+    public void accept(AbstractList<AbstractLayer> subLayers, InterfaceGraphicVisitor visitor) {
 
         //mutableVisitorForDebugging = visitor;
 

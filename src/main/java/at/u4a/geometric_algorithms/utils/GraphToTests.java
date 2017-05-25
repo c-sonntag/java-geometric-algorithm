@@ -2,7 +2,9 @@ package at.u4a.geometric_algorithms.utils;
 
 import java.awt.Component;
 import java.awt.event.ActionListener;
+import java.util.AbstractList;
 import java.util.Random;
+import java.util.Vector;
 import java.util.function.BiConsumer;
 
 import javax.swing.Box;
@@ -23,7 +25,7 @@ import at.u4a.geometric_algorithms.gui.tools.Tool;
 
 public class GraphToTests {
 
-    static boolean activeDefault = true;
+    static boolean activeDefault = false;
 
     static double Square_FACTOR = 5;
 
@@ -41,12 +43,14 @@ public class GraphToTests {
         Random rnd = new Random();
 
 
+        lm.addLayer(triangulationForMonotisation(monotisation(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, false))));
+        lm.addLayer(triangulationForMonotisation(monotisation(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, true))));            
+        lm.addLayer(monotisation(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, false)));
+        lm.addLayer(monotisation(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, true)));
+        
         //
         if (activeDefault) {
-            lm.addLayer(triangulationForMonotisation(monotisation(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, false))));
-            lm.addLayer(triangulationForMonotisation(monotisation(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, true))));            
-            lm.addLayer(monotisation(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, false)));
-            lm.addLayer(monotisation(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, true)));
+            
             lm.addLayer(triangulation(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, false)));
             lm.addLayer(triangulation(polygon(rnd.nextLong(), Polygon_SIDE_NB, Polygon_FACTOR, true)));
             lm.addLayer(rectangle(rnd.nextLong(), Square_FACTOR));
@@ -58,35 +62,37 @@ public class GraphToTests {
     }
 
     /* ****** ALGORITHM LAYER ****** */
+    
+    private static AbstractLayer executeBuilder(InterfaceAlgorithmBuilder b, AbstractLayer layer) {
+        layer.getAuthorized().clear();
+        Vector<AbstractLayer> layers = new Vector<AbstractLayer>();
+        layers.add(layer);
+        return b.builder(layers);
+    }
 
     private static AbstractLayer convex_envelope(AbstractLayer layer) {
         ConvexEnvelope.Builder ceb = new ConvexEnvelope.Builder();
-        layer.getAuthorized().clear();
-        return ceb.builder(layer);
+        return executeBuilder(ceb, layer);
     }
 
     static AbstractLayer triangulation(AbstractLayer layer) {
         Triangulation.Builder tb = new Triangulation.Builder();
-        layer.getAuthorized().clear();
-        return tb.builder(layer);
+        return executeBuilder(tb,layer);
     }
 
     static AbstractLayer triangulationForMonotisation(AbstractLayer layer) {
         TriangulationForMonotisation.Builder tfmb = new TriangulationForMonotisation.Builder();
-        layer.getAuthorized().clear();
-        return tfmb.builder(layer);
+        return executeBuilder(tfmb,layer);
     }
 
     static AbstractLayer segment_intersection(AbstractLayer layer) {
         SegmentIntersection.Builder si = new SegmentIntersection.Builder();
-        layer.getAuthorized().clear();
-        return si.builder(layer);
+        return executeBuilder(si,layer);
     }
 
     static AbstractLayer monotisation(AbstractLayer layer) {
         Monotisation.Builder m = new Monotisation.Builder();
-        layer.getAuthorized().clear();
-        return m.builder(layer);
+        return executeBuilder(m,layer);
     }
 
     /* ****** SHAPE LAYER ****** */

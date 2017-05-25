@@ -1,4 +1,4 @@
-package at.u4a.geometric_algorithms.gui;
+package at.u4a.geometric_algorithms._others;
 
 
 import java.awt.BorderLayout;

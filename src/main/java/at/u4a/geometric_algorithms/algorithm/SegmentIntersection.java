@@ -41,20 +41,25 @@ public class SegmentIntersection extends AbstractAlgorithm {
         }
 
         @Override
-        public boolean canApply(AbstractLayer l) {
-            AbstractShape as = l.getShape();
+        public boolean canApply(AbstractList<AbstractLayer> layers) {
+            if(layers.size() != 1)
+                return false;
+            //
+            AbstractShape as = layers.get(0).getShape();
             return ((as instanceof CloudOfSegments) || (as instanceof Polygon));
         }
 
         static int SegmentIntersectionCount = 1;
 
         @Override
-        public AbstractLayer builder(AbstractLayer l) {
+        public AbstractLayer builder(AbstractList<AbstractLayer> layers) {
 
-            Iterable<Segment> cloud = null;
-
+            if(layers.isEmpty())
+                throw new RuntimeException("Need one layer !");
+            
             //
-            AbstractShape as = l.getShape();
+            AbstractShape as = layers.get(0).getShape();
+            Iterable<Segment> cloud = null;
 
             //
             if (as instanceof CloudOfSegments)
@@ -65,7 +70,7 @@ public class SegmentIntersection extends AbstractAlgorithm {
                 throw new RuntimeException("SegmentIntersection need a CloudOfSegments Shape, or Polygon Shape !");
 
             //
-            AbstractLayer al = new AlgorithmLayer<SegmentIntersection>(new SegmentIntersection(cloud, as), Algorithm.SegmentIntersection, l);
+            AbstractLayer al = new AlgorithmLayer<SegmentIntersection>(new SegmentIntersection(cloud, as), Algorithm.SegmentIntersection, layers);
             al.setLayerName("si" + String.valueOf(SegmentIntersectionCount));
             SegmentIntersectionCount++;
             return al;
@@ -97,7 +102,7 @@ public class SegmentIntersection extends AbstractAlgorithm {
     InterfaceGraphicVisitor mutableVisitorForDebugging = null;
 
     @Override
-    public void accept(Vector<AbstractLayer> v, InterfaceGraphicVisitor visitor) {
+    public void accept(AbstractList<AbstractLayer> subLayers, InterfaceGraphicVisitor visitor) {
         // mutableVisitorForDebugging = visitor;
         makeSegmentInteraction();
         visitor.visit(cop);

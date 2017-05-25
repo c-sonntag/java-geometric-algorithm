@@ -38,6 +38,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import java.awt.event.ActionListener;
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
 import java.awt.event.ActionEvent;
@@ -404,23 +405,34 @@ public class PrincipalGui extends JFrame {
         }
 
         @Override
-        public void setActiveLayer(AbstractLayer l) {
-            if (l == null) {
+        public void setActiveLayers(AbstractList<AbstractLayer> layers) {
+            if (layers == null) {
                 mnAlgorithmMenu.setEnabled(false);
                 btnLayerDelete.setEnabled(false);
                 return;
             }
 
-            btnLayerDelete.setEnabled(l.isAuthorized(AuthorizedAction.Delete));
-            btnLayerDeleteAlgorithm.setEnabled(l.isAuthorized(AuthorizedAction.DeleteAlgorithm));
+            boolean deleteAuthorized = false, deleteAlgorithmAuthorized = false, applyAlgorithm = false;
+
+            for (AbstractLayer l : layers) {
+                if (l.isAuthorized(AuthorizedAction.Delete))
+                    deleteAuthorized = true;
+                if (l.isAuthorized(AuthorizedAction.DeleteAlgorithm))
+                    deleteAlgorithmAuthorized = true;
+                if (l.isAuthorized(AuthorizedAction.ApplyAlgorithm))
+                    applyAlgorithm = true;
+            }
+
+            btnLayerDelete.setEnabled(deleteAuthorized);
+            btnLayerDeleteAlgorithm.setEnabled(deleteAlgorithmAuthorized);
 
             //
-            if (!l.isAuthorized(AuthorizedAction.ApplyAlgorithm)) {
+            if (!applyAlgorithm) {
                 mnAlgorithmMenu.setEnabled(false);
             } else {
                 boolean atLeastOnAlgorithm = false;
                 for (AlgorithmEntry ae : algorithms) {
-                    if (ae.abi.canApply(l)) {
+                    if (ae.abi.canApply(layers)) {
                         ae.jmi.setEnabled(true);
                         atLeastOnAlgorithm = true;
                     } else {
@@ -447,12 +459,13 @@ public class PrincipalGui extends JFrame {
         @Override
         public void applyAlgorithm(InterfaceAlgorithmBuilder abi) {
             LayerManager lm = ds.getLayerManager();
-            AbstractLayer selectedLayer = lm.getSelectedLayer();
-            AbstractLayer algorithmLayer = abi.builder(selectedLayer);
+            AbstractList<AbstractLayer> selectedLayers = lm.getSelectedLayers();
+            AbstractLayer algorithmLayer = abi.builder(selectedLayers);
             //
-            selectedLayer.getAuthorized().clear();
+            for (AbstractLayer sl : selectedLayers)
+                sl.getAuthorized().clear();
             //
-            lm.remplaceLayer(selectedLayer, algorithmLayer);
+            lm.remplaceLayer(selectedLayers, algorithmLayer);
         }
 
     }

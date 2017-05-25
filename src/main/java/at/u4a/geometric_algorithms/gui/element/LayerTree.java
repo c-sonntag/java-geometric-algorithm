@@ -8,6 +8,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,6 +16,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.print.Book;
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.EventObject;
@@ -28,6 +30,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.event.ChangeEvent;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
@@ -71,17 +75,34 @@ public class LayerTree extends JTree {
 
         LayerNodeRenderer renderer = new LayerNodeRenderer();
 
-        // this.setEditable(true);
-
+        this.setEditable(true);
         this.setCellRenderer(renderer);
-
-        // this.setCellEditor(new LayerNodeEditor(this));
+        this.setCellEditor(new LayerNodeEditor(this));
 
         //
         // getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         // getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
 
         getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
+
+        getSelectionModel().addTreeSelectionListener(new TreeSelectionListener() {
+
+            @Override
+            public void valueChanged(TreeSelectionEvent e) {
+
+                lm.layerTree_clearSelectedLayers();
+                for (TreePath path : selectionModel.getSelectionPaths()) {
+                    Object component = path.getLastPathComponent();
+                    if (component instanceof DefaultMutableTreeNode) {
+                        Object node = ((DefaultMutableTreeNode) component).getUserObject();
+                        if (node instanceof AbstractLayer)
+                            lm.layerTree_addSelectedLayer((AbstractLayer) node);
+                    }
+                }
+                lm.layerTree_refresh();
+            }
+
+        });
 
         //
         expandRow(0);
@@ -98,7 +119,7 @@ public class LayerTree extends JTree {
 
     }
 
-    private void insertLayer(DefaultMutableTreeNode node, Vector<AbstractLayer> layers) {
+    private void insertLayer(DefaultMutableTreeNode node, AbstractList<AbstractLayer> layers) {
         for (AbstractLayer layer : layers) {
             DefaultMutableTreeNode dmtn = new DefaultMutableTreeNode(layer);
             if (layer.isContener())
@@ -110,7 +131,8 @@ public class LayerTree extends JTree {
     public void reload() {
         DefaultMutableTreeNode rootNode = (DefaultMutableTreeNode) treeModel.getRoot();
 
-        lm.setSelectedLayer(null);
+        // lm.setSelectedLayer(null);
+
         rootNode.removeAllChildren();
 
         insertLayer(rootNode, lm.getLayers());
@@ -125,9 +147,11 @@ public class LayerTree extends JTree {
     }
 
     /** @see http://stackoverflow.com/questions/8210630/how-to-search-a-particular-node-in-jtree-and-make-that-node-expanded */
-    private TreePath find(DefaultMutableTreeNode root, AbstractLayer n) {
+    private Vector<TreePath> find(DefaultMutableTreeNode root, AbstractList<AbstractLayer> nodes) {
         @SuppressWarnings("unchecked")
         Enumeration<DefaultMutableTreeNode> e = root.depthFirstEnumeration();
+        Vector<TreePath> paths = new Vector<TreePath>();
+
         while (e.hasMoreElements()) {
 
             DefaultMutableTreeNode mutableNode = e.nextElement();
@@ -136,18 +160,22 @@ public class LayerTree extends JTree {
             //
             if (userObject instanceof AbstractLayer) {
                 AbstractLayer al = (AbstractLayer) userObject;
-                if (n == al)
-                    return new TreePath(mutableNode.getPath());
+
+                if (nodes.contains(al))
+                    paths.add(new TreePath(mutableNode.getPath()));
             }
         }
-        return null;
+        return paths.isEmpty() ? null : paths;
     }
 
-    public void selectNode(AbstractLayer n) {
+    public void selectNodes(AbstractList<AbstractLayer> nodes) {
         DefaultMutableTreeNode rootNode = (DefaultMutableTreeNode) treeModel.getRoot();
-        TreePath findNode = find(rootNode, n);
-        if (findNode != null)
-            setSelectionPath(findNode);
+        Vector<TreePath> findNodes = find(rootNode, nodes);
+
+        if (findNodes != null) {
+            TreePath[] arr = (TreePath[]) findNodes.toArray(new TreePath[findNodes.size()]);
+            setSelectionPaths(arr);
+        }
     }
 
     // !!!!!!!!!!!! //
@@ -174,9 +202,9 @@ public class LayerTree extends JTree {
 
             // super(renderer);
 
-            renderer.setFocusable(false);
-            renderer.setRequestFocusEnabled(false);
-            renderer.setOpaque(false);
+            renderer.setFocusable(true);
+            renderer.setRequestFocusEnabled(true);
+            renderer.setOpaque(true);
 
             Dimension rigidAreaSize = new Dimension(5, 0);
 
@@ -324,6 +352,54 @@ public class LayerTree extends JTree {
             return renderer;
         }
 
+        public boolean containEditableClick(int x, int y, Rectangle pRect) {
+
+            // int xPositionIntoNode = pRect.height
+
+            int xOrigin = (x-pRect.x);
+            int yOrigin = (y-pRect.y);
+            
+            boolean inX = (xOrigin>=0 && xOrigin<=30) || (xOrigin>=90);
+            boolean inY = (yOrigin>=0 && yOrigin<=30);
+            
+           if( inX && inY )
+            return true;
+
+            /* Component[] com_l = toolBar.getComponents();
+             * for(Component c : com_l) {
+             * 
+             * if((c instanceof JCheckBox) || (c instanceof ColorChooserButton))
+             * {
+             * 
+             * 
+             * Point cLoc = c.getLocation); Dimension cSize = c.getSize();
+             * 
+             * int cX = cLoc.x; int cY = cLoc.y; int cHeight = cSize.height; int
+             * cWidth = cSize.width;
+             * 
+             * boolean inX = ( (x >= (pRect.x + cX)) && (x <= (pRect.x + cX +
+             * cWidth )) ); boolean inY = ( (y >= (pRect.y + cY)) && (y <=
+             * (pRect.y + cY + cHeight )) );
+             * 
+             * if( inX && inY ) return true;
+             * 
+             * //c.getX() //c.getWidth(); }
+             * 
+             * 
+             * }
+             */
+            /*
+             * Dimension panel = renderer.getPreferredSize(); Dimension d =
+             * chckbxActive.getPreferredSize(); pRect.setSize(new
+             * Dimension(d.width, pRect.height));
+             * 
+             * if (pRect.contains(x, y)) { chckbxActive.setBounds(new
+             * Rectangle(0, 0, d.width, pRect.height)); return true; }
+             */
+
+            return false;
+        }
+
         @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
 
@@ -340,15 +416,11 @@ public class LayerTree extends JTree {
                     update(node);
 
                     if (selected) {
-                        //lm.setSelectedLayer(node);
-                        System.out.println("Selected Layer : " + node);
-                        
                         renderer.setBackground(backgroundSelectionColor);
                     } else {
                         renderer.setBackground(backgroundNonSelectionColor);
                     }
 
-                    
                     return renderer;
                 }
             }
@@ -370,14 +442,6 @@ public class LayerTree extends JTree {
 
         public LayerNodeEditor(JTree tree) {
             this.tree = tree;
-
-            renderer.chckbxActive.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    stopCellEditing();
-                }
-            });
-
         }
 
         public Object getCellEditorValue() {
@@ -392,7 +456,8 @@ public class LayerTree extends JTree {
             return renderer.getNode();
         }
 
-        public boolean isCellEditable______1(EventObject event) {
+        // @Override
+        public boolean isCellEditable___(EventObject event) {
             boolean returnValue = false;
             if (event instanceof MouseEvent) {
 
@@ -413,7 +478,6 @@ public class LayerTree extends JTree {
             return returnValue;
         }
 
-        @Override
         public boolean isCellEditable(EventObject e) {
             if (e instanceof MouseEvent && e.getSource() instanceof JTree) {
                 MouseEvent me = (MouseEvent) e;
@@ -422,12 +486,8 @@ public class LayerTree extends JTree {
                 if (r == null) {
                     return false;
                 }
-                Dimension d = renderer.renderer.getPreferredSize();
-                r.setSize(new Dimension(d.width, r.height));
-                if (r.contains(me.getX(), me.getY())) {
-                    renderer.renderer.setBounds(new Rectangle(0, 0, d.width, r.height));
-                    return true;
-                }
+
+                return renderer.containEditableClick(me.getX(), me.getY(), r);
             }
             return false;
         }
@@ -437,7 +497,6 @@ public class LayerTree extends JTree {
             Component editor = renderer.getTreeCellRendererComponent(tree, value, true, expanded, leaf, row, true);
 
             ItemListener itemListener = new ItemListener() {
-
                 public void itemStateChanged(ItemEvent itemEvent) {
                     if (stopCellEditing()) {
                         fireEditingStopped();
@@ -445,22 +504,8 @@ public class LayerTree extends JTree {
                 }
             };
 
-            // if (editor instanceof JCheckBox) {
-            // ((JCheckBox) editor).addItemListener(itemListener);
-            // }
-
             if (editor instanceof JPanel) {
-
-                // ((JPanel) editor). addItemListener(itemListener);
-
                 fireEditingStopped();
-                // fireTreeNodesChanged();
-                // fireEditingCanceled();
-
-                // ((JPanel) editor).addFocusListener(l);
-
-                // ((JPanel) editor).addItemListener(itemListener);
-
             }
 
             return editor;
