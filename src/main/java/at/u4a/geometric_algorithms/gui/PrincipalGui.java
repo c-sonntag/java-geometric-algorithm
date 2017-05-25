@@ -5,6 +5,7 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JMenu;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -62,7 +63,7 @@ public class PrincipalGui extends JFrame {
 
     private final DrawerScene ds = new DrawerScene(da, la);
     private final LayerTree treeLayer = new LayerTree(ds);
-    
+
     private static final int WINDOW_WIDTH = 1000, WINDOW_HEIGHT = 900;
 
     /**
@@ -117,7 +118,7 @@ public class PrincipalGui extends JFrame {
      * Initialize the frame.
      */
     private void initializeFrame() {
-        setBounds(100, 100, WINDOW_WIDTH,WINDOW_HEIGHT);
+        setBounds(100, 100, WINDOW_WIDTH, WINDOW_HEIGHT);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setMinimumSize(new Dimension(800, 600));
     }
@@ -161,9 +162,20 @@ public class PrincipalGui extends JFrame {
 
         mnFile.addSeparator();
 
-        JMenuItem mntmOther = new JMenuItem("Other");
-        mntmOther.setEnabled(false);
-        mnFile.add(mntmOther);
+        JMenuItem mntmAuthor = new JMenuItem("Author");
+        mntmAuthor.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+
+                String text = "" + //
+                "This program was designed by Christophe Sonntag (http://u4a.at), student at Luminy 2016-17.\n" + //
+                "The algorithms used were explained during the course of Algorithmic Geometry by M. Victor Chepoi.\n" + //
+                "In addition to the conceps studied in the book \"Computational Geometry - Algorithms and Applications, 3rd Edition\".";
+
+                JOptionPane.showMessageDialog(null, text, "Freeware author", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+        mntmAuthor.setEnabled(true);
+        mnFile.add(mntmAuthor);
 
         mnFile.addSeparator();
 
