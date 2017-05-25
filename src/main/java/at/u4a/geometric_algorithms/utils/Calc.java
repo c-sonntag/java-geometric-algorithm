@@ -20,17 +20,16 @@ public class Calc {
         final double pBy = pB.y - pOrigine.y;
         return pAx * pBy - pAy * pBx;
     }
-    
-    
-    public static double resumeProduitVectorielZ_2(Point pA, Point pOrigine, Point pB) {
-        final double pAx = pOrigine.x - pA.x;
-        final double pAy = pB.x - pA.x;
-        final double pBx = pOrigine.y - pA.y;
-        final double pBy = pB.y - pA.y;
-        return pAx * pBy - pAy * pBx;
+
+    public static double resumeProduitVectorielZbis(Point pA, Point pOrigine, Point pB) {
+        return (pA.x - pOrigine.x) * (pB.y - pOrigine.y) - (pA.y - pOrigine.y) * (pB.x - pOrigine.x);
     }
 
-    public static double resumeProduitVectorielZ(Point pA, Point pB) {
+    public static double resumeProduitVectorielZ_2(Point pA, Point pOrigine, Point pB) {
+        return (pB.x - pA.x) * (pOrigine.y - pA.y) - (pOrigine.x - pA.x) * (pB.y - pA.y);
+    }
+
+    public static double produitVectorielZ(Point pA, Point pB) {
         return pA.x * pB.y - pA.y * pB.x;
     }
 
@@ -52,10 +51,10 @@ public class Calc {
 
         while (p_it.hasNext()) {
             pB = p_it.next();
-            sumOfVectorialZProd += resumeProduitVectorielZ(pA, pB);
+            sumOfVectorialZProd += produitVectorielZ(pA, pB);
             pA = pB;
         }
-        sumOfVectorialZProd += resumeProduitVectorielZ(pB, pFirst);
+        sumOfVectorialZProd += produitVectorielZ(pB, pFirst);
 
         return sumOfVectorialZProd;
     }
