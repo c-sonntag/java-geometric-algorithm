@@ -145,8 +145,6 @@ public class SegmentIntersection extends AbstractAlgorithm {
             statusStartBuild();
 
             //
-            // statusBuildIs(buildSegmentInteractionQuadratique());
-
             statusBuildIs(buildSegmentInteraction());
 
             //
@@ -477,11 +475,7 @@ public class SegmentIntersection extends AbstractAlgorithm {
         sweepline.clear();
 
         //
-        // countForcePush = 0;
         findIntersections();
-
-        // System.out.println("CountForcePush : " + countForcePush);
-        // System.out.println("Size : " + arrangements.size());
 
         //
         return true;

@@ -104,8 +104,10 @@ public class Monotisation extends AbstractAlgorithm {
         }
     }
 
+    
+    /* ************** */
+    
     private InterfaceGraphicVisitor mutableVisitorForDebugging = null;
-
     public void accept_3(AbstractList<AbstractLayer> subLayers, InterfaceGraphicVisitor visitor) {
 
         mutableVisitorForDebugging = visitor;
@@ -128,7 +130,7 @@ public class Monotisation extends AbstractAlgorithm {
 
     public void acceptDebug(AbstractList<AbstractLayer> subLayers, InterfaceGraphicVisitor visitor) {
 
-        int countStroboscope = 0;
+        int countColor = 0;
         Color colorStrop[] = { Color.CORAL, Color.BLUEVIOLET, Color.MEDIUMSPRINGGREEN, Color.HOTPINK, Color.YELLOWGREEN, Color.FIREBRICK, Color.GREEN };
 
         mutableVisitorForDebugging = visitor;
@@ -149,10 +151,10 @@ public class Monotisation extends AbstractAlgorithm {
             visitor.getGraphicsContext().save();
             visitor.getGraphicsContext().setLineWidth(10);
             for (MonotonePolygon mp : mp_v) {
-                Color sC = colorStrop[countStroboscope];
+                Color sC = colorStrop[countColor];
                 visitor.getGraphicsContext().setStroke(Color.color(sC.getRed(), sC.getGreen(), sC.getBlue(), 0.2));
                 visitor.visit(mp);
-                countStroboscope = (countStroboscope + 1) % colorStrop.length;
+                countColor = (countColor + 1) % colorStrop.length;
             }
             System.out.println("NbPolygon(" + mp_v.size() + ")");
             visitor.getGraphicsContext().restore();

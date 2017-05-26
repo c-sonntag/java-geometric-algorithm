@@ -227,8 +227,9 @@ public class VisibilityGraph extends AbstractAlgorithm {
         //
         final Set<IntersecteOder> intersectionTree = new TreeSet<IntersecteOder>(new IntersecteOderComparator());
 
+        
+        
         return null;
-
     }
 
     protected boolean buildVisibilityGraph() {

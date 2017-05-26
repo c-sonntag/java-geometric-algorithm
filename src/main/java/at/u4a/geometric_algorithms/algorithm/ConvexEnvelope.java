@@ -8,7 +8,6 @@ import at.u4a.geometric_algorithms.algorithm.InterfaceAlgorithmBuilder;
 import at.u4a.geometric_algorithms.geometric.*;
 import at.u4a.geometric_algorithms.geometric.Polygon.*;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGraphicVisitor;
-import at.u4a.geometric_algorithms.gui.element.StatusBar;
 import at.u4a.geometric_algorithms.gui.layer.AbstractLayer;
 import at.u4a.geometric_algorithms.gui.layer.AlgorithmLayer;
 import at.u4a.geometric_algorithms.utils.Calc;
@@ -173,14 +172,11 @@ public class ConvexEnvelope extends AbstractAlgorithm {
 
     private static class SideSearch {
 
-        // Point top = null, bottom = null;
         Point left = null, right = null;
 
         final Point center = new Point();
 
         void initFirst(Point first) {
-            // this.top = first;
-            // this.bottom = first;
             this.left = first;
             this.right = first;
         }
@@ -195,10 +191,6 @@ public class ConvexEnvelope extends AbstractAlgorithm {
         }
 
         private void updateSide(Point p) {
-            // if (p.y < top.y)
-            // top = p;
-            // else if (p.y > bottom.y)
-            // bottom = p;
             if (p.x < left.x)
                 left = p;
             else if (p.x > right.x)
@@ -207,7 +199,6 @@ public class ConvexEnvelope extends AbstractAlgorithm {
 
         void updateCenter() {
             center.x = ((right.x - left.x) / 2) + left.x;
-            // center.y = ((bottom.y - top.y) / 2) + top.y;
         }
 
     };
@@ -472,7 +463,7 @@ public class ConvexEnvelope extends AbstractAlgorithm {
         //
         SideTuple sides = new SideTuple(poly);
 
-        // MultiplePoint on same point
+        // Multiples points on same zone
         if (sides.pointsRight.isEmpty())
             return sides.pointsLeft;
 
