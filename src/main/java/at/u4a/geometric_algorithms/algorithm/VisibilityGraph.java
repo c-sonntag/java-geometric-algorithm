@@ -2,20 +2,27 @@ package at.u4a.geometric_algorithms.algorithm;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.Vector;
 
 import at.u4a.geometric_algorithms.algorithm.InterfaceAlgorithmBuilder;
+import at.u4a.geometric_algorithms.algorithm.Monotisation.VertexInform;
 import at.u4a.geometric_algorithms.geometric.AbstractShape;
 import at.u4a.geometric_algorithms.geometric.CloudOfPoints;
 import at.u4a.geometric_algorithms.geometric.Point;
 import at.u4a.geometric_algorithms.geometric.Polygon;
+import at.u4a.geometric_algorithms.geometric.Segment;
 import at.u4a.geometric_algorithms.geometric.Polygon.MonotonePolygon;
 import at.u4a.geometric_algorithms.graphic_visitor.InterfaceGraphicVisitor;
 import at.u4a.geometric_algorithms.gui.layer.AbstractLayer;
 import at.u4a.geometric_algorithms.gui.layer.AlgorithmLayer;
 import at.u4a.geometric_algorithms.utils.NonOrientedGraph;
 import at.u4a.geometric_algorithms.utils.NonOrientedGraph.Vertice;
+import at.u4a.geometric_algorithms.utils.Calc;
 import at.u4a.geometric_algorithms.utils.Mutable;
 import javafx.scene.paint.Color;
 
@@ -128,7 +135,7 @@ public class VisibilityGraph extends AbstractAlgorithm {
 
     /* ************** */
 
-    private ArrayList<Triangulation> triangulations = new ArrayList<Triangulation>();
+    private Vector<PolygonCourse> sortedPolygons = new Vector<PolygonCourse>();
 
     /* ************** */
 
@@ -155,7 +162,71 @@ public class VisibilityGraph extends AbstractAlgorithm {
 
     /* ************** */
 
+    class IntersecteOder {
+        int num;
+    }
+
+    private static class IntersecteOderComparator implements Comparator<IntersecteOder> {
+
+        @Override
+        public int compare(IntersecteOder io1, IntersecteOder io2) {
+            return io1.num == io2.num ? 0 : (io1.num < io2.num ? -1 : 1);
+        }
+
+    }
+
+    /* ************** */
+
+    class PolygonCourse {
+
+        Point top = null, bottom = null;
+        double sumOfVectorialZProd = 0;
+        final Polygon poly;
+        final boolean isClockwise;
+
+        public PolygonCourse(Polygon poly) {
+
+            this.poly = poly;
+            
+            Iterator<Point> p_it = poly.perimeter.iterator();
+            final Point pFirst = p_it.next();
+            Point pA = pFirst, pB = null;
+
+            if (p_it.hasNext()) {
+                pB = p_it.next();
+                g.addVerticle(pB);
+                top = bottom = pB;
+
+                while (p_it.hasNext()) {
+                    pA = pB;
+                    pB = p_it.next();
+                    sumOfVectorialZProd += Calc.produitVectorielZ(pA, pB);
+                    g.addVerticle(pB);
+                    checkOpposite(pB);
+                }
+                sumOfVectorialZProd += Calc.produitVectorielZ(pB, pFirst);
+            }
+            
+            this.isClockwise = sumOfVectorialZProd > 0;
+        }
+
+        private void checkOpposite(Point p) {
+            if (p.y < top.y)
+                top = p;
+            else if (p.y > bottom.y)
+                bottom = p;
+        }
+    }
+
+    /* ************** */
+
     protected Vector<NonOrientedGraph<Point>.Vertice> visibleVertices(NonOrientedGraph<Point>.Vertice v) {
+
+        /** todo test if contain */
+
+        //
+        final Set<IntersecteOder> intersectionTree = new TreeSet<IntersecteOder>(new IntersecteOderComparator());
+
         return null;
 
     }
@@ -164,11 +235,12 @@ public class VisibilityGraph extends AbstractAlgorithm {
 
         //
         g.clear();
+        sortedPolygons.clear();
 
         //
-        for (Polygon poly : polygons)
-            for (Point p : poly.perimeter)
-                g.addVerticle(p);
+        for (Polygon poly : polygons) {
+            sortedPolygons.add(new PolygonCourse(poly));
+        }
 
         //
         for (NonOrientedGraph<Point>.Vertice v : g.vertices.values()) {
