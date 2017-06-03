@@ -30,7 +30,7 @@ public class ConvexEnvelope extends AbstractAlgorithm {
 
         @Override
         public boolean canApply(AbstractList<AbstractLayer> layers) {
-            if(layers.size() != 1)
+            if (layers.size() != 1)
                 return false;
             //
             AbstractShape as = layers.get(0).getShape();
@@ -42,9 +42,9 @@ public class ConvexEnvelope extends AbstractAlgorithm {
         @Override
         public AbstractLayer builder(AbstractList<AbstractLayer> layers) {
 
-            if(layers.isEmpty())
+            if (layers.isEmpty())
                 throw new RuntimeException("Need one layer !");
-            
+
             //
             AbstractShape as = layers.get(0).getShape();
             Vector<Point> points = null;
@@ -150,18 +150,26 @@ public class ConvexEnvelope extends AbstractAlgorithm {
         convexPoly.clear();
 
         //
-        try {
-            Vector<Point> convexPoints = devideToRing(points, 0);
-            if (convexPoints == null) {
+        if (points.size() <= 3)
+            convexPoly.perimeter.addAll(points);
+
+        else {
+
+            //
+            try {
+                Vector<Point> convexPoints = devideToRing(points, 0);
+                if (convexPoints == null) {
+                    return false;
+                }
+            } catch (StackOverflowError e) {
+                statusAddCause("StackOverflowError");
+                System.out.println("Can't make ConvexeEnvelope due of error : StackOverflowError");
+                return false;
+            } catch (Exception e) {
+                System.out.println("Error during process of ConvexEnvelop : " + e.getMessage());
                 return false;
             }
-        } catch (StackOverflowError e) {
-            statusAddCause("StackOverflowError");
-            System.out.println("Can't make ConvexeEnvelope due of error : StackOverflowError");
-            return false;
-        } catch (Exception e) {
-            System.out.println("Error during process of ConvexEnvelop : " + e.getMessage());
-            return false;
+
         }
 
         //
@@ -289,6 +297,10 @@ public class ConvexEnvelope extends AbstractAlgorithm {
         final SideSearchCorner sideSearchHozIdLeft = new SideSearchCorner(polyLeft);
         final SideSearchCorner sideSearchHozIdRight = new SideSearchCorner(polyRight);
 
+        /** @todo Monter delicatement pour trouverle plus haut 
+         * -> 
+         * en montant */
+        
         //
         int uTop = polyLeft.indexOf(sideSearchHozIdLeft.top);
         int vTop = polyRight.indexOf(sideSearchHozIdRight.top);
@@ -384,7 +396,7 @@ public class ConvexEnvelope extends AbstractAlgorithm {
                 vBottom = Math.floorMod(vBottom + 1, polyRightSize);
                 // vBottom = Math.floorMod(vBottom - 1, polyRightSize);
                 vBottomChange = true;
-                //printLnDebug("uBottom_IsOnTop_OfThePolyRight_BottomLine");
+                // printLnDebug("uBottom_IsOnTop_OfThePolyRight_BottomLine");
             }
 
             //
@@ -393,7 +405,7 @@ public class ConvexEnvelope extends AbstractAlgorithm {
                 uBottom = Math.floorMod(uBottom - 1, polyLeftSize);
                 // uBottom = Math.floorMod(uBottom + 1, polyLeftSize);
                 uBottomChange = true;
-                //printLnDebug("vBottom_IsOnBottom_OfThePolyLeft_BottomLine");
+                // printLnDebug("vBottom_IsOnBottom_OfThePolyLeft_BottomLine");
             }
 
             //
@@ -401,7 +413,7 @@ public class ConvexEnvelope extends AbstractAlgorithm {
                 break;
         }
 
-        //printLnDebug("");
+        // printLnDebug("");
 
         Vector<Point> convexPoints = (deph == 0) ? convexPoly.perimeter : new Vector<Point>();
 
@@ -435,7 +447,9 @@ public class ConvexEnvelope extends AbstractAlgorithm {
         int polySize = poly.size();
         if (polySize == 0)
             return null;
-        else if (polySize <= 3) {
+        
+        
+        if (polySize <= 3) {
             if (polySize >= 2) {
                 Point p0 = poly.get(0);
                 Point p1 = poly.get(1);

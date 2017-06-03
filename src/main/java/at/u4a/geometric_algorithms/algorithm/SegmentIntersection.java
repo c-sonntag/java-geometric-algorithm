@@ -179,7 +179,7 @@ public class SegmentIntersection extends AbstractAlgorithm {
         // final Point intersectionPoint = notExactly ?
         // Calc.intersectionOnLine(s1, s2) : Calc.intersection(s1, s2);
         final Point intersectionPoint = Calc.intersectionOnLine(s1, s2);
-        
+
         //
         if (notExactly)
             if ((intersectionPoint != null))
@@ -333,6 +333,12 @@ public class SegmentIntersection extends AbstractAlgorithm {
                 upper.add(ep.s);
             if (ep.type == EventType.Lower)
                 lower.add(ep.s);
+
+            /**
+             * @todo attention n² }
+             * 
+             *       if (ep.type == EventType.Intersection) {
+             */
 
             //
             if ((contain.size() + upper.size() + lower.size()) > 1) {
